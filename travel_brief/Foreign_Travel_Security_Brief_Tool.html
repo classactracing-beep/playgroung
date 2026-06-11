@@ -193,7 +193,7 @@
     </div>
     <p class="hint">All exports download directly — the PDF is generated natively (fully searchable text, standard
     fonts, no browser print headers). <strong>Send via Outlook</strong> downloads a ready-to-send draft (.eml) with the
-    subject filled in and the PDF + Word versions attached — open it and Outlook shows it as an unsent message.</p>
+    subject filled in and the searchable PDF attached — open it and Outlook shows it as an unsent message.</p>
   </div>
   <div id="briefPreviewBox" style="display:none"></div>
 </div>
@@ -298,7 +298,7 @@
       <li><strong>Export HTML</strong> — downloads a standalone HTML copy of the brief, suitable for email or archive.</li>
       <li><strong>Send via Outlook</strong> — enter the traveler's email (and optional CC), then click the button. It
       downloads a draft message (<code>.eml</code>) with the subject line filled in, the full brief in the email body,
-      and the <strong>PDF and Word versions attached</strong>. Open the file and Outlook presents it as an unsent
+      and the <strong>searchable PDF attached</strong>. Open the file and Outlook presents it as an unsent
       message — review and click Send.</li>
     </ul>
     <p>Generate the brief first; the export and send buttons use the most recently generated brief.</p>
@@ -1451,10 +1451,12 @@ function sendOutlook() {
   const to = document.getElementById("bEmail").value.trim();
   const cc = document.getElementById("bCc").value.trim();
   if (!to) { alert("Enter the traveler's email address (Traveler Email field)."); return; }
+  // Outlook renders <hr> as a heavy gray bar, so strip all rule lines from the email body
+  const emailBrief = lastBrief.html.replace(/<hr[^>]*>/gi, "");
   const bodyHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${briefCSS()}</style></head><body>` +
     `<p style="font-family:Arial,sans-serif;font-size:13px">Hi,<br><br>Please review your foreign travel security brief below ` +
-    `(also attached). Reply to this email to confirm receipt, and remember the post-travel debrief is due within five (5) ` +
-    `business days of return.<br><br>Safe travels.</p><hr>` + lastBrief.html + `</body></html>`;
+    `(also attached as a PDF). Reply to this email to confirm receipt, and remember the post-travel debrief is due within five (5) ` +
+    `business days of return.<br><br>Safe travels.</p>` + emailBrief + `</body></html>`;
   // real searchable PDF attachment, generated natively (no print dialog)
   const pdfB64 = makePDF().output("datauristring").split(",")[1].replace(/(.{76})/g, "$1\r\n");
   const BOUND = "=_brief_" + Date.now();
@@ -1477,18 +1479,12 @@ function sendOutlook() {
     `Content-Disposition: attachment; filename="${lastBrief.fname}.pdf"`,
     "",
     pdfB64,
-    "--" + BOUND,
-    `Content-Type: application/msword; name="${lastBrief.fname}.doc"`,
-    "Content-Transfer-Encoding: base64",
-    `Content-Disposition: attachment; filename="${lastBrief.fname}.doc"`,
-    "",
-    b64(wordDoc()),
     "--" + BOUND + "--",
     ""
   ].filter(l => l !== null).join("\r\n");
   download(lastBrief.fname + ".eml", eml, "message/rfc822");
   alert("Outlook draft downloaded (" + lastBrief.fname + ".eml).\n\nOpen the file — Outlook will show it as an unsent " +
-        "message with the subject filled in and the PDF and Word versions attached. Review and click Send.");
+        "message with the subject filled in and the PDF attached. Review and click Send.");
 }
 
 /* ================================ UI ===================================== */
