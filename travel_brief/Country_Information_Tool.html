@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Country Information &amp; Embassy Resources — AVASO Federal Solutions</title>
+<title>International Travel — Country Information &amp; U.S. Embassy Resources</title>
 <style>
   :root {
-    --avaso-slate: #5A6B72;
-    --avaso-slate-dark: #46555B;
-    --avaso-blue: #1E88C7;
-    --avaso-blue-dark: #156FA6;
-    --avaso-green: #2FE3A0;
-    --avaso-light: #EEF4F2;
+    --slate: #5A6B72;
+    --slate-dark: #46555B;
+    --blue: #1E88C7;
+    --blue-dark: #156FA6;
+    --green: #2FE3A0;
+    --light: #EEF4F2;
     --grid: #C9D6DB;
   }
   * { box-sizing: border-box; }
@@ -23,37 +23,21 @@
   }
   .brandbar {
     height: 8px;
-    background: linear-gradient(90deg, var(--avaso-green) 0%, var(--avaso-blue) 45%, var(--avaso-slate) 100%);
+    background: linear-gradient(90deg, var(--green) 0%, var(--blue) 45%, var(--slate) 100%);
   }
   header {
     background: #FFFFFF;
-    padding: 22px 32px 18px;
+    padding: 20px 32px 16px;
     border-bottom: 1px solid var(--grid);
   }
-  header .company {
-    font-size: 26px;
-    font-weight: 800;
-    letter-spacing: 4px;
-    color: var(--avaso-slate);
-    margin: 0;
-  }
-  header .company span { color: var(--avaso-blue); }
-  header .tagline {
-    font-size: 12px;
-    letter-spacing: 5px;
-    font-weight: 600;
-    color: var(--avaso-slate);
-    margin: 2px 0 0;
-    text-transform: uppercase;
-  }
   header .doc-title {
-    margin: 14px 0 0;
-    font-size: 18px;
+    margin: 0;
+    font-size: 20px;
     font-weight: 700;
-    color: var(--avaso-blue-dark);
+    color: var(--blue-dark);
   }
   header .doc-sub {
-    margin: 2px 0 0;
+    margin: 3px 0 0;
     font-size: 12.5px;
     font-style: italic;
     color: #6B7A80;
@@ -62,7 +46,7 @@
   .selector {
     background: #FFFFFF;
     border: 1px solid var(--grid);
-    border-left: 6px solid var(--avaso-green);
+    border-left: 6px solid var(--green);
     border-radius: 6px;
     padding: 18px 22px;
     box-shadow: 0 1px 5px rgba(0,0,0,.06);
@@ -70,30 +54,51 @@
   .selector label {
     display: block;
     font-weight: 700;
-    font-size: 14px;
-    color: var(--avaso-slate-dark);
-    margin-bottom: 8px;
+    font-size: 13px;
+    color: var(--slate-dark);
+    margin-bottom: 6px;
     text-transform: uppercase;
     letter-spacing: 1px;
   }
-  .selector select {
+  .selector select, .selector input {
     width: 100%;
-    font-size: 16px;
-    padding: 10px 12px;
-    border: 1.5px solid var(--avaso-blue);
+    font-size: 15px;
+    padding: 9px 12px;
+    border: 1.5px solid var(--blue);
     border-radius: 5px;
     color: #2B3A40;
     background: #FFFFFF;
-    cursor: pointer;
   }
-  .selector select:focus { outline: 3px solid rgba(47,227,160,.45); }
+  .selector select { cursor: pointer; }
+  .selector select:focus, .selector input:focus { outline: 3px solid rgba(47,227,160,.45); }
+  .traveler-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 14px;
+    margin-top: 16px;
+  }
+  @media (max-width: 640px) { .traveler-grid { grid-template-columns: 1fr; } }
   #results { display: none; margin-top: 26px; }
+  .toolbar { margin-top: 18px; text-align: right; }
+  .pdf-btn {
+    background: var(--slate-dark);
+    color: #FFFFFF;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 11px 22px;
+    border-radius: 5px;
+    cursor: pointer;
+    letter-spacing: .5px;
+  }
+  .pdf-btn:hover { background: var(--blue-dark); }
+  .pdf-btn::before { content: "\2913  "; }
   h2.section {
-    color: var(--avaso-blue-dark);
+    color: var(--blue-dark);
     font-size: 16px;
     margin: 28px 0 10px;
     padding-bottom: 5px;
-    border-bottom: 2px solid var(--avaso-blue);
+    border-bottom: 2px solid var(--blue);
     text-transform: uppercase;
     letter-spacing: 1px;
   }
@@ -102,16 +107,16 @@
   .card {
     background: #FFFFFF;
     border: 1px solid var(--grid);
-    border-top: 4px solid var(--avaso-green);
+    border-top: 4px solid var(--green);
     border-radius: 6px;
     padding: 14px 16px;
     box-shadow: 0 1px 4px rgba(0,0,0,.05);
   }
-  .card h3 { margin: 0 0 6px; font-size: 14px; color: var(--avaso-slate-dark); }
+  .card h3 { margin: 0 0 6px; font-size: 14px; color: var(--slate-dark); }
   .card p { margin: 0 0 10px; font-size: 12.5px; color: #6B7A80; line-height: 1.4; }
   .card a.btn {
     display: inline-block;
-    background: var(--avaso-blue);
+    background: var(--blue);
     color: #FFFFFF;
     text-decoration: none;
     font-size: 13px;
@@ -119,7 +124,8 @@
     padding: 7px 14px;
     border-radius: 4px;
   }
-  .card a.btn:hover { background: var(--avaso-blue-dark); }
+  .card a.btn:hover { background: var(--blue-dark); }
+  .card .url { display: none; font-size: 11px; color: var(--blue-dark); word-break: break-all; }
   table.embassy {
     width: 100%;
     border-collapse: collapse;
@@ -133,13 +139,13 @@
     vertical-align: top;
   }
   table.embassy td:first-child {
-    background: var(--avaso-light);
+    background: var(--light);
     font-weight: 700;
-    color: var(--avaso-slate-dark);
+    color: var(--slate-dark);
     width: 190px;
     white-space: nowrap;
   }
-  table.embassy a { color: var(--avaso-blue-dark); }
+  table.embassy a { color: var(--blue-dark); }
   .verify-note {
     margin-top: 10px;
     font-size: 12px;
@@ -149,13 +155,35 @@
   .step-banner {
     margin-top: 26px;
     background: linear-gradient(90deg, rgba(47,227,160,.15), rgba(30,136,199,.12));
-    border: 1px solid var(--avaso-blue);
-    border-left: 6px solid var(--avaso-blue);
+    border: 1px solid var(--blue);
+    border-left: 6px solid var(--blue);
     border-radius: 6px;
     padding: 13px 18px;
     font-size: 14px;
   }
-  .step-banner a { color: var(--avaso-blue-dark); font-weight: 700; }
+  .step-banner a { color: var(--blue-dark); font-weight: 700; }
+  .debrief-banner {
+    margin-top: 14px;
+    background: #FFF3CD;
+    border: 1px solid #FFC107;
+    border-left: 6px solid #FFC107;
+    border-radius: 6px;
+    padding: 13px 18px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .ack {
+    margin-top: 26px;
+    background: #FFFFFF;
+    border: 1px solid var(--grid);
+    border-radius: 6px;
+    padding: 16px 20px;
+    font-size: 13px;
+  }
+  .ack p { margin: 0 0 10px; line-height: 1.5; }
+  .sig-row { display: flex; gap: 40px; margin-top: 28px; }
+  .sig-row div { flex: 1; border-top: 1.5px solid var(--slate-dark); padding-top: 5px;
+                 font-size: 12px; color: var(--slate-dark); font-weight: 600; }
   footer {
     text-align: center;
     font-size: 11.5px;
@@ -165,16 +193,64 @@
     margin-top: 40px;
     background: #FFFFFF;
   }
-  footer .fcompany { font-weight: 700; letter-spacing: 2px; color: var(--avaso-slate); }
+  .print-meta { display: none; }
+
+  /* ------------------------- print / PDF layout ------------------------- */
+  @media print {
+    body { background: #FFFFFF; }
+    .brandbar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .selector, .toolbar, footer { display: none; }
+    .wrap { max-width: none; margin: 0; padding: 0 6px; }
+    header { padding: 0 6px 10px; border-bottom: none; }
+    .print-meta {
+      display: table;
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    .print-meta td {
+      border: 1px solid var(--grid);
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+    .print-meta td:nth-child(odd) {
+      background: var(--light);
+      font-weight: 700;
+      width: 160px;
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+    .cards { display: block; }
+    .card {
+      box-shadow: none;
+      border-radius: 0;
+      margin-bottom: 8px;
+      padding: 8px 12px;
+      break-inside: avoid;
+    }
+    .card p { display: none; }
+    .card a.btn { display: none; }
+    .card .url { display: block; }
+    .card h3 { margin-bottom: 2px; }
+    h2.section { margin: 16px 0 8px; font-size: 14px; }
+    table.embassy { box-shadow: none; }
+    table.embassy td:first-child { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .step-banner, .debrief-banner {
+      border-radius: 0;
+      margin-top: 12px;
+      font-size: 12.5px;
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+    .ack { break-inside: avoid; border-radius: 0; }
+    #results { display: block !important; }
+  }
 </style>
 </head>
 <body>
 <div class="brandbar"></div>
 <header>
-  <p class="company">AVASO</p>
-  <p class="tagline">Federal Solutions</p>
   <p class="doc-title">International Travel — Country Information &amp; U.S. Embassy Resources</p>
   <p class="doc-sub">Cleared &amp; Non-Cleared Foreign Travel Reporting — Facility Security Officer (FSO)</p>
+  <table class="print-meta" id="printMeta"></table>
 </header>
 
 <div class="wrap">
@@ -183,30 +259,52 @@
     <select id="countrySelect">
       <option value="">— Choose a country —</option>
     </select>
+    <div class="traveler-grid">
+      <div>
+        <label for="travName">Traveler Name (optional)</label>
+        <input type="text" id="travName" placeholder="Last, First">
+      </div>
+      <div>
+        <label for="travDepart">Departure</label>
+        <input type="date" id="travDepart">
+      </div>
+      <div>
+        <label for="travReturn">Return</label>
+        <input type="date" id="travReturn">
+      </div>
+    </div>
   </div>
 
   <div id="results">
+    <div class="toolbar">
+      <button class="pdf-btn" onclick="exportPDF()">Export PDF</button>
+    </div>
+
     <h2 class="section">Country Resources — <span id="countryName"></span></h2>
     <div class="cards">
       <div class="card">
         <h3>Country Information</h3>
         <p>U.S. Department of State travel page: entry/exit requirements, safety conditions, travel advisories, and local laws.</p>
         <a class="btn" id="lnkInfo" href="#" target="_blank" rel="noopener">Open Country Information</a>
+        <span class="url" id="urlInfo"></span>
       </div>
       <div class="card">
         <h3>Country Security Report (OSAC)</h3>
         <p>Overseas Security Advisory Council security report covering crime, terrorism, and security environment.</p>
         <a class="btn" id="lnkOsac" href="#" target="_blank" rel="noopener">Open Security Report</a>
+        <span class="url" id="urlOsac"></span>
       </div>
       <div class="card">
         <h3>Fact Sheet</h3>
         <p>U.S. Department of State bilateral relations fact sheet for this country.</p>
         <a class="btn" id="lnkFact" href="#" target="_blank" rel="noopener">Open Fact Sheet</a>
+        <span class="url" id="urlFact"></span>
       </div>
       <div class="card">
         <h3>U.S. Embassy Website</h3>
         <p>Official U.S. Embassy site — alerts, services, and assistance for U.S. citizens in country.</p>
         <a class="btn" id="lnkEmb" href="#" target="_blank" rel="noopener">Open Embassy Site</a>
+        <span class="url" id="urlEmb"></span>
       </div>
     </div>
 
@@ -218,13 +316,24 @@
       &#9993;&nbsp; Before departure, register your trip with the Smart Traveler Enrollment Program (STEP):
       <a href="https://step.state.gov/" target="_blank" rel="noopener">https://step.state.gov/</a>
     </div>
+    <div class="debrief-banner">
+      &#9888;&nbsp; Reminder: you must complete the post-travel debrief with the FSO within five (5) days of return.
+    </div>
+
+    <div class="ack">
+      <p><strong>Traveler Acknowledgment:</strong> I acknowledge receipt of this foreign travel brief. I have reviewed
+      the country resources listed above, registered my travel with STEP, and understand my obligation to report any
+      suspicious contacts or incidents during travel and to complete the post-travel debrief within five (5) days of
+      my return.</p>
+      <div class="sig-row">
+        <div>Traveler Signature / Date</div>
+        <div>Facility Security Officer (FSO) / Date</div>
+      </div>
+    </div>
   </div>
 </div>
 
-<footer>
-  <span class="fcompany">AVASO FEDERAL SOLUTIONS</span><br>
-  Foreign Travel Reporting Resource — Facility Security Office
-</footer>
+<footer>Foreign Travel Reporting Resource — Facility Security Office</footer>
 
 <script>
 // Each entry: display name, travel.state.gov page name (tsg), OSAC name (osac),
@@ -321,20 +430,30 @@ function esc(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-sel.addEventListener("change", () => {
+function fmtDate(v) {
+  if (!v) return "";
+  const [y, m, d] = v.split("-");
+  return `${parseInt(m)}/${parseInt(d)}/${y}`;
+}
+
+function render() {
   const name = sel.value;
   const results = document.getElementById("results");
   if (!name) { results.style.display = "none"; return; }
   const c = COUNTRIES[name];
 
   document.getElementById("countryName").textContent = name;
-  document.getElementById("lnkInfo").href =
-    "https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/" + c.tsg + ".html";
-  document.getElementById("lnkOsac").href =
-    "https://www.osac.gov/Country/" + encodeURIComponent(c.osac) + "/Detail";
-  document.getElementById("lnkFact").href =
-    "https://www.state.gov/countries-areas/" + c.fs + "/";
-  document.getElementById("lnkEmb").href = c.emb;
+
+  const links = {
+    Info: "https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/" + c.tsg + ".html",
+    Osac: "https://www.osac.gov/Country/" + encodeURIComponent(c.osac) + "/Detail",
+    Fact: "https://www.state.gov/countries-areas/" + c.fs + "/",
+    Emb: c.emb
+  };
+  for (const k of Object.keys(links)) {
+    document.getElementById("lnk" + k).href = links[k];
+    document.getElementById("url" + k).textContent = links[k];
+  }
 
   const rows = [];
   rows.push(["Assistance for U.S. Citizens in", name]);
@@ -355,8 +474,35 @@ sel.addEventListener("change", () => {
     "<tr><td>" + esc(r[0]) + "</td><td>" + (r[2] ? r[1] : esc(r[1])) + "</td></tr>"
   ).join("");
 
+  // Header meta table — only rendered on the printed/PDF copy.
+  const meta = [["Destination Country", name]];
+  const trav = document.getElementById("travName").value.trim();
+  const dep = fmtDate(document.getElementById("travDepart").value);
+  const ret = fmtDate(document.getElementById("travReturn").value);
+  if (trav) meta.push(["Traveler", trav]);
+  if (dep) meta.push(["Departure Date", dep]);
+  if (ret) meta.push(["Return Date", ret]);
+  meta.push(["Brief Generated", new Date().toLocaleDateString("en-US")]);
+  document.getElementById("printMeta").innerHTML = meta.map(r =>
+    "<tr><td>" + esc(r[0]) + "</td><td>" + esc(r[1]) + "</td></tr>"
+  ).join("");
+
   results.style.display = "block";
-});
+}
+
+sel.addEventListener("change", render);
+["travName", "travDepart", "travReturn"].forEach(id =>
+  document.getElementById(id).addEventListener("input", render));
+
+function exportPDF() {
+  render();
+  const name = sel.value || "Travel_Brief";
+  const prev = document.title;
+  // The browser uses the page title as the default PDF filename.
+  document.title = "Foreign_Travel_Brief_" + name.replace(/\s+/g, "_");
+  window.print();
+  document.title = prev;
+}
 </script>
 </body>
 </html>
