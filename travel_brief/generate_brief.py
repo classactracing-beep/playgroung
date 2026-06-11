@@ -117,9 +117,6 @@ html = f"""<!DOCTYPE html>
 
   <div class="reminder">&#9888;&nbsp; {REMINDER}</div>
 
-  <p>{CLOSING}</p>
-  <p class="sig">Best,<br><br>____________________________<br>Facility Security Officer (FSO)</p>
-
   <footer>International Foreign Travel Brief &mdash; {COUNTRY} &mdash; Travel {DEPART} to {RETURN}</footer>
 </div>
 </body>
