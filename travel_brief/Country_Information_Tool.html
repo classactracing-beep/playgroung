@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Country Information &amp; Embassy Resources — AVASO Federal Solutions</title>
+<style>
+  :root {
+    --avaso-slate: #5A6B72;
+    --avaso-slate-dark: #46555B;
+    --avaso-blue: #1E88C7;
+    --avaso-blue-dark: #156FA6;
+    --avaso-green: #2FE3A0;
+    --avaso-light: #EEF4F2;
+    --grid: #C9D6DB;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    margin: 0;
+    background: #F2F5F6;
+    color: #2B3A40;
+  }
+  .brandbar {
+    height: 8px;
+    background: linear-gradient(90deg, var(--avaso-green) 0%, var(--avaso-blue) 45%, var(--avaso-slate) 100%);
+  }
+  header {
+    background: #FFFFFF;
+    padding: 22px 32px 18px;
+    border-bottom: 1px solid var(--grid);
+  }
+  header .company {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    color: var(--avaso-slate);
+    margin: 0;
+  }
+  header .company span { color: var(--avaso-blue); }
+  header .tagline {
+    font-size: 12px;
+    letter-spacing: 5px;
+    font-weight: 600;
+    color: var(--avaso-slate);
+    margin: 2px 0 0;
+    text-transform: uppercase;
+  }
+  header .doc-title {
+    margin: 14px 0 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--avaso-blue-dark);
+  }
+  header .doc-sub {
+    margin: 2px 0 0;
+    font-size: 12.5px;
+    font-style: italic;
+    color: #6B7A80;
+  }
+  .wrap { max-width: 880px; margin: 26px auto 50px; padding: 0 18px; }
+  .selector {
+    background: #FFFFFF;
+    border: 1px solid var(--grid);
+    border-left: 6px solid var(--avaso-green);
+    border-radius: 6px;
+    padding: 18px 22px;
+    box-shadow: 0 1px 5px rgba(0,0,0,.06);
+  }
+  .selector label {
+    display: block;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--avaso-slate-dark);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .selector select {
+    width: 100%;
+    font-size: 16px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--avaso-blue);
+    border-radius: 5px;
+    color: #2B3A40;
+    background: #FFFFFF;
+    cursor: pointer;
+  }
+  .selector select:focus { outline: 3px solid rgba(47,227,160,.45); }
+  #results { display: none; margin-top: 26px; }
+  h2.section {
+    color: var(--avaso-blue-dark);
+    font-size: 16px;
+    margin: 28px 0 10px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid var(--avaso-blue);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .cards { grid-template-columns: 1fr; } }
+  .card {
+    background: #FFFFFF;
+    border: 1px solid var(--grid);
+    border-top: 4px solid var(--avaso-green);
+    border-radius: 6px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  }
+  .card h3 { margin: 0 0 6px; font-size: 14px; color: var(--avaso-slate-dark); }
+  .card p { margin: 0 0 10px; font-size: 12.5px; color: #6B7A80; line-height: 1.4; }
+  .card a.btn {
+    display: inline-block;
+    background: var(--avaso-blue);
+    color: #FFFFFF;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 4px;
+  }
+  .card a.btn:hover { background: var(--avaso-blue-dark); }
+  table.embassy {
+    width: 100%;
+    border-collapse: collapse;
+    background: #FFFFFF;
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  }
+  table.embassy td {
+    border: 1px solid var(--grid);
+    padding: 9px 12px;
+    font-size: 13.5px;
+    vertical-align: top;
+  }
+  table.embassy td:first-child {
+    background: var(--avaso-light);
+    font-weight: 700;
+    color: var(--avaso-slate-dark);
+    width: 190px;
+    white-space: nowrap;
+  }
+  table.embassy a { color: var(--avaso-blue-dark); }
+  .verify-note {
+    margin-top: 10px;
+    font-size: 12px;
+    font-style: italic;
+    color: #6B7A80;
+  }
+  .step-banner {
+    margin-top: 26px;
+    background: linear-gradient(90deg, rgba(47,227,160,.15), rgba(30,136,199,.12));
+    border: 1px solid var(--avaso-blue);
+    border-left: 6px solid var(--avaso-blue);
+    border-radius: 6px;
+    padding: 13px 18px;
+    font-size: 14px;
+  }
+  .step-banner a { color: var(--avaso-blue-dark); font-weight: 700; }
+  footer {
+    text-align: center;
+    font-size: 11.5px;
+    color: #8A979C;
+    padding: 18px;
+    border-top: 1px solid var(--grid);
+    margin-top: 40px;
+    background: #FFFFFF;
+  }
+  footer .fcompany { font-weight: 700; letter-spacing: 2px; color: var(--avaso-slate); }
+</style>
+</head>
+<body>
+<div class="brandbar"></div>
+<header>
+  <p class="company">AVASO</p>
+  <p class="tagline">Federal Solutions</p>
+  <p class="doc-title">International Travel — Country Information &amp; U.S. Embassy Resources</p>
+  <p class="doc-sub">Cleared &amp; Non-Cleared Foreign Travel Reporting — Facility Security Officer (FSO)</p>
+</header>
+
+<div class="wrap">
+  <div class="selector">
+    <label for="countrySelect">Select Destination Country</label>
+    <select id="countrySelect">
+      <option value="">— Choose a country —</option>
+    </select>
+  </div>
+
+  <div id="results">
+    <h2 class="section">Country Resources — <span id="countryName"></span></h2>
+    <div class="cards">
+      <div class="card">
+        <h3>Country Information</h3>
+        <p>U.S. Department of State travel page: entry/exit requirements, safety conditions, travel advisories, and local laws.</p>
+        <a class="btn" id="lnkInfo" href="#" target="_blank" rel="noopener">Open Country Information</a>
+      </div>
+      <div class="card">
+        <h3>Country Security Report (OSAC)</h3>
+        <p>Overseas Security Advisory Council security report covering crime, terrorism, and security environment.</p>
+        <a class="btn" id="lnkOsac" href="#" target="_blank" rel="noopener">Open Security Report</a>
+      </div>
+      <div class="card">
+        <h3>Fact Sheet</h3>
+        <p>U.S. Department of State bilateral relations fact sheet for this country.</p>
+        <a class="btn" id="lnkFact" href="#" target="_blank" rel="noopener">Open Fact Sheet</a>
+      </div>
+      <div class="card">
+        <h3>U.S. Embassy Website</h3>
+        <p>Official U.S. Embassy site — alerts, services, and assistance for U.S. citizens in country.</p>
+        <a class="btn" id="lnkEmb" href="#" target="_blank" rel="noopener">Open Embassy Site</a>
+      </div>
+    </div>
+
+    <h2 class="section">Assistance for U.S. Citizens</h2>
+    <table class="embassy" id="embassyTable"></table>
+    <p class="verify-note">Always verify current embassy contact information on the official embassy website prior to travel.</p>
+
+    <div class="step-banner">
+      &#9993;&nbsp; Before departure, register your trip with the Smart Traveler Enrollment Program (STEP):
+      <a href="https://step.state.gov/" target="_blank" rel="noopener">https://step.state.gov/</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span class="fcompany">AVASO FEDERAL SOLUTIONS</span><br>
+  Foreign Travel Reporting Resource — Facility Security Office
+</footer>
+
+<script>
+// Each entry: display name, travel.state.gov page name (tsg), OSAC name (osac),
+// state.gov fact-sheet slug (fs), embassy URL (emb), and optional embassy contact details.
+const COUNTRIES = {
+  "Argentina":      { tsg:"Argentina", osac:"Argentina", fs:"argentina", emb:"https://ar.usembassy.gov/" },
+  "Australia":      { tsg:"Australia", osac:"Australia", fs:"australia", emb:"https://au.usembassy.gov/",
+    post:"U.S. Embassy Canberra", addr:"Moonah Place, Yarralumla, ACT 2600, Australia", tel:"+61-2-6214-5600" },
+  "Austria":        { tsg:"Austria", osac:"Austria", fs:"austria", emb:"https://at.usembassy.gov/" },
+  "Bahamas":        { tsg:"TheBahamas", osac:"Bahamas", fs:"the-bahamas", emb:"https://bs.usembassy.gov/" },
+  "Belgium":        { tsg:"Belgium", osac:"Belgium", fs:"belgium", emb:"https://be.usembassy.gov/" },
+  "Brazil":         { tsg:"Brazil", osac:"Brazil", fs:"brazil", emb:"https://br.usembassy.gov/",
+    post:"U.S. Embassy Brasília", addr:"SES Av. das Nações, Quadra 801, Lote 3, 70403-900 Brasília, DF, Brazil", tel:"+55 (61) 3312-7000" },
+  "Canada":         { tsg:"Canada", osac:"Canada", fs:"canada", emb:"https://ca.usembassy.gov/",
+    post:"U.S. Embassy Ottawa", addr:"490 Sussex Drive, Ottawa, Ontario K1N 1G8, Canada", tel:"+1 613-238-5335" },
+  "Chile":          { tsg:"Chile", osac:"Chile", fs:"chile", emb:"https://cl.usembassy.gov/" },
+  "China":          { tsg:"China", osac:"China", fs:"china", emb:"https://china.usembassy-china.org.cn/",
+    post:"U.S. Embassy Beijing", addr:"55 Anjialou Road, Chaoyang District, Beijing 100600, China", tel:"+86 (10) 8531-3000" },
+  "Colombia":       { tsg:"Colombia", osac:"Colombia", fs:"colombia", emb:"https://co.usembassy.gov/" },
+  "Costa Rica":     { tsg:"CostaRica", osac:"Costa Rica", fs:"costa-rica", emb:"https://cr.usembassy.gov/" },
+  "Croatia":        { tsg:"Croatia", osac:"Croatia", fs:"croatia", emb:"https://hr.usembassy.gov/" },
+  "Czech Republic": { tsg:"CzechRepublic", osac:"Czech Republic", fs:"czech-republic", emb:"https://cz.usembassy.gov/" },
+  "Denmark":        { tsg:"Denmark", osac:"Denmark", fs:"denmark", emb:"https://dk.usembassy.gov/" },
+  "Dominican Republic": { tsg:"DominicanRepublic", osac:"Dominican Republic", fs:"dominican-republic", emb:"https://do.usembassy.gov/" },
+  "Egypt":          { tsg:"Egypt", osac:"Egypt", fs:"egypt", emb:"https://eg.usembassy.gov/" },
+  "Finland":        { tsg:"Finland", osac:"Finland", fs:"finland", emb:"https://fi.usembassy.gov/" },
+  "France":         { tsg:"France", osac:"France", fs:"france", emb:"https://fr.usembassy.gov/",
+    post:"U.S. Embassy Paris", addr:"2 Avenue Gabriel, 75008 Paris, France", tel:"+33 (1) 43-12-22-22" },
+  "Germany":        { tsg:"Germany", osac:"Germany", fs:"germany", emb:"https://de.usembassy.gov/",
+    post:"U.S. Embassy Berlin", addr:"Pariser Platz 2, 10117 Berlin, Germany (Consular: Clayallee 170, 14191 Berlin)", tel:"+49 (30) 8305-0" },
+  "Greece":         { tsg:"Greece", osac:"Greece", fs:"greece", emb:"https://gr.usembassy.gov/" },
+  "Hungary":        { tsg:"Hungary", osac:"Hungary", fs:"hungary", emb:"https://hu.usembassy.gov/" },
+  "Iceland":        { tsg:"Iceland", osac:"Iceland", fs:"iceland", emb:"https://is.usembassy.gov/" },
+  "India":          { tsg:"India", osac:"India", fs:"india", emb:"https://in.usembassy.gov/",
+    post:"U.S. Embassy New Delhi", addr:"Shantipath, Chanakyapuri, New Delhi 110021, India", tel:"+91 (11) 2419-8000" },
+  "Indonesia":      { tsg:"Indonesia", osac:"Indonesia", fs:"indonesia", emb:"https://id.usembassy.gov/" },
+  "Ireland":        { tsg:"Ireland", osac:"Ireland", fs:"ireland", emb:"https://ie.usembassy.gov/" },
+  "Israel":         { tsg:"IsraeltheWestBankandGaza", osac:"Israel", fs:"israel", emb:"https://il.usembassy.gov/",
+    post:"U.S. Embassy Jerusalem", addr:"14 David Flusser Street, Jerusalem 9378322, Israel", tel:"+972 (2) 630-4000" },
+  "Italy":          { tsg:"Italy", osac:"Italy", fs:"italy", emb:"https://it.usembassy.gov/",
+    post:"U.S. Embassy Rome", addr:"Via Vittorio Veneto 121, 00187 Rome, Italy", tel:"+39 06-46741" },
+  "Jamaica":        { tsg:"Jamaica", osac:"Jamaica", fs:"jamaica", emb:"https://jm.usembassy.gov/" },
+  "Japan":          { tsg:"Japan", osac:"Japan", fs:"japan", emb:"https://jp.usembassy.gov/",
+    post:"U.S. Embassy Tokyo", addr:"1-10-5 Akasaka, Minato-ku, Tokyo 107-8420, Japan", tel:"+81 (3) 3224-5000" },
+  "Jordan":         { tsg:"Jordan", osac:"Jordan", fs:"jordan", emb:"https://jo.usembassy.gov/" },
+  "Kenya":          { tsg:"Kenya", osac:"Kenya", fs:"kenya", emb:"https://ke.usembassy.gov/" },
+  "Malaysia":       { tsg:"Malaysia", osac:"Malaysia", fs:"malaysia", emb:"https://my.usembassy.gov/" },
+  "Mexico":         { tsg:"Mexico", osac:"Mexico", fs:"mexico", emb:"https://mx.usembassy.gov/",
+    post:"U.S. Embassy Mexico City", addr:"Paseo de la Reforma 305, Colonia Cuauhtémoc, 06500 Mexico City, Mexico", tel:"+52 (55) 5080-2000" },
+  "Morocco":        { tsg:"Morocco", osac:"Morocco", fs:"morocco", emb:"https://ma.usembassy.gov/" },
+  "Netherlands":    { tsg:"TheNetherlands", osac:"Netherlands", fs:"the-netherlands", emb:"https://nl.usembassy.gov/" },
+  "New Zealand":    { tsg:"NewZealand", osac:"New Zealand", fs:"new-zealand", emb:"https://nz.usembassy.gov/" },
+  "Norway":         { tsg:"Norway", osac:"Norway", fs:"norway", emb:"https://no.usembassy.gov/" },
+  "Panama":         { tsg:"Panama", osac:"Panama", fs:"panama", emb:"https://pa.usembassy.gov/" },
+  "Peru":           { tsg:"Peru", osac:"Peru", fs:"peru", emb:"https://pe.usembassy.gov/" },
+  "Philippines":    { tsg:"Philippines", osac:"Philippines", fs:"the-philippines", emb:"https://ph.usembassy.gov/",
+    post:"U.S. Embassy Manila", addr:"1201 Roxas Boulevard, Ermita, Manila 1000, Philippines", tel:"+63 (2) 5301-2000" },
+  "Poland":         { tsg:"Poland", osac:"Poland", fs:"poland", emb:"https://pl.usembassy.gov/" },
+  "Portugal":       { tsg:"Portugal", osac:"Portugal", fs:"portugal", emb:"https://pt.usembassy.gov/" },
+  "Qatar":          { tsg:"Qatar", osac:"Qatar", fs:"qatar", emb:"https://qa.usembassy.gov/" },
+  "Saudi Arabia":   { tsg:"SaudiArabia", osac:"Saudi Arabia", fs:"saudi-arabia", emb:"https://sa.usembassy.gov/" },
+  "Singapore":      { tsg:"Singapore", osac:"Singapore", fs:"singapore", emb:"https://sg.usembassy.gov/",
+    post:"U.S. Embassy Singapore", addr:"27 Napier Road, Singapore 258508", tel:"+65 6476-9100" },
+  "South Africa":   { tsg:"SouthAfrica", osac:"South Africa", fs:"south-africa", emb:"https://za.usembassy.gov/" },
+  "South Korea":    { tsg:"SouthKorea", osac:"South Korea", fs:"south-korea", emb:"https://kr.usembassy.gov/",
+    post:"U.S. Embassy Seoul", addr:"188 Sejong-daero, Jongno-gu, Seoul 03141, Republic of Korea", tel:"+82 (2) 397-4114" },
+  "Spain":          { tsg:"Spain", osac:"Spain", fs:"spain", emb:"https://es.usembassy.gov/",
+    post:"U.S. Embassy Madrid", addr:"Calle de Serrano 75, 28006 Madrid, Spain", tel:"+34 91-587-2200" },
+  "Sweden":         { tsg:"Sweden", osac:"Sweden", fs:"sweden", emb:"https://se.usembassy.gov/" },
+  "Switzerland":    { tsg:"SwitzerlandandLiechtenstein", osac:"Switzerland", fs:"switzerland", emb:"https://ch.usembassy.gov/" },
+  "Taiwan":         { tsg:"Taiwan", osac:"Taiwan", fs:"taiwan", emb:"https://www.ait.org.tw/",
+    post:"American Institute in Taiwan (AIT), Taipei", addr:"No. 100, Jinhu Road, Neihu District, Taipei 114017, Taiwan", tel:"+886 (2) 2162-2000" },
+  "Thailand":       { tsg:"Thailand", osac:"Thailand", fs:"thailand", emb:"https://th.usembassy.gov/",
+    post:"U.S. Embassy Bangkok", addr:"95 Wireless Road, Bangkok 10330, Thailand",
+    tel:"+ (66) (2) 205-4049", emerg:"+ (66) (2) 205-4000", fax:"+ (66) (2) 205-4103",
+    email:"ACSBkk@state.gov", web:"https://th.usembassy.gov/embassy-consulate/bangkok/" },
+  "Turkey":         { tsg:"Turkey", osac:"Turkey", fs:"turkey-turkiye", emb:"https://tr.usembassy.gov/" },
+  "United Arab Emirates": { tsg:"UnitedArabEmirates", osac:"United Arab Emirates", fs:"united-arab-emirates", emb:"https://ae.usembassy.gov/" },
+  "United Kingdom": { tsg:"UnitedKingdom", osac:"United Kingdom", fs:"united-kingdom", emb:"https://uk.usembassy.gov/",
+    post:"U.S. Embassy London", addr:"33 Nine Elms Lane, London SW11 7US, United Kingdom", tel:"+44 (0)20 7499-9000" },
+  "Vietnam":        { tsg:"Vietnam", osac:"Vietnam", fs:"vietnam", emb:"https://vn.usembassy.gov/",
+    post:"U.S. Embassy Hanoi", addr:"7 Lang Ha Street, Ba Dinh District, Hanoi, Vietnam", tel:"+84 (24) 3850-5000" }
+};
+
+const sel = document.getElementById("countrySelect");
+Object.keys(COUNTRIES).sort().forEach(name => {
+  const opt = document.createElement("option");
+  opt.value = name;
+  opt.textContent = name;
+  sel.appendChild(opt);
+});
+
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+sel.addEventListener("change", () => {
+  const name = sel.value;
+  const results = document.getElementById("results");
+  if (!name) { results.style.display = "none"; return; }
+  const c = COUNTRIES[name];
+
+  document.getElementById("countryName").textContent = name;
+  document.getElementById("lnkInfo").href =
+    "https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/" + c.tsg + ".html";
+  document.getElementById("lnkOsac").href =
+    "https://www.osac.gov/Country/" + encodeURIComponent(c.osac) + "/Detail";
+  document.getElementById("lnkFact").href =
+    "https://www.state.gov/countries-areas/" + c.fs + "/";
+  document.getElementById("lnkEmb").href = c.emb;
+
+  const rows = [];
+  rows.push(["Assistance for U.S. Citizens in", name]);
+  if (c.post) rows.push(["Embassy / Post", c.post]);
+  if (c.addr) rows.push(["Address", c.addr]);
+  if (c.tel) rows.push(["Telephone", c.tel]);
+  if (c.emerg) rows.push(["Emergency", c.emerg]);
+  if (c.fax) rows.push(["Fax", c.fax]);
+  if (c.email) rows.push(["Email", '<a href="mailto:' + esc(c.email) + '">' + esc(c.email) + "</a>", true]);
+  const web = c.web || c.emb;
+  rows.push(["Website", '<a href="' + esc(web) + '" target="_blank" rel="noopener">' + esc(web) + "</a>", true]);
+  if (!c.post) {
+    rows.push(["Contact Details",
+      'See the official embassy website above for the current address, telephone, and after-hours emergency line.']);
+  }
+
+  document.getElementById("embassyTable").innerHTML = rows.map(r =>
+    "<tr><td>" + esc(r[0]) + "</td><td>" + (r[2] ? r[1] : esc(r[1])) + "</td></tr>"
+  ).join("");
+
+  results.style.display = "block";
+});
+</script>
+</body>
+</html>
