@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foreign Travel Security Brief Builder</title>
+<style>
+  :root {
+    --slate: #5A6B72; --slate-dark: #46555B;
+    --blue: #1E88C7; --blue-dark: #156FA6;
+    --green: #2FE3A0; --light: #EEF4F2; --grid: #C9D6DB;
+    --navy: #1C3144;
+    --l1: #1E7D46; --l2: #B26A00; --l3: #B3261E; --l4: #7A1F1F;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Arial, sans-serif; margin: 0; background: #F2F5F6; color: #2B3A40; }
+  .brandbar { height: 8px; background: linear-gradient(90deg, var(--green), var(--blue) 45%, var(--slate)); }
+  header.app { background: #fff; padding: 18px 30px 0; border-bottom: 1px solid var(--grid); }
+  header.app h1 { margin: 0; font-size: 20px; color: var(--blue-dark); }
+  header.app p.sub { margin: 3px 0 14px; font-size: 12.5px; font-style: italic; color: #6B7A80; }
+  nav.tabs { display: flex; gap: 4px; }
+  nav.tabs button {
+    border: 1px solid var(--grid); border-bottom: none; background: var(--light);
+    padding: 9px 18px; font-size: 13.5px; font-weight: 700; color: var(--slate-dark);
+    border-radius: 6px 6px 0 0; cursor: pointer;
+  }
+  nav.tabs button.active { background: #fff; color: var(--blue-dark); border-color: var(--blue); border-bottom: 2px solid #fff; margin-bottom: -1px; }
+  .wrap { max-width: 1000px; margin: 24px auto 60px; padding: 0 18px; }
+  .tab { display: none; }
+  .tab.active { display: block; }
+  .panel { background: #fff; border: 1px solid var(--grid); border-radius: 6px; padding: 18px 22px; margin-bottom: 18px; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+  .panel h2 { margin: 0 0 12px; font-size: 15px; color: var(--blue-dark); text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid var(--blue); padding-bottom: 5px; }
+  label { display: block; font-weight: 700; font-size: 12px; color: var(--slate-dark); margin: 10px 0 4px; text-transform: uppercase; letter-spacing: .5px; }
+  input[type=text], input[type=date], select, textarea {
+    width: 100%; font-size: 14px; padding: 8px 10px; border: 1.5px solid var(--grid);
+    border-radius: 4px; color: #2B3A40; background: #fff;
+  }
+  input:focus, select:focus, textarea:focus { outline: 2px solid rgba(47,227,160,.5); border-color: var(--blue); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 18px; }
+  @media (max-width: 700px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+  .hint { font-size: 11.5px; color: #6B7A80; margin: 3px 0 0; }
+  .btnrow { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+  button.act {
+    background: var(--blue); color: #fff; border: none; padding: 10px 18px;
+    font-size: 13.5px; font-weight: 700; border-radius: 5px; cursor: pointer;
+  }
+  button.act:hover { background: var(--blue-dark); }
+  button.act.gray { background: var(--slate-dark); }
+  button.act.outline { background: #fff; color: var(--blue-dark); border: 1.5px solid var(--blue); }
+  button.act.danger { background: var(--l3); }
+  .chip { display: inline-block; border: 1.5px solid; border-radius: 12px; padding: 2px 10px; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+  .adv1 { color: var(--l1); border-color: var(--l1); }
+  .adv2 { color: var(--l2); border-color: var(--l2); }
+  .adv3 { color: var(--l3); border-color: var(--l3); }
+  .adv4 { color: var(--l4); border-color: var(--l4); background: #FBEAEA; }
+  .t1 { color: var(--l3); border-color: var(--l3); }
+  .t2 { color: var(--l2); border-color: var(--l2); }
+  .t3 { color: var(--l1); border-color: var(--l1); }
+  table.ref { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.ref th { text-align: left; color: #8A979C; font-size: 11.5px; text-transform: uppercase; letter-spacing: .5px; padding: 6px 8px; border-bottom: 2px solid var(--grid); }
+  table.ref td { padding: 7px 8px; border-bottom: 1px solid #E4EBEE; }
+  .burner {
+    background: #7A1F1F; color: #fff; border-radius: 6px; padding: 14px 18px; margin: 14px 0;
+  }
+  .burner h3 { margin: 0 0 6px; letter-spacing: 2px; font-size: 15px; }
+  .burner .blist { font-weight: 700; font-size: 13.5px; }
+  .burner p { font-size: 12px; margin: 8px 0 0; color: #F3DADA; }
+  .tenant-list { list-style: none; padding: 0; margin: 0 0 14px; }
+  .tenant-list li { display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--grid); border-radius: 5px; padding: 8px 12px; margin-bottom: 6px; font-size: 13.5px; }
+  .tenant-list li.cur { border-color: var(--green); background: rgba(47,227,160,.08); }
+  .guide h3 { color: var(--blue-dark); font-size: 14.5px; margin: 20px 0 6px; }
+  .guide p, .guide li { font-size: 13.5px; line-height: 1.55; }
+  .guide code { background: var(--light); padding: 1px 5px; border-radius: 3px; font-size: 12.5px; }
+  #briefPreviewBox { background: #fff; border: 1px solid var(--grid); border-radius: 6px; padding: 30px 36px; box-shadow: 0 1px 6px rgba(0,0,0,.08); }
+
+  /* ------- brief document styles (shared with exports via BRIEF_CSS) ------- */
+  .bf-classif { color: #B26A00; font-size: 10.5px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin: 0; }
+  .bf-title { font-size: 23px; font-weight: 800; color: #1C3144; margin: 4px 0 2px; }
+  .bf-meta { font-size: 12px; color: #5A6B72; margin: 0 0 10px; }
+  .bf-rule { border: none; border-top: 4px solid #1C3144; margin: 10px 0 16px; }
+  .bf-kv { width: 100%; border-collapse: collapse; margin-bottom: 18px; }
+  .bf-kv td { padding: 5px 8px 5px 0; font-size: 13px; vertical-align: top; }
+  .bf-kv td.k { font-weight: 700; color: #156FA6; width: 165px; }
+  .bf-banner { border: 2px solid; border-radius: 6px; padding: 13px 17px; margin: 4px 0 20px; }
+  .bf-banner h3 { margin: 0 0 6px; font-size: 15px; }
+  .bf-banner p { margin: 0 0 6px; font-size: 12.5px; line-height: 1.5; }
+  .bf-banner p.small { font-size: 11.5px; color: #5A6B72; margin: 0; }
+  .bf-sec { font-size: 15px; font-weight: 800; color: #1C3144; margin: 22px 0 4px; }
+  .bf-secline { border: none; border-top: 2px solid #C8A85C; margin: 0 0 10px; }
+  .bf-tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .bf-tbl th { text-align: left; color: #8A979C; font-size: 11px; text-transform: uppercase; padding: 5px 8px; border-bottom: 1.5px solid #C9D6DB; }
+  .bf-tbl td { padding: 7px 8px; border-bottom: 1px solid #E4EBEE; vertical-align: top; }
+  .bf-chip { display: inline-block; border: 1.5px solid; border-radius: 11px; padding: 1px 9px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .bf-ck { margin: 0; padding: 0; list-style: none; }
+  .bf-ck li { padding: 7px 0; border-bottom: 1px dotted #D5DEE2; font-size: 12.5px; line-height: 1.45; }
+  .bf-ck li:before { content: "\2610  "; font-size: 13px; }
+  .bf-ck .tag { font-weight: 800; color: #B3261E; }
+  .bf-ck .lnk, .bf-link { color: #156FA6; word-break: break-all; }
+  .bf-ck strong.h { font-size: 13px; }
+  .bf-bul { margin: 0; padding-left: 20px; }
+  .bf-bul li { font-size: 12.5px; line-height: 1.55; margin-bottom: 6px; }
+  .bf-ack { border: 1px solid #C9D6DB; border-radius: 5px; padding: 13px 16px; font-size: 12.5px; line-height: 1.5; }
+  .bf-sigrow { display: table; width: 100%; margin-top: 34px; }
+  .bf-sig { display: table-cell; width: 60%; border-top: 1.5px solid #46555B; font-size: 11px; color: #46555B; padding-top: 4px; }
+  .bf-sig + .bf-sigspace { display: table-cell; width: 6%; }
+  .bf-sigd { display: table-cell; width: 34%; border-top: 1.5px solid #46555B; font-size: 11px; color: #46555B; padding-top: 4px; }
+  .bf-foot { font-size: 10.5px; color: #8A979C; margin-top: 24px; border-top: 1px solid #E4EBEE; padding-top: 8px; }
+
+  @media print {
+    body * { visibility: hidden; }
+    #briefPreviewBox, #briefPreviewBox * { visibility: visible; }
+    #briefPreviewBox { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; padding: 0; }
+    .bf-banner, .bf-chip { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="brandbar"></div>
+<header class="app">
+  <h1>Foreign Travel Security Brief Builder</h1>
+  <p class="sub">Cleared &amp; Non-Cleared Foreign Travel Reporting — Facility Security Officer (FSO)</p>
+  <nav class="tabs">
+    <button class="active" data-tab="build" onclick="showTab('build')">Brief Builder</button>
+    <button data-tab="ref" onclick="showTab('ref')">Country Risk Reference</button>
+    <button data-tab="tenants" onclick="showTab('tenants')">Organizations</button>
+    <button data-tab="guide" onclick="showTab('guide')">User Guide</button>
+  </nav>
+</header>
+
+<div class="wrap">
+
+<!-- ============================ BRIEF BUILDER ============================ -->
+<div class="tab active" id="tab-build">
+  <div class="panel">
+    <h2>Trip Details</h2>
+    <div class="grid3">
+      <div>
+        <label>Organization (tenant)</label>
+        <select id="bTenant"></select>
+      </div>
+      <div>
+        <label>Traveler Name</label>
+        <input type="text" id="bName" placeholder="Last, First — title">
+      </div>
+      <div>
+        <label>Cleared Personnel</label>
+        <select id="bCleared">
+          <option value="yes">Yes — SEAD-3 reporting applies</option>
+          <option value="no">No — uncleared traveler</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid3">
+      <div>
+        <label>Purpose</label>
+        <select id="bPurpose">
+          <option>Personal travel (reportable)</option>
+          <option>Business travel</option>
+          <option>Official / government travel</option>
+        </select>
+      </div>
+      <div>
+        <label>Departure</label>
+        <input type="date" id="bDepart">
+      </div>
+      <div>
+        <label>Return</label>
+        <input type="date" id="bReturn">
+      </div>
+    </div>
+    <label>Destinations (Ctrl/Cmd-click to select multiple, including transit countries)</label>
+    <select id="bDest" multiple size="8"></select>
+    <label>Notes (optional — itinerary detail, lodging, justification)</label>
+    <textarea id="bNotes" rows="2"></textarea>
+    <div class="btnrow">
+      <button class="act" onclick="buildBrief()">Generate Brief</button>
+      <button class="act gray" onclick="exportPDF()">Export PDF (print)</button>
+      <button class="act gray" onclick="exportWord()">Export Word (.doc)</button>
+      <button class="act gray" onclick="exportHTML()">Export HTML</button>
+    </div>
+    <p class="hint">PDF export opens the print dialog — choose “Save as PDF”. Word/HTML exports download files directly.</p>
+  </div>
+  <div id="briefPreviewBox" style="display:none"></div>
+</div>
+
+<!-- ======================== COUNTRY RISK REFERENCE ======================== -->
+<div class="tab" id="tab-ref">
+  <div class="panel">
+    <h2>Country Risk Reference</h2>
+    <p class="hint" style="margin-bottom:10px">Advisory levels and device tiers are a planning <strong>snapshot (June 2026)</strong>.
+      Always verify the live advisory at <a href="https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories.html" target="_blank" rel="noopener">travel.state.gov</a> before travel.</p>
+    <div class="burner">
+      <h3>&#128293; THE BURNER LIST — CLEAN DEVICES ONLY</h3>
+      <div class="blist" id="burnerNames"></div>
+      <p>These countries get burner hardware: a clean loaner laptop and phone with no corporate credentials, accounts,
+      or stored data. Assume any device that enters is compromised; it is wiped (“burned”) or retired on return —
+      never reconnected to the corporate network.</p>
+    </div>
+    <input type="text" id="refSearch" placeholder="Search country…" oninput="renderRef()" style="margin-bottom:10px">
+    <table class="ref">
+      <thead><tr><th>Country</th><th>Advisory (snapshot)</th><th>Device tier</th></tr></thead>
+      <tbody id="refBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============================== TENANTS ================================ -->
+<div class="tab" id="tab-tenants">
+  <div class="panel">
+    <h2>Organizations (Multi-Tenant)</h2>
+    <p class="hint" style="margin-bottom:10px">Each organization carries its own FSO, security contacts, and footer.
+    The selected organization populates every brief. Data is saved in this browser (localStorage); use Export/Import
+    to move configurations between machines or share with other FSOs.</p>
+    <ul class="tenant-list" id="tenantList"></ul>
+    <div class="btnrow">
+      <button class="act" onclick="newTenant()">+ Add Organization</button>
+      <button class="act outline" onclick="exportTenants()">Export Config</button>
+      <button class="act outline" onclick="document.getElementById('impFile').click()">Import Config</button>
+      <input type="file" id="impFile" accept=".json" style="display:none" onchange="importTenants(this)">
+    </div>
+  </div>
+  <div class="panel" id="tenantForm" style="display:none">
+    <h2>Edit Organization</h2>
+    <input type="hidden" id="tId">
+    <div class="grid2">
+      <div><label>Organization Name</label><input type="text" id="tName"></div>
+      <div><label>FSO Name</label><input type="text" id="tFso"></div>
+      <div><label>Security Contact (24/7)</label><input type="text" id="tSec" placeholder="Name / phone / email"></div>
+      <div><label>IT Device Handling Contact</label><input type="text" id="tIt" placeholder="Name / phone / email"></div>
+      <div><label>Classification / Handling Line</label><input type="text" id="tClassif"></div>
+      <div><label>Footer Text</label><input type="text" id="tFoot"></div>
+    </div>
+    <div class="btnrow">
+      <button class="act" onclick="saveTenant()">Save</button>
+      <button class="act danger" onclick="deleteTenant()">Delete</button>
+      <button class="act outline" onclick="document.getElementById('tenantForm').style.display='none'">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== USER GUIDE ============================= -->
+<div class="tab" id="tab-guide">
+  <div class="panel guide">
+    <h2>User Guide</h2>
+
+    <h3>1. Quick Start</h3>
+    <p>On the <strong>Brief Builder</strong> tab: pick your organization, enter the traveler's name, set whether they
+    are cleared, choose the purpose and dates, select one or more destinations (hold Ctrl on Windows or Cmd on Mac to
+    select several, including transit stops), then click <strong>Generate Brief</strong>. The full brief renders below
+    the form — review it, then export.</p>
+
+    <h3>2. How the Ratings Work</h3>
+    <p>Every country carries two independent ratings. The <strong>advisory level</strong> (Levels 1–4) is the State
+    Department's physical-safety rating. The <strong>device tier</strong> (T1–T3) is this program's counterintelligence
+    and device-security rating. A country can be safe to walk around in and still hostile to your laptop.</p>
+    <ul>
+      <li><strong>T1 · Clean Device Required</strong> — Burner List country. Clean loaner laptop/phone in; wiped or retired on return; never reconnects to the corporate network.</li>
+      <li><strong>T2 · Loaner Strongly Recommended</strong> — Minimal-data or loaner device; no offline sensitive data; remote access only with strong MFA; re-image before rejoining the network.</li>
+      <li><strong>T3 · Standard Precautions</strong> — Corporate device acceptable with encryption, patching, minimal-data profile, and the standard checklist.</li>
+    </ul>
+    <p>A trip is rated by the <strong>worst tier and worst advisory level</strong> across all destinations and
+    transits. Checklist items tagged <strong>[TIER 1]</strong> apply only to Burner List trips; items tagged
+    <strong>[TIER ≤ 2]</strong> apply to T1 and T2 trips.</p>
+
+    <h3>3. Cleared vs. Non-Cleared</h3>
+    <p>Setting <strong>Cleared Personnel = Yes</strong> adds the SEAD-3 Reporting Obligations section (pre-travel
+    reporting, suspicious-contact reporting, post-travel debrief) and names the FSO in the brief header. Non-cleared
+    briefs omit SEAD-3 content but keep the safety, embassy, and digital-security material.</p>
+
+    <h3>4. Exports</h3>
+    <ul>
+      <li><strong>Export PDF (print)</strong> — opens the browser print dialog with only the brief visible. Choose “Save as PDF”. The filename is pre-set from the traveler and country.</li>
+      <li><strong>Export Word (.doc)</strong> — downloads a Word-compatible document you can edit before issuing.</li>
+      <li><strong>Export HTML</strong> — downloads a standalone HTML copy of the brief, suitable for email or archive.</li>
+    </ul>
+    <p>Generate the brief first; the export buttons use the most recently generated brief.</p>
+
+    <h3>5. Organizations (Multi-Tenant)</h3>
+    <p>The <strong>Organizations</strong> tab lets one FSO (or a security service provider) run briefs for multiple
+    companies. Each organization stores its own name, FSO, 24/7 security contact, IT device-handling contact,
+    classification line, and footer. Click an organization to edit it; the one marked <em>active</em> feeds the Brief
+    Builder. <strong>Export Config</strong> downloads all organizations as a JSON file; <strong>Import Config</strong>
+    loads one — use this to move between computers or share a standard setup, since data otherwise lives only in this
+    browser's localStorage.</p>
+
+    <h3>6. Country Risk Reference</h3>
+    <p>The reference tab lists every country in the tool with its advisory snapshot and device tier, plus the Burner
+    List. Advisory levels change — the snapshot is for planning only. Verify the live advisory at
+    <code>travel.state.gov</code> before every departure, and update the snapshot in the file's
+    <code>COUNTRIES</code> data block when levels change (each country is one line; set <code>adv:</code> 1–4 and
+    <code>tier:</code> 1–3).</p>
+
+    <h3>7. Record-Keeping Reminders</h3>
+    <ul>
+      <li>Issue the brief before departure and keep the signed acknowledgment — it serves as the defensive-briefing record.</li>
+      <li>Post-travel debrief is due within five (5) business days of return.</li>
+      <li>Itinerary deviations are reported as they happen, not after return.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+/* =============================== DATA ==================================== */
+const SNAPSHOT = "June 2026";
+const ADV = {
+  1: "Level 1 — Exercise Normal Precautions",
+  2: "Level 2 — Exercise Increased Caution",
+  3: "Level 3 — Reconsider Travel",
+  4: "Level 4 — Do Not Travel"
+};
+const TIER = {
+  1: "T1 · Clean Device Required",
+  2: "T2 · Loaner Strongly Recommended",
+  3: "T3 · Standard Precautions"
+};
+const TIER_BANNER = {
+  1: { title: "Tier 1 — Clean Device Required", color: "#B3261E",
+       body: "Burner List trip. Clean loaner laptop and phone only — no corporate credentials, accounts, or stored data. Assume any device that enters is compromised; it is wiped (“burned”) or retired on return and never reconnected to the corporate network." },
+  2: { title: "Tier 2 — Loaner Strongly Recommended", color: "#B26A00",
+       body: "Minimal-data or loaner device for this itinerary; no offline sensitive data; remote access only with strong MFA; device re-imaged before rejoining the network." },
+  3: { title: "Tier 3 — Standard Precautions", color: "#1E7D46",
+       body: "Corporate device acceptable with full-disk encryption verified, patched OS, minimal-data profile, MFA on all accounts, and the standard travel checklist completed." }
+};
+// tsg: travel.state.gov page; osac: OSAC name; fs: state.gov fact-sheet slug; emb: embassy URL
+// adv: advisory snapshot 1-4; tier: device tier 1-3; optional embassy contact details
+const COUNTRIES = {
+  "Afghanistan": { adv:4, tier:1, tsg:"Afghanistan", osac:"Afghanistan", fs:"afghanistan", emb:"https://af.usembassy.gov/" },
+  "Argentina": { adv:1, tier:3, tsg:"Argentina", osac:"Argentina", fs:"argentina", emb:"https://ar.usembassy.gov/" },
+  "Australia": { adv:1, tier:3, tsg:"Australia", osac:"Australia", fs:"australia", emb:"https://au.usembassy.gov/", post:"U.S. Embassy Canberra", addr:"Moonah Place, Yarralumla, ACT 2600, Australia", tel:"+61-2-6214-5600" },
+  "Austria": { adv:1, tier:3, tsg:"Austria", osac:"Austria", fs:"austria", emb:"https://at.usembassy.gov/" },
+  "Bahamas": { adv:2, tier:3, tsg:"TheBahamas", osac:"Bahamas", fs:"the-bahamas", emb:"https://bs.usembassy.gov/" },
+  "Belarus": { adv:4, tier:1, tsg:"Belarus", osac:"Belarus", fs:"belarus", emb:"https://by.usembassy.gov/" },
+  "Belgium": { adv:2, tier:3, tsg:"Belgium", osac:"Belgium", fs:"belgium", emb:"https://be.usembassy.gov/" },
+  "Brazil": { adv:2, tier:3, tsg:"Brazil", osac:"Brazil", fs:"brazil", emb:"https://br.usembassy.gov/", post:"U.S. Embassy Brasília", addr:"SES Av. das Nações, Quadra 801, Lote 3, 70403-900 Brasília, DF, Brazil", tel:"+55 (61) 3312-7000" },
+  "Canada": { adv:1, tier:3, tsg:"Canada", osac:"Canada", fs:"canada", emb:"https://ca.usembassy.gov/", post:"U.S. Embassy Ottawa", addr:"490 Sussex Drive, Ottawa, Ontario K1N 1G8, Canada", tel:"+1 613-238-5335" },
+  "Chile": { adv:2, tier:3, tsg:"Chile", osac:"Chile", fs:"chile", emb:"https://cl.usembassy.gov/" },
+  "China": { adv:2, tier:1, tsg:"China", osac:"China", fs:"china", emb:"https://china.usembassy-china.org.cn/", post:"U.S. Embassy Beijing", addr:"55 Anjialou Road, Chaoyang District, Beijing 100600, China", tel:"+86 (10) 8531-3000" },
+  "Colombia": { adv:3, tier:3, tsg:"Colombia", osac:"Colombia", fs:"colombia", emb:"https://co.usembassy.gov/" },
+  "Costa Rica": { adv:2, tier:3, tsg:"CostaRica", osac:"Costa Rica", fs:"costa-rica", emb:"https://cr.usembassy.gov/" },
+  "Croatia": { adv:1, tier:3, tsg:"Croatia", osac:"Croatia", fs:"croatia", emb:"https://hr.usembassy.gov/" },
+  "Cuba": { adv:2, tier:1, tsg:"Cuba", osac:"Cuba", fs:"cuba", emb:"https://cu.usembassy.gov/" },
+  "Czech Republic": { adv:1, tier:3, tsg:"CzechRepublic", osac:"Czech Republic", fs:"czech-republic", emb:"https://cz.usembassy.gov/" },
+  "Denmark": { adv:2, tier:3, tsg:"Denmark", osac:"Denmark", fs:"denmark", emb:"https://dk.usembassy.gov/" },
+  "Dominican Republic": { adv:2, tier:3, tsg:"DominicanRepublic", osac:"Dominican Republic", fs:"dominican-republic", emb:"https://do.usembassy.gov/" },
+  "Egypt": { adv:3, tier:2, tsg:"Egypt", osac:"Egypt", fs:"egypt", emb:"https://eg.usembassy.gov/" },
+  "Finland": { adv:1, tier:3, tsg:"Finland", osac:"Finland", fs:"finland", emb:"https://fi.usembassy.gov/" },
+  "France": { adv:2, tier:3, tsg:"France", osac:"France", fs:"france", emb:"https://fr.usembassy.gov/", post:"U.S. Embassy Paris", addr:"2 Avenue Gabriel, 75008 Paris, France", tel:"+33 (1) 43-12-22-22" },
+  "Germany": { adv:2, tier:3, tsg:"Germany", osac:"Germany", fs:"germany", emb:"https://de.usembassy.gov/", post:"U.S. Embassy Berlin", addr:"Pariser Platz 2, 10117 Berlin, Germany (Consular: Clayallee 170, 14191 Berlin)", tel:"+49 (30) 8305-0" },
+  "Greece": { adv:1, tier:3, tsg:"Greece", osac:"Greece", fs:"greece", emb:"https://gr.usembassy.gov/" },
+  "Hong Kong": { adv:2, tier:1, tsg:"HongKong", osac:"Hong Kong", fs:"hong-kong", emb:"https://hk.usconsulate.gov/" },
+  "Hungary": { adv:1, tier:3, tsg:"Hungary", osac:"Hungary", fs:"hungary", emb:"https://hu.usembassy.gov/" },
+  "Iceland": { adv:1, tier:3, tsg:"Iceland", osac:"Iceland", fs:"iceland", emb:"https://is.usembassy.gov/" },
+  "India": { adv:2, tier:2, tsg:"India", osac:"India", fs:"india", emb:"https://in.usembassy.gov/", post:"U.S. Embassy New Delhi", addr:"Shantipath, Chanakyapuri, New Delhi 110021, India", tel:"+91 (11) 2419-8000" },
+  "Indonesia": { adv:2, tier:3, tsg:"Indonesia", osac:"Indonesia", fs:"indonesia", emb:"https://id.usembassy.gov/" },
+  "Iran": { adv:4, tier:1, tsg:"Iran", osac:"Iran", fs:"iran", emb:"https://ir.usembassy.gov/" },
+  "Ireland": { adv:1, tier:3, tsg:"Ireland", osac:"Ireland", fs:"ireland", emb:"https://ie.usembassy.gov/" },
+  "Israel": { adv:3, tier:2, tsg:"IsraeltheWestBankandGaza", osac:"Israel", fs:"israel", emb:"https://il.usembassy.gov/", post:"U.S. Embassy Jerusalem", addr:"14 David Flusser Street, Jerusalem 9378322, Israel", tel:"+972 (2) 630-4000" },
+  "Italy": { adv:2, tier:3, tsg:"Italy", osac:"Italy", fs:"italy", emb:"https://it.usembassy.gov/", post:"U.S. Embassy Rome", addr:"Via Vittorio Veneto 121, 00187 Rome, Italy", tel:"+39 06-46741" },
+  "Jamaica": { adv:3, tier:3, tsg:"Jamaica", osac:"Jamaica", fs:"jamaica", emb:"https://jm.usembassy.gov/" },
+  "Japan": { adv:1, tier:3, tsg:"Japan", osac:"Japan", fs:"japan", emb:"https://jp.usembassy.gov/", post:"U.S. Embassy Tokyo", addr:"1-10-5 Akasaka, Minato-ku, Tokyo 107-8420, Japan", tel:"+81 (3) 3224-5000" },
+  "Jordan": { adv:2, tier:3, tsg:"Jordan", osac:"Jordan", fs:"jordan", emb:"https://jo.usembassy.gov/" },
+  "Kenya": { adv:2, tier:3, tsg:"Kenya", osac:"Kenya", fs:"kenya", emb:"https://ke.usembassy.gov/" },
+  "Macau": { adv:2, tier:1, tsg:"Macau", osac:"Macau", fs:"macau", emb:"https://hk.usconsulate.gov/" },
+  "Malaysia": { adv:1, tier:3, tsg:"Malaysia", osac:"Malaysia", fs:"malaysia", emb:"https://my.usembassy.gov/" },
+  "Mexico": { adv:2, tier:3, tsg:"Mexico", osac:"Mexico", fs:"mexico", emb:"https://mx.usembassy.gov/", post:"U.S. Embassy Mexico City", addr:"Paseo de la Reforma 305, Colonia Cuauhtémoc, 06500 Mexico City, Mexico", tel:"+52 (55) 5080-2000" },
+  "Morocco": { adv:2, tier:3, tsg:"Morocco", osac:"Morocco", fs:"morocco", emb:"https://ma.usembassy.gov/" },
+  "Netherlands": { adv:2, tier:3, tsg:"TheNetherlands", osac:"Netherlands", fs:"the-netherlands", emb:"https://nl.usembassy.gov/" },
+  "New Zealand": { adv:1, tier:3, tsg:"NewZealand", osac:"New Zealand", fs:"new-zealand", emb:"https://nz.usembassy.gov/" },
+  "North Korea": { adv:4, tier:1, tsg:"NorthKoreaDemocraticPeoplesRepublicofKorea", osac:"North Korea", fs:"north-korea", emb:"https://kr.usembassy.gov/" },
+  "Norway": { adv:1, tier:3, tsg:"Norway", osac:"Norway", fs:"norway", emb:"https://no.usembassy.gov/" },
+  "Panama": { adv:2, tier:3, tsg:"Panama", osac:"Panama", fs:"panama", emb:"https://pa.usembassy.gov/" },
+  "Peru": { adv:2, tier:3, tsg:"Peru", osac:"Peru", fs:"peru", emb:"https://pe.usembassy.gov/" },
+  "Philippines": { adv:2, tier:3, tsg:"Philippines", osac:"Philippines", fs:"the-philippines", emb:"https://ph.usembassy.gov/", post:"U.S. Embassy Manila", addr:"1201 Roxas Boulevard, Ermita, Manila 1000, Philippines", tel:"+63 (2) 5301-2000" },
+  "Poland": { adv:1, tier:3, tsg:"Poland", osac:"Poland", fs:"poland", emb:"https://pl.usembassy.gov/" },
+  "Portugal": { adv:1, tier:3, tsg:"Portugal", osac:"Portugal", fs:"portugal", emb:"https://pt.usembassy.gov/" },
+  "Qatar": { adv:1, tier:3, tsg:"Qatar", osac:"Qatar", fs:"qatar", emb:"https://qa.usembassy.gov/" },
+  "Russia": { adv:4, tier:1, tsg:"Russia", osac:"Russia", fs:"russia", emb:"https://ru.usembassy.gov/" },
+  "Saudi Arabia": { adv:2, tier:2, tsg:"SaudiArabia", osac:"Saudi Arabia", fs:"saudi-arabia", emb:"https://sa.usembassy.gov/" },
+  "Singapore": { adv:1, tier:3, tsg:"Singapore", osac:"Singapore", fs:"singapore", emb:"https://sg.usembassy.gov/", post:"U.S. Embassy Singapore", addr:"27 Napier Road, Singapore 258508", tel:"+65 6476-9100" },
+  "South Africa": { adv:2, tier:3, tsg:"SouthAfrica", osac:"South Africa", fs:"south-africa", emb:"https://za.usembassy.gov/" },
+  "South Korea": { adv:1, tier:3, tsg:"SouthKorea", osac:"South Korea", fs:"south-korea", emb:"https://kr.usembassy.gov/", post:"U.S. Embassy Seoul", addr:"188 Sejong-daero, Jongno-gu, Seoul 03141, Republic of Korea", tel:"+82 (2) 397-4114" },
+  "Spain": { adv:2, tier:3, tsg:"Spain", osac:"Spain", fs:"spain", emb:"https://es.usembassy.gov/", post:"U.S. Embassy Madrid", addr:"Calle de Serrano 75, 28006 Madrid, Spain", tel:"+34 91-587-2200" },
+  "Sweden": { adv:2, tier:3, tsg:"Sweden", osac:"Sweden", fs:"sweden", emb:"https://se.usembassy.gov/" },
+  "Switzerland": { adv:1, tier:3, tsg:"SwitzerlandandLiechtenstein", osac:"Switzerland", fs:"switzerland", emb:"https://ch.usembassy.gov/" },
+  "Syria": { adv:4, tier:1, tsg:"Syria", osac:"Syria", fs:"syria", emb:"https://sy.usembassy.gov/" },
+  "Taiwan": { adv:1, tier:3, tsg:"Taiwan", osac:"Taiwan", fs:"taiwan", emb:"https://www.ait.org.tw/", post:"American Institute in Taiwan (AIT), Taipei", addr:"No. 100, Jinhu Road, Neihu District, Taipei 114017, Taiwan", tel:"+886 (2) 2162-2000" },
+  "Thailand": { adv:1, tier:3, tsg:"Thailand", osac:"Thailand", fs:"thailand", emb:"https://th.usembassy.gov/", post:"U.S. Embassy Bangkok", addr:"95 Wireless Road, Bangkok 10330, Thailand", tel:"+ (66) (2) 205-4049", emerg:"+ (66) (2) 205-4000", fax:"+ (66) (2) 205-4103", email:"ACSBkk@state.gov", web:"https://th.usembassy.gov/embassy-consulate/bangkok/" },
+  "Turkey": { adv:2, tier:2, tsg:"Turkey", osac:"Turkey", fs:"turkey-turkiye", emb:"https://tr.usembassy.gov/" },
+  "Ukraine": { adv:4, tier:1, tsg:"Ukraine", osac:"Ukraine", fs:"ukraine", emb:"https://ua.usembassy.gov/" },
+  "United Arab Emirates": { adv:2, tier:2, tsg:"UnitedArabEmirates", osac:"United Arab Emirates", fs:"united-arab-emirates", emb:"https://ae.usembassy.gov/" },
+  "United Kingdom": { adv:2, tier:3, tsg:"UnitedKingdom", osac:"United Kingdom", fs:"united-kingdom", emb:"https://uk.usembassy.gov/", post:"U.S. Embassy London", addr:"33 Nine Elms Lane, London SW11 7US, United Kingdom", tel:"+44 (0)20 7499-9000" },
+  "Venezuela": { adv:4, tier:1, tsg:"Venezuela", osac:"Venezuela", fs:"venezuela", emb:"https://ve.usembassy.gov/" },
+  "Vietnam": { adv:1, tier:2, tsg:"Vietnam", osac:"Vietnam", fs:"vietnam", emb:"https://vn.usembassy.gov/", post:"U.S. Embassy Hanoi", addr:"7 Lang Ha Street, Ba Dinh District, Hanoi, Vietnam", tel:"+84 (24) 3850-5000" }
+};
+
+/* checklist items — tier: 1 = burner-only, 2 = tier<=2, 0 = everyone */
+const CK_BEFORE = [
+  [0, "STEP enrollment completed for every destination on the itinerary."],
+  [0, "Travel advisory and OSAC country security report reviewed for each destination (this week, not last quarter)."],
+  [0, "Itinerary, lodging, and emergency contacts filed with the security point of contact before departure."],
+  [0, "Copies of passport, visas, and itinerary stored separately from the originals (and accessible to the home office)."],
+  [0, "Travel medical and evacuation coverage confirmed for the destination."],
+  [0, "OS and all apps fully patched; full-disk encryption verified (BitLocker / FileVault) before departure."],
+  [0, "Phishing-resistant MFA on every account used in transit — hardware key or authenticator app, never SMS."],
+  [0, "Minimal-data profile: remove files, mailboxes, and apps not needed for this trip."],
+  [0, "Fresh travel credentials set; no password reuse with home accounts."],
+  [0, "Wi-Fi auto-join and Bluetooth discovery disabled; VPN installed and tested before departure."],
+  [0, "Privacy screen fitted to laptop; full device backup completed and left at home."],
+  [2, "Loaner / minimal-data device issued for this trip; no offline sensitive data loaded."],
+  [1, "Clean burner laptop and phone issued — no corporate credentials, accounts, or stored data. Personal devices stay home."]
+];
+const CK_BORDER = [
+  [0, "Devices powered fully OFF (not sleeping) before every border crossing so encryption is at rest."],
+  [0, "Devices carried in hand luggage — never checked."],
+  [0, "If officials inspect or seize a device: comply, never obstruct or lie, then report it to the security contact at the first safe opportunity."]
+];
+const CK_INCOUNTRY = [
+  [0, "Devices on your person or in your direct line of sight. Hotel safes do not count as secure."],
+  [0, "No public Wi-Fi without the VPN; prefer your own cellular hotspot for anything that matters."],
+  [0, "No public USB charging ports or borrowed cables — AC wall adapter only."],
+  [0, "No unknown USB drives, gifted electronics, or conference freebies that plug in."],
+  [0, "Screen privacy in public spaces; no sensitive calls in taxis, lobbies, or shared offices."],
+  [0, "Stay alert to elicitation: unusually curious strangers, too-flattering invitations, persistent new “friends.”"],
+  [0, "Report any incident — theft, inspection, approach, detention — to the security contact immediately, not after returning."],
+  [1, "Assume hotel rooms, vehicles, and meeting spaces are monitored. No sensitive conversations indoors."]
+];
+const CK_RETURN = [
+  [0, "Report any anomalies: device behaving oddly, unexpected prompts, time out of your sight, unusual approaches or contacts."],
+  [0, "Rotate every credential used during travel before reconnecting to normal work."],
+  [2, "IT inspects and re-images the travel device BEFORE it touches the corporate network."],
+  [1, "Burner devices surrendered to IT for wipe (“burn”) or retirement — never reconnected to the corporate network."],
+  [0, "Security debrief completed within 5 business days of return."]
+];
+const SEAD3 = [
+  "Unofficial (personal) foreign travel must be reported to the FSO before departure, per SEAD-3 reporting requirements for covered individuals.",
+  "Itinerary deviations — added countries, side trips, extended stays — are reported as they happen, not after return.",
+  "A defensive security briefing is completed before departure (this document can serve as the record).",
+  "Report immediately: contact with anyone known or suspected of working for a foreign intelligence entity; elicitation attempts; offers that seem aimed at your access rather than your company.",
+  "Report any border detention, device seizure or inspection, hotel-room intrusion, or unusual customs attention.",
+  "Continuing association with foreign nationals met during travel is reportable on return.",
+  "A post-travel debrief with the FSO is completed within the timeframe your insider-threat / security program requires (5 business days is the working default).",
+  "Official travel may additionally require agency country clearance — confirm with your government customer before booking."
+];
+
+/* ============================ TENANT STORE =============================== */
+const LS_KEY = "ftb_tenants_v1";
+function defaultTenants() {
+  return { active: "t1", list: [{
+    id: "t1", name: "My Organization", fso: "", sec: "Record before departure",
+    it: "Record before departure",
+    classif: "BUSINESS SENSITIVE — FOR TRAVELER AND SECURITY USE",
+    foot: "Your security partner before, during, and after travel."
+  }]};
+}
+function loadTenants() {
+  try { const d = JSON.parse(localStorage.getItem(LS_KEY)); if (d && d.list && d.list.length) return d; } catch(e) {}
+  return defaultTenants();
+}
+let TEN = loadTenants();
+function saveStore() { localStorage.setItem(LS_KEY, JSON.stringify(TEN)); renderTenants(); fillTenantSelect(); }
+function activeTenant() { return TEN.list.find(t => t.id === (document.getElementById("bTenant").value || TEN.active)) || TEN.list[0]; }
+
+function renderTenants() {
+  const ul = document.getElementById("tenantList");
+  ul.innerHTML = TEN.list.map(t =>
+    `<li class="${t.id===TEN.active?'cur':''}">
+      <span><strong>${esc(t.name)}</strong>${t.fso? " — FSO: "+esc(t.fso):""}${t.id===TEN.active?" <em>(active)</em>":""}</span>
+      <span>
+        <button class="act outline" style="padding:4px 10px;font-size:12px" onclick="setActive('${t.id}')">Set Active</button>
+        <button class="act" style="padding:4px 10px;font-size:12px" onclick="editTenant('${t.id}')">Edit</button>
+      </span>
+    </li>`).join("");
+}
+function setActive(id) { TEN.active = id; saveStore(); }
+function editTenant(id) {
+  const t = TEN.list.find(x => x.id === id); if (!t) return;
+  document.getElementById("tenantForm").style.display = "block";
+  tId.value = t.id; tName.value = t.name; tFso.value = t.fso; tSec.value = t.sec;
+  tIt.value = t.it; tClassif.value = t.classif; tFoot.value = t.foot;
+}
+function newTenant() {
+  const id = "t" + Date.now();
+  TEN.list.push({ id, name: "New Organization", fso: "", sec: "Record before departure",
+    it: "Record before departure", classif: "BUSINESS SENSITIVE — FOR TRAVELER AND SECURITY USE", foot: "" });
+  saveStore(); editTenant(id);
+}
+function saveTenant() {
+  const t = TEN.list.find(x => x.id === tId.value); if (!t) return;
+  t.name = tName.value.trim() || "Unnamed"; t.fso = tFso.value.trim(); t.sec = tSec.value.trim();
+  t.it = tIt.value.trim(); t.classif = tClassif.value.trim(); t.foot = tFoot.value.trim();
+  saveStore();
+  document.getElementById("tenantForm").style.display = "none";
+}
+function deleteTenant() {
+  if (TEN.list.length <= 1) { alert("At least one organization is required."); return; }
+  if (!confirm("Delete this organization?")) return;
+  TEN.list = TEN.list.filter(x => x.id !== tId.value);
+  if (!TEN.list.find(x => x.id === TEN.active)) TEN.active = TEN.list[0].id;
+  saveStore();
+  document.getElementById("tenantForm").style.display = "none";
+}
+function exportTenants() {
+  download("travel_brief_org_config.json", JSON.stringify(TEN, null, 2), "application/json");
+}
+function importTenants(inp) {
+  const f = inp.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      if (!d.list || !d.list.length) throw 0;
+      TEN = d; saveStore(); alert("Configuration imported: " + d.list.length + " organization(s).");
+    } catch(e) { alert("Invalid configuration file."); }
+  };
+  r.readAsText(f); inp.value = "";
+}
+
+/* ============================== HELPERS ================================== */
+function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function fmtDate(v) { if (!v) return ""; const [y,m,d] = v.split("-"); return `${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m-1]} ${parseInt(d)}, ${y}`; }
+function advChip(l) { return `<span class="bf-chip" style="color:${["","#1E7D46","#B26A00","#B3261E","#7A1F1F"][l]};border-color:${["","#1E7D46","#B26A00","#B3261E","#7A1F1F"][l]}">${ADV[l]}</span>`; }
+function tierChip(t) { return `<span class="bf-chip" style="color:${["","#B3261E","#B26A00","#1E7D46"][t]};border-color:${["","#B3261E","#B26A00","#1E7D46"][t]}">${TIER[t]}</span>`; }
+function tsgURL(c) { return "https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/" + c.tsg + ".html"; }
+function fsURL(c) { return "https://www.state.gov/countries-areas/" + c.fs + "/"; }
+function download(name, content, mime) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([content], { type: mime }));
+  a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+/* ============================ BRIEF BUILD ================================ */
+let lastBrief = null; // {html, fname}
+
+function ckList(items, worstTier) {
+  return '<ul class="bf-ck">' + items.filter(([t]) => t === 0 || worstTier <= t).map(([t, txt]) =>
+    `<li>${t===1?'<span class="tag">[TIER 1]</span> ':''}${t===2?'<span class="tag">[TIER ≤ 2]</span> ':''}${txt}</li>`
+  ).join("") + "</ul>";
+}
+
+function buildBrief() {
+  const tn = activeTenant();
+  const name = document.getElementById("bName").value.trim() || "________________";
+  const cleared = document.getElementById("bCleared").value === "yes";
+  const purpose = document.getElementById("bPurpose").value;
+  const dep = fmtDate(document.getElementById("bDepart").value) || "____";
+  const ret = fmtDate(document.getElementById("bReturn").value) || "____";
+  const notes = document.getElementById("bNotes").value.trim();
+  const dests = [...document.getElementById("bDest").selectedOptions].map(o => o.value);
+  if (!dests.length) { alert("Select at least one destination country."); return; }
+
+  const worstAdv = Math.max(...dests.map(d => COUNTRIES[d].adv));
+  const worstTier = Math.min(...dests.map(d => COUNTRIES[d].tier));
+  const B = TIER_BANNER[worstTier];
+  const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+  let h = "";
+  h += `<p class="bf-classif">${esc(tn.classif || "")}</p>`;
+  h += `<p class="bf-title">Foreign Travel Security Brief</p>`;
+  h += `<p class="bf-meta">${esc(tn.name)} · ${today}</p><hr class="bf-rule">`;
+
+  h += `<table class="bf-kv">
+    <tr><td class="k">Traveler</td><td>${esc(name)}</td></tr>
+    <tr><td class="k">Cleared personnel</td><td>${cleared ? "Yes — SEAD-3 reporting applies" + (tn.fso ? " (FSO: " + esc(tn.fso) + ")" : "") : "No — uncleared traveler (security best practices still apply)"}</td></tr>
+    <tr><td class="k">Purpose</td><td>${esc(purpose)}</td></tr>
+    <tr><td class="k">Dates</td><td>${dep} → ${ret}</td></tr>
+    <tr><td class="k">Destinations</td><td>${dests.map(esc).join(", ")}</td></tr>
+    ${notes ? `<tr><td class="k">Notes</td><td>${esc(notes)}</td></tr>` : ""}
+  </table>`;
+
+  h += `<div class="bf-banner" style="border-color:${B.color}">
+    <h3 style="color:${B.color}">${B.title}</h3>
+    <p>${B.body}</p>
+    <p class="small">Highest travel advisory across this itinerary at snapshot: <strong>${ADV[worstAdv]}</strong>. Verify live advisories before departure.</p>
+  </div>`;
+
+  h += `<p class="bf-sec">Destination Risk Detail</p><hr class="bf-secline">
+  <table class="bf-tbl"><tr><th>Country</th><th>Advisory (snapshot ${SNAPSHOT})</th><th>Device tier</th></tr>` +
+  dests.map(d => `<tr><td><strong>${esc(d)}</strong></td><td>${advChip(COUNTRIES[d].adv)}</td><td>${tierChip(COUNTRIES[d].tier)}</td></tr>`).join("") +
+  `</table>`;
+
+  h += `<p class="bf-sec">Pre-Travel Process (U.S. State Department)</p><hr class="bf-secline"><ul class="bf-ck">`;
+  h += `<li><strong class="h">1. Register with STEP</strong><br>Enroll the traveler and itinerary in the Smart Traveler Enrollment Program so the nearest U.S. embassy or consulate can reach them in an emergency and push security alerts for the destination.<br><a class="lnk" href="https://step.state.gov/">step.state.gov</a></li>`;
+  h += `<li><strong class="h">2. Country Information</strong><br>Review the State Department country information page for each destination: travel advisory level, entry/exit requirements, visas, local laws, and health conditions.<br>` +
+       dests.map(d => `<a class="lnk" href="${tsgURL(COUNTRIES[d])}">${esc(d)} page</a>`).join(" · ") + `</li>`;
+  h += `<li><strong class="h">3. Country Security Report</strong><br>Pull the OSAC Country Security Report for each destination — crime, terrorism, surveillance, and business-travel risk detail written for the private sector.<br>` +
+       dests.map(d => `<a class="lnk" href="https://www.osac.gov/Country/${encodeURIComponent(COUNTRIES[d].osac)}/Detail">${esc(d)} report</a>`).join(" · ") + `</li>`;
+  h += `<li><strong class="h">4. Bilateral Fact Sheet</strong><br>Review the State Department fact sheet for political and bilateral-relationship context that shapes how U.S. travelers are treated.<br>` +
+       dests.map(d => `<a class="lnk" href="${fsURL(COUNTRIES[d])}">${esc(d)} fact sheet</a>`).join(" · ") + `</li>`;
+  h += `<li><strong class="h">5. Consular Assistance</strong><br>Identify the serving U.S. embassy or consulate for each destination. Record its address, emergency phone, and after-hours American Citizen Services contact in the brief.<br>` +
+       dests.map(d => `<a class="lnk" href="${COUNTRIES[d].emb}">${esc(d)} embassy</a>`).join(" · ") + `</li></ul>`;
+
+  // embassy detail table for destinations with curated contacts
+  const withC = dests.filter(d => COUNTRIES[d].post);
+  if (withC.length) {
+    h += `<p class="bf-sec">Assistance for U.S. Citizens</p><hr class="bf-secline"><table class="bf-tbl">`;
+    withC.forEach(d => {
+      const c = COUNTRIES[d];
+      h += `<tr><td style="width:165px"><strong>${esc(d)}</strong></td><td>${esc(c.post)}<br>${esc(c.addr)}<br>Tel ${esc(c.tel)}` +
+           (c.emerg ? `<br>Emergency ${esc(c.emerg)}` : "") + (c.fax ? `<br>Fax ${esc(c.fax)}` : "") +
+           (c.email ? `<br>Email <a class="bf-link" href="mailto:${esc(c.email)}">${esc(c.email)}</a>` : "") +
+           `<br><a class="bf-link" href="${esc(c.web || c.emb)}">${esc(c.web || c.emb)}</a></td></tr>`;
+    });
+    h += `</table><p class="bf-foot" style="border:none;margin-top:6px">Verify current contact details on the embassy website before departure.</p>`;
+  }
+
+  h += `<p class="bf-sec">Digital Security — Before Departure</p><hr class="bf-secline">` + ckList(CK_BEFORE, worstTier);
+  h += `<p class="bf-sec">Digital Security — Border Crossings</p><hr class="bf-secline">` + ckList(CK_BORDER, worstTier);
+  h += `<p class="bf-sec">Digital Security — In Country</p><hr class="bf-secline">` + ckList(CK_INCOUNTRY, worstTier);
+  h += `<p class="bf-sec">Digital Security — On Return</p><hr class="bf-secline">` + ckList(CK_RETURN, worstTier);
+
+  if (cleared) {
+    h += `<p class="bf-sec">Cleared Traveler — SEAD-3 Reporting Obligations</p><hr class="bf-secline"><ul class="bf-bul">` +
+         SEAD3.map(x => `<li>${x}</li>`).join("") + `</ul>`;
+  }
+
+  h += `<p class="bf-sec">Emergency Contacts</p><hr class="bf-secline"><table class="bf-kv">
+    <tr><td class="k">Security contact (24/7)</td><td>${esc(tn.sec || "Record before departure")}</td></tr>
+    <tr><td class="k">IT device handling</td><td>${esc(tn.it || "Record before departure")}</td></tr>
+    <tr><td class="k">FSO</td><td>${esc(tn.fso || "Record before departure")}</td></tr>
+    <tr><td class="k">U.S. embassy / consulate</td><td>Look up the serving post and after-hours American Citizen Services line: <a class="bf-link" href="https://www.usembassy.gov/">usembassy.gov</a></td></tr>
+    <tr><td class="k">State Dept (overseas)</td><td>+1-202-501-4444 · from the U.S.: 1-888-407-4747</td></tr>
+    <tr><td class="k">STEP alerts</td><td><a class="bf-link" href="https://step.state.gov/">step.state.gov</a> — enrollment confirmed: pending</td></tr>
+  </table>`;
+
+  h += `<p class="bf-sec">Traveler Acknowledgment</p><hr class="bf-secline">
+  <div class="bf-ack">I have received this briefing, understand the device guidance and reporting obligations for this
+  itinerary, and will report security incidents and reportable contacts as described above. I will complete the
+  post-travel debrief within five (5) business days of return.
+  <div class="bf-sigrow"><div class="bf-sig">Traveler signature / name</div><div class="bf-sigspace"></div><div class="bf-sigd">Date</div></div>
+  <div class="bf-sigrow"><div class="bf-sig">FSO signature / name</div><div class="bf-sigspace"></div><div class="bf-sigd">Date</div></div>
+  </div>`;
+
+  h += `<p class="bf-sec">How to Read the Ratings</p><hr class="bf-secline">
+  <p style="font-size:12.5px;line-height:1.5">Every country carries two independent ratings. The <strong>advisory
+  level</strong> is the State Department's physical-safety rating. The <strong>device tier</strong> is the
+  counterintelligence and device-security rating. A country can be safe to walk around in and still hostile to your
+  laptop.</p>
+  <table class="bf-tbl"><tr><th>Travel advisory (State Dept)</th><th>Meaning</th><th>What we do</th></tr>
+    <tr><td>${advChip(1)}</td><td>Exercise normal precautions — the lowest State Department advisory.</td><td>Standard approval; standard checklist.</td></tr>
+    <tr><td>${advChip(2)}</td><td>Exercise increased caution — heightened risks to safety and security.</td><td>Standard approval; review the country notes and OSAC report closely.</td></tr>
+    <tr><td>${advChip(3)}</td><td>Reconsider travel — serious risks; State advises reconsidering plans.</td><td>Requires a documented business justification and leadership approval.</td></tr>
+    <tr><td>${advChip(4)}</td><td>Do not travel — greatest likelihood of life-threatening risk; U.S. assistance may be unavailable.</td><td>Executive sign-off required; default answer is defer or send no one.</td></tr>
+  </table>
+  <table class="bf-tbl" style="margin-top:10px"><tr><th>Device tier (this program)</th><th>Device handling</th></tr>
+    <tr><td>${tierChip(1)}</td><td>Clean loaner laptop and phone in; wiped (“burned”) or retired on return. Never reconnects to the corporate network.</td></tr>
+    <tr><td>${tierChip(2)}</td><td>Minimal-data or loaner device; no offline sensitive data; remote access only with strong MFA; re-image before rejoining the network.</td></tr>
+    <tr><td>${tierChip(3)}</td><td>Corporate device acceptable with encryption, patching, minimal-data profile, and the standard checklist.</td></tr>
+  </table>
+  <p class="bf-foot" style="border:none">Checklist tags: <strong>[TIER 1]</strong> items apply only to Burner List trips;
+  <strong>[TIER ≤ 2]</strong> items apply to Tier 1 and Tier 2 trips. A trip is rated by the worst tier and worst
+  advisory level across all destinations and transits.</p>`;
+
+  h += `<p class="bf-foot">Advisory levels and device tiers reflect a planning snapshot (${SNAPSHOT}). Verify live
+  advisories at travel.state.gov before departure.${tn.foot ? " " + esc(tn.foot) : ""}</p>`;
+
+  const box = document.getElementById("briefPreviewBox");
+  box.innerHTML = h;
+  box.style.display = "block";
+  if (box.scrollIntoView) box.scrollIntoView({ behavior: "smooth" });
+
+  const fname = ("Travel_Brief_" + (document.getElementById("bName").value.trim() || "Traveler") + "_" + dests[0])
+    .replace(/[^A-Za-z0-9_-]+/g, "_");
+  lastBrief = { html: h, fname };
+}
+
+/* =============================== EXPORTS ================================= */
+// Pull the .bf- rules out of this page's stylesheet so exports match the preview.
+function briefCSS() {
+  let out = 'body { font-family: Arial, "Segoe UI", sans-serif; color: #2B3A40; max-width: 800px; margin: 24px auto; padding: 0 18px; }\n';
+  for (const sheet of document.styleSheets) {
+    try {
+      for (const r of sheet.cssRules) {
+        if (r.selectorText && r.selectorText.indexOf(".bf-") !== -1) out += r.cssText + "\n";
+      }
+    } catch(e) {}
+  }
+  return out;
+}
+function needBrief() {
+  if (!lastBrief) { alert("Generate the brief first."); return false; }
+  return true;
+}
+function exportPDF() {
+  if (!needBrief()) return;
+  const prev = document.title;
+  document.title = lastBrief.fname;
+  window.print();
+  document.title = prev;
+}
+function exportHTML() {
+  if (!needBrief()) return;
+  const doc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${lastBrief.fname}</title><style>${briefCSS()}</style></head><body>${lastBrief.html}</body></html>`;
+  download(lastBrief.fname + ".html", doc, "text/html");
+}
+function exportWord() {
+  if (!needBrief()) return;
+  const doc = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="UTF-8"><title>${lastBrief.fname}</title>
+<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]-->
+<style>${briefCSS()}</style></head><body>${lastBrief.html}</body></html>`;
+  download(lastBrief.fname + ".doc", doc, "application/msword");
+}
+
+/* ================================ UI ===================================== */
+function showTab(id) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll("nav.tabs button").forEach(b => b.classList.toggle("active", b.dataset.tab === id));
+  document.getElementById("tab-" + id).classList.add("active");
+}
+function fillTenantSelect() {
+  const s = document.getElementById("bTenant");
+  s.innerHTML = TEN.list.map(t => `<option value="${t.id}" ${t.id===TEN.active?"selected":""}>${esc(t.name)}</option>`).join("");
+}
+function renderRef() {
+  const q = (document.getElementById("refSearch").value || "").toLowerCase();
+  document.getElementById("refBody").innerHTML = Object.keys(COUNTRIES).sort()
+    .filter(n => n.toLowerCase().includes(q))
+    .map(n => { const c = COUNTRIES[n];
+      return `<tr><td><strong>${esc(n)}</strong></td><td><span class="chip adv${c.adv}">${ADV[c.adv]}</span></td><td><span class="chip t${c.tier}">${TIER[c.tier]}</span></td></tr>`;
+    }).join("");
+}
+
+// init
+const destSel = document.getElementById("bDest");
+Object.keys(COUNTRIES).sort().forEach(n => {
+  const c = COUNTRIES[n];
+  const o = document.createElement("option");
+  o.value = n;
+  o.textContent = `${n}  —  L${c.adv} / T${c.tier}`;
+  destSel.appendChild(o);
+});
+document.getElementById("burnerNames").textContent =
+  Object.keys(COUNTRIES).filter(n => COUNTRIES[n].tier === 1).sort().join(" · ");
+fillTenantSelect();
+renderTenants();
+renderRef();
+</script>
+</body>
+</html>
