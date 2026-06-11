@@ -24,54 +24,47 @@ endobj
 <<
 /A <<
 /S /URI /Type /Action /URI (https://step.state.gov/)
->> /Border [ 0 0 0 ] /Rect [ 226.6 397.4125 316.907 410.4125 ] /Subtype /Link /Type /Annot
+>> /Border [ 0 0 0 ] /Rect [ 226.6 375.4125 316.907 388.4125 ] /Subtype /Link /Type /Annot
 >>
 endobj
 6 0 obj
 <<
 /A <<
 /S /URI /Type /Action /URI (https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/Thailand.html)
->> /Border [ 0 0 0 ] /Rect [ 226.6 361.4125 540.2425 374.4125 ] /Subtype /Link /Type /Annot
+>> /Border [ 0 0 0 ] /Rect [ 226.6 339.4125 540.2425 352.4125 ] /Subtype /Link /Type /Annot
 >>
 endobj
 7 0 obj
 <<
 /A <<
 /S /URI /Type /Action /URI (https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/Thailand.html)
->> /Border [ 0 0 0 ] /Rect [ 226.6 348.4125 420.8845 361.4125 ] /Subtype /Link /Type /Annot
+>> /Border [ 0 0 0 ] /Rect [ 226.6 326.4125 420.8845 339.4125 ] /Subtype /Link /Type /Annot
 >>
 endobj
 8 0 obj
 <<
 /A <<
 /S /URI /Type /Action /URI (https://www.osac.gov/Country/Thailand/Detail)
->> /Border [ 0 0 0 ] /Rect [ 226.6 325.4125 418.253 338.4125 ] /Subtype /Link /Type /Annot
+>> /Border [ 0 0 0 ] /Rect [ 226.6 303.4125 418.253 316.4125 ] /Subtype /Link /Type /Annot
 >>
 endobj
 9 0 obj
 <<
 /A <<
 /S /URI /Type /Action /URI (https://www.state.gov/countries-areas/thailand/)
->> /Border [ 0 0 0 ] /Rect [ 226.6 289.4125 423.5445 302.4125 ] /Subtype /Link /Type /Annot
+>> /Border [ 0 0 0 ] /Rect [ 226.6 267.4125 423.5445 280.4125 ] /Subtype /Link /Type /Annot
 >>
 endobj
 10 0 obj
 <<
 /A <<
 /S /URI /Type /Action /URI (https://th.usembassy.gov/)
->> /Border [ 0 0 0 ] /Rect [ 226.6 266.4125 334.3205 279.4125 ] /Subtype /Link /Type /Annot
+>> /Border [ 0 0 0 ] /Rect [ 226.6 244.4125 334.3205 257.4125 ] /Subtype /Link /Type /Annot
 >>
 endobj
 11 0 obj
 <<
-/A <<
-/S /URI /Type /Action /URI (mailto:ACSBkk@state.gov)
->> /Border [ 0 0 0 ] /Rect [ 205 77.4125 288.562 90.4125 ] /Subtype /Link /Type /Annot
->>
-endobj
-12 0 obj
-<<
-/Annots [ 5 0 R 6 0 R 7 0 R 8 0 R 9 0 R 10 0 R 11 0 R ] /Contents 18 0 R /MediaBox [ 0 0 612 792 ] /Parent 17 0 R /Resources <<
+/Annots [ 5 0 R 6 0 R 7 0 R 8 0 R 9 0 R 10 0 R ] /Contents 18 0 R /MediaBox [ 0 0 612 792 ] /Parent 17 0 R /Resources <<
 /Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
 >> /Rotate 0 
   /Trans <<
@@ -79,16 +72,23 @@ endobj
 >> /Type /Page
 >>
 endobj
+12 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (mailto:ACSBkk@state.gov)
+>> /Border [ 0 0 0 ] /Rect [ 205 719.9125 288.562 732.9125 ] /Subtype /Link /Type /Annot
+>>
+endobj
 13 0 obj
 <<
 /A <<
 /S /URI /Type /Action /URI (https://th.usembassy.gov/embassy-consulate/bangkok/)
->> /Border [ 0 0 0 ] /Rect [ 205 719.9125 435.7455 732.9125 ] /Subtype /Link /Type /Annot
+>> /Border [ 0 0 0 ] /Rect [ 205 696.9125 435.7455 709.9125 ] /Subtype /Link /Type /Annot
 >>
 endobj
 14 0 obj
 <<
-/Annots [ 13 0 R ] /Contents 19 0 R /MediaBox [ 0 0 612 792 ] /Parent 17 0 R /Resources <<
+/Annots [ 12 0 R 13 0 R ] /Contents 19 0 R /MediaBox [ 0 0 612 792 ] /Parent 17 0 R /Resources <<
 /Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
 >> /Rotate 0 
   /Trans <<
@@ -103,28 +103,28 @@ endobj
 endobj
 16 0 obj
 <<
-/Author (\(anonymous\)) /CreationDate (D:20260611180833+00'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20260611180833+00'00') /Producer (ReportLab PDF Library - \(opensource\)) 
-  /Subject (\(unspecified\)) /Title (International Foreign Travel Brief - Thailand) /Trapped /False
+/Author (\(anonymous\)) /CreationDate (D:20260611181115+00'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20260611181115+00'00') /Producer (ReportLab PDF Library - \(opensource\)) 
+  /Subject (\(unspecified\)) /Title (Cleared & Non-Cleared Foreign Travel Reporting \204 Facility Security Officer \(FSO\) Briefing - Thailand) /Trapped /False
 >>
 endobj
 17 0 obj
 <<
-/Count 2 /Kids [ 12 0 R 14 0 R ] /Type /Pages
+/Count 2 /Kids [ 11 0 R 14 0 R ] /Type /Pages
 >>
 endobj
 18 0 obj
 <<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 1906
+/Filter [ /ASCII85Decode /FlateDecode ] /Length 1839
 >>
 stream
-GauHL=a(cC'Ro4Hgnu3V)U1gZkG_eBjRb9hTdMLBR=G:VZVY?iFaebBB#U,Tn<an"+=,4^h=TN!U0uuMk24W)i*lc-%0am^1'_P-)^^'OojmR<J<husMn%\BrB6.FT27ut2ZU^^B0-f`j12Tg5qW?iN7RPs@Z7T10N6/,9M>("6>[^4b[C3#agb$]9Vb5s_+cDi=<oS_i?OEA64,o+#F"U1Gn6[Pa&'5uptjEE%>%3ek=Q:UX5Wn#n/69S&N!S.\?R1'_fHr$rd+)b(GNL\GUW@rIY#8^A5rN^dIrU(;ONAP!Vbdm\-]&W'%mqWq/e32j7@XNVHh":n7MUor`sBnF2_=!o.<9:gU&s[*<"A*KtH4I8cEZ;[Vlg$>7lg<`DXRgESO/;#thf34"qQOpnec[*DnDH;?s/^U9'Jp8e1Ie"#C`n`&phg4NN4hT;@SRJQJqYrC@SFX,)j4PVO0,dR&[i>bO[ZoRP,,SRh;jEn^sd;;4G1Na.D./2ULa+psN:X)nk7];Gt9:hFM8fN"=/"54j-`if$<6%+BRbjA6aTtSsjj/@<FN:'1gYcGBK\;+$rIP95mpjeDtXa,7u$f-kK@?9=16,30BrAI[/W!&D:r[kV?C4.c=]r^uYZDC*"/fm#^PB6a6B&Sr*FH5*\#Ck'oTCDH#5Wmq:Q30O)1W1G$0PTH[r'AEXeA.bd840_$CERB-8b\\"qTQ'EebHlA&Xo_;Cf\4TL/flbX'XP_Ha-`H199i^B$jgJS6iI6<@`OOLWPS$$LiF'_E?8W)semee1?72jMCUYS@&R3ODW^"AL#8B&+Ggd@@g("DH3mE8&BR09k4,T/$^d#T`R[0T->(Z/lO<t(#D3aPj*M!KPD<eDWS,qFXqC<CO_7R=7J(GjAGD@Y1#LlZ,VMrr8>*tMFVa??ok&h*%dU&C2(p-N_R'980e_unVp''#$+Wp(XUC]r(Mt_6&W:R2q_#'="m@4/B%K1@dU?QaZq-8^UU47OtT-^bPd/g@\oD2B;dB*egf8`+.ij&<T/#<UnWt4J_5c,6@J,F+,(=g-6E`mOTosa5*Cd`%Fe3T3n>r-rh$UFK]Z>+;,(XpT=+!Yq#dsajU\MLEV,AsNcamCquO9:=5$K[]m_Pd6B53E`HZEOM\nC5Yp@pb020A7f831r.+SF3Q0CViEPp42,-L7)2:N+.o1^$.*n!O40`rMRlf<L[:"tCpR`:.PR0LdK,aR[ps#'-_LYp9+>H&-fJS)'@c9+i;l(cX'P:/WJV^drG$pHQgi/iF^o<&"c:?<Tk+$aXY<a@SI=#4Mt'B\%EWtUsjC%Gd7Ip7BOq]Ab2*&)VHM![RQW9f"WP/2!7VjAGFQ(Aq3H#@^C0"<YdO<r($N]LY3G#H6O%8b$F5)'d7PZkctiTKb,jhX@Z]T_G;%4D]hr=aUcfoT0edl]ahIC1/V.unT)j[m'+'?1,[#3.#mf`>/Snk\6p(\+jWT9&QnFtRQC$*HaBJdn!-<DMjQ@,(;@>U]g40U_L%D>[,J">6sfrSVrICs_q'af>OWs)_!n4lS3f%8P06A?C+S/QD#7%;T<:O\t;1iaVcjMHnJR6'8XJV\X.GZ!C;kL62]ML,ocdFrKX^2:U<ZW,khVF-<'&W\sO6A4Gt80pSo3l6\!PGpH1jr;)ueS$2!(bj5Kcf0qG838Y`,I5c(c8!Q`_7@5VIdYEi'ht+/9Ho=?lh&_A2?-luVIRTD<i<!tbL9n5/%ZH-RR:l$\DK$r4l=u_65O%b$=!XTEMl6"?+iA4$VNG`L_<J.DY%'(#4II85ZCVjmHgNN3e)0KHK`D%Al^WA=@!8+=Ep#LO+t1d?E_]I!I+6&FY:k(^QfF!ZLYlk;n?s6j@+s*SJ%)$"4YQ*RcJ76%fQOt#5@"ebg(fk`#6+]^mbPD~>endstream
+Gb!#\gN"2m&:N^lqItjuNFnusk:Ns`DGmIAA(\q^?R?m\nQ^l,R!$,l>FHKX$kS#+f.LR\UJ(@Gf$P@4Yjn'KcUeK5D@G*X!bF'W!Hj5,j,\.BmX=EKWi,:s+8grSk9NJXNhFWB%/Zqf.1,OfGRBDon^`d&Zh9911@"ZI&B4e'UHlK-G681m%fOS(a-'6W2u"oL#5,H60"I?^0UD5R:Z.6dF'4<8rX-YP@Jh#`O*G!A=T9FTKjd(UM("s'`$[(7)`P*kQuEB+rScu&rY<)0K$Q?P(q9TdW];c_:\_OBD@k=V'$'pcp4#*[6@sG#$>\ijUmj/mksqCt6^Zo=b2rA#_.=Au,1#7Z4':NVj5olp*KKu\d*beY^`&hok]MH*pI?kmK2Z_Vf;'sKdIsr30^p'kSsDcEglWQ/%0)$i'/:NASr6JWW8loC"5T1]B!6QiRApD2'URXmnZ9)!Lk9Z4bon[9:5p]<0Qm"5r@>%T-4GcNRBNn_51Qn9J.m&GFRR;)kgi)\74aT]Rs*'u5iA4N_D7Fr$5'n-$\#ng,M1TAhR@030q7uch"U#(mb`$V4Zg[X,8]#+4g=iOY-[UCf?Gq#pI_Q4G@!r"O'H)umdqXi-i&4\X("o1`>/D^,.Ukt9Yj:tHks[fA2"[X*3%FT,+Z_L$M#'PF.N4LMgiIVY<<MO+VGS&rQ1.V_T8U:YPADPCY]PWVP+8I\uggf,q!Q;T@rRj?M3nqj,odF1H'#!P$r4HAo2\h`er$pb+-J/c-fcnS6iI:eLQ+&`Q91-9Ci#NM=$G=]>8?*61$->Sk6qoihA6NAo9P<Vp:8IQT`,_^4KK?0tGhkX"=rbb=S;jDadfO71M1(K)R99!G4)_U#?q=(,B7A(JsR0Eklr9m<@FOpAPh]KAm^2aJ7[/j3oPS;%gfFI-2g^`KM1@Z(02pNY,!J[C#*(T1uhI6t?gApqi5B%8/,]"Urk5?V%FI(bo+:-L:!c$7:%!`4/$"WpttQ!^qe<V<+[%q)jsAK,ZG"_F/G2To-?^.H;W_T*jCSiOH0lH'"F^X@8;F5L#@P64'3H2u@T:U7aNU4-eE=AA+:D.'%k-.uOA8&mCIS8j6qL=G9ne+'Ll_G-$/^"3b82Z?)\.5HQ#H474U<l?Ak-F.lEfQ";Zg?f*'JND_m%)pHKeZ-.8:o-?nM!cMX6QZ7?OWge!V&#5h9</#8fp_0<:F?M\mJbYhQ!Bogr<66sd*6L*07Q,8QT`2*.k;`HI'ZEt`Yq-<)8Ta'61=%&E4_GDHOf+^APlua6m05P'O)=nH51HV6E[]MQMp9u*:jLlL7P8,ClZIg3(.oC#-2h]=W:rNB7.n@TR3ac!rLgG\'E#A"Re"m&#8M93%HI`&nXM,1-<[W&dUZ/!r4UO_HNVbXCYkN&2m(*5qu4k(mH)/N%t_.<3S!ScSo]4OYLdQQX*A+%;oRAHBO,VRl[;=8V^Z&%s"%Qbi4M#L<B^@bT^n4@pXJe3=DcWp#"rnm^j#9M=[`eRW<0N?mbTFI`#E>&DUc\`A45>gcaN;tS:iKk*d[FXLa5))W-1E-B)_q2`Ib0*:VXh?4`tc3:Io$g\WODS5!gGP]mc'a)rmnb><B84l.dcZW9$jZQ-N\dSXieB410/_cZ(1m9rhTAVb!Zs4.fF(=&]!M8jNF.pDhdr/\TBaL4Q=-!T(fKr#pPLs#nEWknJhpG8bqpJck?21J6."(P'+[SmKod?nNG>^47HrDbdqF)<7a?7@q3>ouHML7suK:\aTD(5EV69Y3e^A^C@_K\X`8-Ei@&S]F*=0LM`[^@Up>Uo-0MD]DT_'HEk)CA+)F$*<Q8[h$<TO"guUPc2~>endstream
 endobj
 19 0 obj
 <<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 589
+/Filter [ /ASCII85Decode /FlateDecode ] /Length 647
 >>
 stream
-Gat$t9lHLd&A@Zck*SR-ZEmoB3EBlF<P:@\l6R6_0/eXf(D]O?pRMI]&uUah&A+^*fpOer*XJ9B*7f69n0N_^)ZgAf$:)QEA3]$g(B')/au%0B,Uf%R"6=)qL'O)GQ4)DE0!0YI)qC0+,bQtFK`tV]KAnNC6Qq>ZHh!erps:Gj4goT^!b]<3BuhbR+i";GC<063k-nQ;V0BD14[F6-C+eb!Xc#daTW'j0L7SO8<1;PUR*iekeEpH'iVPSQP:/7e1a?Xide`=`_lkR]nH.t#qa5QLa*u)*c;gpXlV;9N*95.IXIHfepUPM<.^->-c#`fDWIE4g'X8oXL"*oT.P0tQUGW'(;=u\0k(Ip9,XAFsV3XHa3EgKS^N&ht8)XuH,IntE[&1Y0il[7V6cQ!uBU5!*U0Bh)#t[Dc?dV%CBi^D8WV;"Gs&9WAda+_b?DW=&@Rq"<4h.Mn2m0iL;q"+aG95=0FkAeE_!`6_Ra*R6RigH-2K%'2Y(2ken&cQ+o'#$%7R,bH-9lY"'Em1bD9]5(84+cYUk\jq/kAkWfY`P.)Z+p\A:@"t8Fr?n8b3WmmmJlj8)bZf$[IBjY5~>endstream
+Gatm895iQ=%)2U?nCSM4XLG='[LV,D@@+>*G3Qt;jM[$"RB<:+^E;Q=]<phL@5_rLUdT[m8"'ItRs"12$#l(npltm?OCZ-POc]KkgEcP/Y[OGAKS,9od<GZa`!Chn1"&mY92(&ud&_j,pIbrhBG/2kV8biF(!t5<g;d=&MoB$lML``qN0d&eKNJch8VoVj(b_TsiLO6/Q>'Z16LkE(Q$57/qq3Qb!qD5P$.X8h5_N+d`'C]po"\Yr9R#C*e2S&!.juQ1+I\AK"l,`$a\H5mrc3Lph0s*El7?)iLU2d];#aLMT6AWEcMjXQlG"'c$VDVBeAk4eEGjB7LS<IaI;@"pg9sLYP&QLqbIVH_"VrRmUt'cqDo4N>qMrm35b^7#636UpDK%It)=>g\cTZK5.AH3udmL3%G4"X]]egVj$RM?cBRXG=(R#WR?JG4gpX)XOpA#",>2UPEWIC`,YGP%:ES;6>(a^PKmH/4'1r4q!1R('_BW-6$d,]8#0fng$3o9:@R9(on>f3i'6b.+U/F.=X=D,He/F;ZQc!6GRC]Q&uBQBTY;slPh"^-;Yn8P'B/n("d>Gs?2mIj7Cc8(;L7nUf?Il<O$UG:(D)^r\4a7?##*dp3Ie#$(7#D;rL<<d#1*!F"Wd]+`K~>endstream
 endobj
 xref
 0 20
@@ -140,18 +140,18 @@ xref
 0000001355 00000 n 
 0000001551 00000 n 
 0000001726 00000 n 
-0000001894 00000 n 
-0000002146 00000 n 
-0000002345 00000 n 
-0000002560 00000 n 
-0000002630 00000 n 
-0000002943 00000 n 
-0000003011 00000 n 
-0000005009 00000 n 
+0000001971 00000 n 
+0000002141 00000 n 
+0000002340 00000 n 
+0000002562 00000 n 
+0000002632 00000 n 
+0000003005 00000 n 
+0000003073 00000 n 
+0000005004 00000 n 
 trailer
 <<
 /ID 
-[<10a789c9b354e65940e09f7a7758d94e><10a789c9b354e65940e09f7a7758d94e>]
+[<2194e92a1971fc6f0963b534b949c208><2194e92a1971fc6f0963b534b949c208>]
 % ReportLab generated PDF document -- digest (opensource)
 
 /Info 16 0 R
@@ -159,5 +159,5 @@ trailer
 /Size 20
 >>
 startxref
-5689
+5742
 %%EOF

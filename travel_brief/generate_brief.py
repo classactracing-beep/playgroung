@@ -40,8 +40,8 @@ REVIEW = ("Please, review and familiarize yourself with the updated resources li
           "the current status and conditions in the country you will be visiting:")
 REMINDER = "Reminder: you must complete the post-travel debrief within five (5) days of return."
 CLOSING = "Please confirm receipt and safe travels."
-TITLE = "International Foreign Travel Brief"
-SUBTITLE = "Cleared & Non-Cleared Foreign Travel Reporting — Facility Security Officer (FSO)"
+TITLE = "Cleared & Non-Cleared Foreign Travel Reporting — Facility Security Officer (FSO) Briefing"
+SUBTITLE = "International Foreign Travel Brief"
 
 BASENAME = os.path.join(OUT_DIR, "Foreign_Travel_Brief_Thailand")
 
@@ -51,7 +51,7 @@ html = f"""<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{TITLE} — {COUNTRY}</title>
+<title>{TITLE.replace("&", "&amp;")} — {COUNTRY}</title>
 <style>
   body {{ font-family: "Segoe UI", Arial, sans-serif; color: #1a1a2e; margin: 0;
          background: #f4f6f8; }}
@@ -80,7 +80,7 @@ html = f"""<!DOCTYPE html>
 <body>
 <div class="page">
   <header>
-    <h1>{TITLE}</h1>
+    <h1>{TITLE.replace("&", "&amp;")}</h1>
     <p class="sub">{SUBTITLE}</p>
   </header>
 
@@ -278,7 +278,7 @@ doc = SimpleDocTemplate(BASENAME + ".pdf", pagesize=letter,
                         topMargin=0.7 * inch, bottomMargin=0.7 * inch,
                         title=f"{TITLE} - {COUNTRY}")
 el = []
-el.append(Paragraph(TITLE, title_st))
+el.append(Paragraph(TITLE.replace("&", "&amp;"), title_st))
 el.append(Paragraph(SUBTITLE, sub_st))
 el.append(HRFlowable(width="100%", thickness=2.5, color=NAVY, spaceAfter=12))
 
