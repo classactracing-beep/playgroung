@@ -1136,8 +1136,12 @@ function briefCSS() {
   return out;
 }
 function needBrief() {
-  if (!lastBrief) { alert("Generate the brief first."); return false; }
-  return true;
+  // Always rebuild from the current form values so late edits (embassy
+  // contacts, dates, names) are never exported stale.
+  const dests = [...document.getElementById("bDest").selectedOptions];
+  if (!dests.length) { alert("Select at least one destination country."); return false; }
+  buildBrief();
+  return !!lastBrief;
 }
 /* ------------------------- native PDF generation -------------------------
    Built with jsPDF using the standard Helvetica font family (PDF base-14:
