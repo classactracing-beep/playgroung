@@ -348,14 +348,6 @@ warn.setStyle(TableStyle([
     ("TOPPADDING", (0, 0), (-1, -1), 8), ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
 ]))
 el.append(warn)
-el.append(Spacer(1, 14))
-
-el.append(Paragraph(CLOSING, body_st))
-el.append(Spacer(1, 10))
-el.append(Paragraph("Best,", body_st))
-el.append(Spacer(1, 24))
-el.append(Paragraph("____________________________", body_st))
-el.append(Paragraph("Facility Security Officer (FSO)", body_st))
 
 doc.build(el)
 print("PDF written")
