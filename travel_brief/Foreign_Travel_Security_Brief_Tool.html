@@ -171,6 +171,17 @@
     </div>
     <label>Destinations (Ctrl/Cmd-click to select multiple, including transit countries)</label>
     <select id="bDest" multiple size="8"></select>
+    <div id="embEdit"></div>
+    <div class="grid2">
+      <div>
+        <label>Traveler Email (for Outlook send)</label>
+        <input type="text" id="bEmail" placeholder="traveler@company.com">
+      </div>
+      <div>
+        <label>CC (optional)</label>
+        <input type="text" id="bCc" placeholder="fso@company.com">
+      </div>
+    </div>
     <label>Notes (optional — itinerary detail, lodging, justification)</label>
     <textarea id="bNotes" rows="2"></textarea>
     <div class="btnrow">
@@ -178,8 +189,12 @@
       <button class="act gray" onclick="exportPDF()">Export PDF (print)</button>
       <button class="act gray" onclick="exportWord()">Export Word (.doc)</button>
       <button class="act gray" onclick="exportHTML()">Export HTML</button>
+      <button class="act" style="background:#0F6CBD" onclick="sendOutlook()">&#9993; Send via Outlook</button>
     </div>
-    <p class="hint">PDF export opens the print dialog — choose “Save as PDF”. Word/HTML exports download files directly.</p>
+    <p class="hint">PDF export opens the print dialog — choose “Save as PDF”. Word/HTML exports download files directly.
+    <strong>Send via Outlook</strong> downloads a ready-to-send draft (.eml) with the subject filled in and the brief
+    attached (Word + HTML) — open it and Outlook shows it as an unsent message. To attach the PDF instead, run Export
+    PDF first and drag the saved file into the draft.</p>
   </div>
   <div id="briefPreviewBox" style="display:none"></div>
 </div>
@@ -268,15 +283,26 @@
     reporting, suspicious-contact reporting, post-travel debrief) and names the FSO in the brief header. Non-cleared
     briefs omit SEAD-3 content but keep the safety, embassy, and digital-security material.</p>
 
-    <h3>4. Exports</h3>
+    <h3>4. Embassy / Consular Contacts</h3>
+    <p>When you select destinations, an editable contact block appears for each one — embassy name, address, telephone,
+    after-hours emergency line, ACS email, and website. Countries with built-in data are pre-filled; complete or correct
+    the fields before generating. Whatever you enter flows into both the <em>Assistance for U.S. Citizens</em> section
+    and the <em>Emergency Contacts</em> table of the brief.</p>
+
+    <h3>5. Exports &amp; Sending</h3>
     <ul>
       <li><strong>Export PDF (print)</strong> — opens the browser print dialog with only the brief visible. Choose “Save as PDF”. The filename is pre-set from the traveler and country.</li>
       <li><strong>Export Word (.doc)</strong> — downloads a Word-compatible document you can edit before issuing.</li>
       <li><strong>Export HTML</strong> — downloads a standalone HTML copy of the brief, suitable for email or archive.</li>
+      <li><strong>Send via Outlook</strong> — enter the traveler's email (and optional CC), then click the button. It
+      downloads a draft message (<code>.eml</code>) with the subject line filled in, the full brief in the email body,
+      and the Word + HTML versions attached. Open the file and Outlook presents it as an unsent message — review and
+      click Send. Browsers cannot attach a print-generated PDF automatically; if you need the PDF attached, run
+      <em>Export PDF</em> first and drag the saved file into the open draft.</li>
     </ul>
-    <p>Generate the brief first; the export buttons use the most recently generated brief.</p>
+    <p>Generate the brief first; the export and send buttons use the most recently generated brief.</p>
 
-    <h3>5. Organizations (Multi-Tenant)</h3>
+    <h3>6. Organizations (Multi-Tenant)</h3>
     <p>The <strong>Organizations</strong> tab lets one FSO (or a security service provider) run briefs for multiple
     companies. Each organization stores its own name, FSO, 24/7 security contact, IT device-handling contact,
     classification line, and footer. Click an organization to edit it; the one marked <em>active</em> feeds the Brief
@@ -284,14 +310,14 @@
     loads one — use this to move between computers or share a standard setup, since data otherwise lives only in this
     browser's localStorage.</p>
 
-    <h3>6. Country Risk Reference</h3>
+    <h3>7. Country Risk Reference</h3>
     <p>The reference tab lists every country in the tool with its advisory snapshot and device tier, plus the Burner
     List. Advisory levels change — the snapshot is for planning only. Verify the live advisory at
     <code>travel.state.gov</code> before every departure, and update the snapshot in the file's
     <code>COUNTRIES</code> data block when levels change (each country is one line; set <code>adv:</code> 1–4 and
     <code>tier:</code> 1–3).</p>
 
-    <h3>7. Record-Keeping Reminders</h3>
+    <h3>8. Record-Keeping Reminders</h3>
     <ul>
       <li>Issue the brief before departure and keep the signed acknowledgment — it serves as the defensive-briefing record.</li>
       <li>Post-travel debrief is due within five (5) business days of return.</li>
@@ -532,8 +558,50 @@ function download(name, content, mime) {
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 }
 
+/* ====================== EMBASSY CONTACTS (EDITABLE) ====================== */
+const EMB_FIELDS = [
+  ["post", "Embassy / Post Name", "U.S. Embassy …"],
+  ["addr", "Address", "Street, city, country"],
+  ["tel", "Telephone", "+ (xx) xxx-xxxx"],
+  ["emerg", "Emergency (after-hours)", "+ (xx) xxx-xxxx"],
+  ["email", "Email (ACS)", "ACS…@state.gov"],
+  ["web", "Website", "https://xx.usembassy.gov/"]
+];
+function embInputId(d, f) { return "embf_" + d.replace(/[^A-Za-z]/g, "") + "_" + f; }
+function renderEmbEdit() {
+  const dests = [...document.getElementById("bDest").selectedOptions].map(o => o.value);
+  const box = document.getElementById("embEdit");
+  // keep anything the FSO already typed before re-rendering
+  const prev = {};
+  box.querySelectorAll("input").forEach(i => prev[i.id] = i.value);
+  if (!dests.length) { box.innerHTML = ""; return; }
+  box.innerHTML = dests.map(d => {
+    const c = COUNTRIES[d];
+    const defaults = { post: c.post || "", addr: c.addr || "", tel: c.tel || "",
+                       emerg: c.emerg || "", email: c.email || "", web: c.web || c.emb || "" };
+    return `<label style="margin-top:14px">Embassy / Consular Contact — ${esc(d)}</label>
+      <div class="grid3">` + EMB_FIELDS.map(([f, lbl, ph]) => {
+        const id = embInputId(d, f);
+        const val = prev[id] !== undefined ? prev[id] : defaults[f];
+        return `<div><label style="text-transform:none;letter-spacing:0;color:#6B7A80">${lbl}</label>
+          <input type="text" id="${id}" value="${esc(val).replace(/"/g, "&quot;")}" placeholder="${ph}"></div>`;
+      }).join("") + `</div>`;
+  }).join("");
+}
+function getEmbData(dests) {
+  return dests.map(d => {
+    const o = { country: d };
+    EMB_FIELDS.forEach(([f]) => {
+      const inp = document.getElementById(embInputId(d, f));
+      o[f] = inp ? inp.value.trim() : (COUNTRIES[d][f] || "");
+    });
+    if (!o.web) o.web = COUNTRIES[d].emb;
+    return o;
+  });
+}
+
 /* ============================ BRIEF BUILD ================================ */
-let lastBrief = null; // {html, fname}
+let lastBrief = null; // {html, fname, subject}
 
 function ckList(items, worstTier) {
   return '<ul class="bf-ck">' + items.filter(([t]) => t === 0 || worstTier <= t).map(([t, txt]) =>
@@ -593,16 +661,18 @@ function buildBrief() {
   h += `<li><strong class="h">5. Consular Assistance</strong><br>Identify the serving U.S. embassy or consulate for each destination. Record its address, emergency phone, and after-hours American Citizen Services contact in the brief.<br>` +
        dests.map(d => `<a class="lnk" href="${COUNTRIES[d].emb}">${esc(d)} embassy</a>`).join(" · ") + `</li></ul>`;
 
-  // embassy detail table for destinations with curated contacts
-  const withC = dests.filter(d => COUNTRIES[d].post);
+  // embassy detail table — uses the editable contact fields from the builder
+  const embData = getEmbData(dests);
+  const withC = embData.filter(e => e.post || e.tel || e.email);
   if (withC.length) {
     h += `<p class="bf-sec">Assistance for U.S. Citizens</p><hr class="bf-secline"><table class="bf-tbl">`;
-    withC.forEach(d => {
-      const c = COUNTRIES[d];
-      h += `<tr><td style="width:165px"><strong>${esc(d)}</strong></td><td>${esc(c.post)}<br>${esc(c.addr)}<br>Tel ${esc(c.tel)}` +
-           (c.emerg ? `<br>Emergency ${esc(c.emerg)}` : "") + (c.fax ? `<br>Fax ${esc(c.fax)}` : "") +
-           (c.email ? `<br>Email <a class="bf-link" href="mailto:${esc(c.email)}">${esc(c.email)}</a>` : "") +
-           `<br><a class="bf-link" href="${esc(c.web || c.emb)}">${esc(c.web || c.emb)}</a></td></tr>`;
+    withC.forEach(e => {
+      h += `<tr><td style="width:165px"><strong>${esc(e.country)}</strong></td><td>` +
+           [e.post && esc(e.post), e.addr && esc(e.addr), e.tel && "Tel " + esc(e.tel),
+            e.emerg && "Emergency " + esc(e.emerg),
+            e.email && `Email <a class="bf-link" href="mailto:${esc(e.email)}">${esc(e.email)}</a>`,
+            e.web && `<a class="bf-link" href="${esc(e.web)}">${esc(e.web)}</a>`
+           ].filter(Boolean).join("<br>") + `</td></tr>`;
     });
     h += `</table><p class="bf-foot" style="border:none;margin-top:6px">Verify current contact details on the embassy website before departure.</p>`;
   }
@@ -620,8 +690,14 @@ function buildBrief() {
   h += `<p class="bf-sec">Emergency Contacts</p><hr class="bf-secline"><table class="bf-kv">
     <tr><td class="k">Security contact (24/7)</td><td>${esc(tn.sec || "Record before departure")}</td></tr>
     <tr><td class="k">IT device handling</td><td>${esc(tn.it || "Record before departure")}</td></tr>
-    <tr><td class="k">FSO</td><td>${esc(tn.fso || "Record before departure")}</td></tr>
-    <tr><td class="k">U.S. embassy / consulate</td><td>Look up the serving post and after-hours American Citizen Services line: <a class="bf-link" href="https://www.usembassy.gov/">usembassy.gov</a></td></tr>
+    <tr><td class="k">FSO</td><td>${esc(tn.fso || "Record before departure")}</td></tr>` +
+    embData.map(e => {
+      const parts = [e.post && esc(e.post), e.tel && "Tel " + esc(e.tel),
+        e.emerg && "<strong>Emergency " + esc(e.emerg) + "</strong>",
+        e.email && `<a class="bf-link" href="mailto:${esc(e.email)}">${esc(e.email)}</a>`,
+        e.web && `<a class="bf-link" href="${esc(e.web)}">${esc(e.web)}</a>`].filter(Boolean);
+      return `<tr><td class="k">U.S. embassy — ${esc(e.country)}</td><td>${parts.length ? parts.join(" · ") : 'Record before departure — serving post lookup: <a class="bf-link" href="https://www.usembassy.gov/">usembassy.gov</a>'}</td></tr>`;
+    }).join("") + `
     <tr><td class="k">State Dept (overseas)</td><td>+1-202-501-4444 · from the U.S.: 1-888-407-4747</td></tr>
     <tr><td class="k">STEP alerts</td><td><a class="bf-link" href="https://step.state.gov/">step.state.gov</a> — enrollment confirmed: pending</td></tr>
   </table>`;
@@ -629,9 +705,7 @@ function buildBrief() {
   h += `<p class="bf-sec">Traveler Acknowledgment</p><hr class="bf-secline">
   <div class="bf-ack">I have received this briefing, understand the device guidance and reporting obligations for this
   itinerary, and will report security incidents and reportable contacts as described above. I will complete the
-  post-travel debrief within five (5) business days of return.
-  <div class="bf-sigrow"><div class="bf-sig">Traveler signature / name</div><div class="bf-sigspace"></div><div class="bf-sigd">Date</div></div>
-  <div class="bf-sigrow"><div class="bf-sig">FSO signature / name</div><div class="bf-sigspace"></div><div class="bf-sigd">Date</div></div>
+  post-travel debrief within five (5) business days of return. <strong>Reply to this email to confirm receipt.</strong>
   </div>`;
 
   h += `<p class="bf-sec">How to Read the Ratings</p><hr class="bf-secline">
@@ -664,7 +738,8 @@ function buildBrief() {
 
   const fname = ("Travel_Brief_" + (document.getElementById("bName").value.trim() || "Traveler") + "_" + dests[0])
     .replace(/[^A-Za-z0-9_-]+/g, "_");
-  lastBrief = { html: h, fname };
+  const subject = `Foreign Travel Security Brief — ${name} — ${dests.join(", ")} (${dep} – ${ret})`;
+  lastBrief = { html: h, fname, subject };
 }
 
 /* =============================== EXPORTS ================================= */
@@ -696,13 +771,64 @@ function exportHTML() {
   const doc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${lastBrief.fname}</title><style>${briefCSS()}</style></head><body>${lastBrief.html}</body></html>`;
   download(lastBrief.fname + ".html", doc, "text/html");
 }
-function exportWord() {
-  if (!needBrief()) return;
-  const doc = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+function wordDoc() {
+  return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
 <head><meta charset="UTF-8"><title>${lastBrief.fname}</title>
 <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]-->
 <style>${briefCSS()}</style></head><body>${lastBrief.html}</body></html>`;
-  download(lastBrief.fname + ".doc", doc, "application/msword");
+}
+function exportWord() {
+  if (!needBrief()) return;
+  download(lastBrief.fname + ".doc", wordDoc(), "application/msword");
+}
+/* "Send via Outlook": build an RFC-822 .eml draft. The X-Unsent header makes
+   Outlook open it as an unsent message with To/Subject/body/attachments set. */
+function b64(str) {
+  const raw = btoa(unescape(encodeURIComponent(str)));
+  return raw.replace(/(.{76})/g, "$1\r\n");
+}
+function sendOutlook() {
+  if (!needBrief()) return;
+  const to = document.getElementById("bEmail").value.trim();
+  const cc = document.getElementById("bCc").value.trim();
+  if (!to) { alert("Enter the traveler's email address (Traveler Email field)."); return; }
+  const bodyHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${briefCSS()}</style></head><body>` +
+    `<p style="font-family:Arial,sans-serif;font-size:13px">Hi,<br><br>Please review your foreign travel security brief below ` +
+    `(also attached). Reply to this email to confirm receipt, and remember the post-travel debrief is due within five (5) ` +
+    `business days of return.<br><br>Safe travels.</p><hr>` + lastBrief.html + `</body></html>`;
+  const BOUND = "=_brief_" + Date.now();
+  const eml = [
+    "To: " + to,
+    cc ? "Cc: " + cc : null,
+    "Subject: " + lastBrief.subject,
+    "X-Unsent: 1",
+    "MIME-Version: 1.0",
+    `Content-Type: multipart/mixed; boundary="${BOUND}"`,
+    "",
+    "--" + BOUND,
+    "Content-Type: text/html; charset=utf-8",
+    "Content-Transfer-Encoding: base64",
+    "",
+    b64(bodyHtml),
+    "--" + BOUND,
+    `Content-Type: application/msword; name="${lastBrief.fname}.doc"`,
+    "Content-Transfer-Encoding: base64",
+    `Content-Disposition: attachment; filename="${lastBrief.fname}.doc"`,
+    "",
+    b64(wordDoc()),
+    "--" + BOUND,
+    `Content-Type: text/html; charset=utf-8; name="${lastBrief.fname}.html"`,
+    "Content-Transfer-Encoding: base64",
+    `Content-Disposition: attachment; filename="${lastBrief.fname}.html"`,
+    "",
+    b64(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${lastBrief.fname}</title><style>${briefCSS()}</style></head><body>${lastBrief.html}</body></html>`),
+    "--" + BOUND + "--",
+    ""
+  ].filter(l => l !== null).join("\r\n");
+  download(lastBrief.fname + ".eml", eml, "message/rfc822");
+  alert("Outlook draft downloaded (" + lastBrief.fname + ".eml).\n\nOpen the file — Outlook will show it as an unsent " +
+        "message with the subject, brief, and attachments ready. To include the PDF, use Export PDF and drag the saved " +
+        "file into the draft before sending.");
 }
 
 /* ================================ UI ===================================== */
@@ -733,6 +859,7 @@ Object.keys(COUNTRIES).sort().forEach(n => {
   o.textContent = `${n}  —  L${c.adv} / T${c.tier}`;
   destSel.appendChild(o);
 });
+destSel.addEventListener("change", renderEmbEdit);
 document.getElementById("burnerNames").textContent =
   Object.keys(COUNTRIES).filter(n => COUNTRIES[n].tier === 1).sort().join(" · ");
 fillTenantSelect();
