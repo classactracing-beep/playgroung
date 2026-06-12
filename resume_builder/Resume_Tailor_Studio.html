@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume Tailor Studio</title>
+<!-- Client side libraries, loaded by CDN. The tool degrades gracefully if a CDN is blocked. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  :root{
+    --navy:#10294b;
+    --navy-2:#1a3a66;
+    --teal:#0e9594;
+    --teal-light:#e0f2f2;
+    --gray-bg:#f3f5f8;
+    --gray-line:#dde3ea;
+    --text:#22303f;
+    --muted:#5d6b7a;
+    --warn:#b45309;
+    --warn-bg:#fef3c7;
+    --good:#15803d;
+    --good-bg:#dcfce7;
+    --bad-bg:#fee2e2;
+    --bad:#b91c1c;
+    --radius:12px;
+    --shadow:0 1px 3px rgba(16,41,75,.08),0 4px 14px rgba(16,41,75,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,Arial,sans-serif;
+    background:var(--gray-bg);color:var(--text);font-size:15px;line-height:1.55;
+  }
+  /* ---------- Header ---------- */
+  header{
+    background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 70%);
+    color:#fff;padding:22px 28px;display:flex;flex-wrap:wrap;gap:14px;
+    align-items:center;justify-content:space-between;
+    position:sticky;top:0;z-index:50;box-shadow:var(--shadow);
+  }
+  header .brand h1{font-size:21px;font-weight:600;letter-spacing:.2px}
+  header .brand p{font-size:13px;opacity:.78;margin-top:2px}
+  header .actions{display:flex;gap:8px;flex-wrap:wrap}
+  /* ---------- Buttons ---------- */
+  .btn{
+    border:none;border-radius:8px;padding:9px 16px;font-size:13.5px;font-weight:600;
+    cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+    transition:background .15s,transform .05s,box-shadow .15s;line-height:1.2;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--teal);color:#fff}
+  .btn-primary:hover{background:#0b7e7d}
+  .btn-navy{background:var(--navy);color:#fff}
+  .btn-navy:hover{background:var(--navy-2)}
+  .btn-ghost{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.3)}
+  .btn-ghost:hover{background:rgba(255,255,255,.22)}
+  .btn-light{background:#fff;color:var(--navy);border:1px solid var(--gray-line)}
+  .btn-light:hover{background:#eef2f6}
+  .btn-danger{background:#fff;color:var(--bad);border:1px solid #f3c2c2}
+  .btn-danger:hover{background:#fff5f5}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn-lg{padding:12px 22px;font-size:15px}
+  /* ---------- Progress steps ---------- */
+  .stepper{
+    display:flex;gap:0;background:#fff;border-bottom:1px solid var(--gray-line);
+    padding:14px 28px;overflow-x:auto;
+  }
+  .step{
+    display:flex;align-items:center;gap:9px;padding:6px 18px 6px 8px;white-space:nowrap;
+    color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;border-radius:8px;
+  }
+  .step:hover{background:var(--gray-bg)}
+  .step .dot{
+    width:26px;height:26px;border-radius:50%;background:var(--gray-line);color:var(--muted);
+    display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;
+    transition:background .2s;
+  }
+  .step.done .dot{background:var(--teal);color:#fff}
+  .step.done{color:var(--navy)}
+  .step+.step{border-left:1px solid var(--gray-line);margin-left:4px;padding-left:16px}
+  /* ---------- Layout ---------- */
+  main{max-width:1320px;margin:0 auto;padding:26px 22px 80px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  @media(max-width:1000px){.grid{grid-template-columns:1fr}}
+  .card{
+    background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:22px;border-top:4px solid var(--navy);
+  }
+  .card.accent{border-top-color:var(--teal)}
+  .card.full{grid-column:1 / -1}
+  .card h2{
+    font-size:16.5px;color:var(--navy);display:flex;align-items:center;gap:9px;margin-bottom:4px;
+  }
+  .card h2 .num{
+    background:var(--navy);color:#fff;border-radius:6px;font-size:12px;
+    width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;flex:none;
+  }
+  .card .sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+  label{font-size:13px;font-weight:600;color:var(--navy);display:block;margin:12px 0 5px}
+  label .req{color:var(--bad);font-weight:700}
+  textarea,input[type=text],input[type=url],select{
+    width:100%;border:1px solid var(--gray-line);border-radius:8px;padding:10px 12px;
+    font:inherit;font-size:14px;color:var(--text);background:#fff;resize:vertical;
+  }
+  textarea:focus,input:focus,select:focus{outline:2px solid var(--teal);outline-offset:0;border-color:var(--teal)}
+  textarea.invalid,input.invalid{border-color:var(--bad);background:#fff8f8}
+  textarea{min-height:130px}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .row>div{flex:1;min-width:160px}
+  .hint{font-size:12.5px;color:var(--muted);margin-top:5px}
+  .note{
+    background:var(--warn-bg);border:1px solid #fcd34d;color:var(--warn);
+    border-radius:8px;padding:10px 13px;font-size:13px;margin-top:10px;display:none;
+  }
+  .note.show{display:block}
+  .field-warning{display:none;color:var(--bad);font-size:12.5px;font-weight:600;margin-top:5px}
+  .field-warning.show{display:block}
+  /* ---------- Tooltips ---------- */
+  .tip{position:relative;display:inline-flex;align-items:center;justify-content:center;
+    width:17px;height:17px;border-radius:50%;background:var(--gray-line);color:var(--muted);
+    font-size:11px;font-weight:700;cursor:help;margin-left:6px;vertical-align:middle;flex:none}
+  .tip::after{
+    content:attr(data-tip);position:absolute;bottom:135%;left:50%;transform:translateX(-50%);
+    background:var(--navy);color:#fff;padding:8px 11px;border-radius:7px;font-size:12px;
+    font-weight:400;width:230px;line-height:1.45;opacity:0;pointer-events:none;
+    transition:opacity .15s;z-index:30;text-align:left;
+  }
+  .tip:hover::after{opacity:1}
+  /* ---------- Chips ---------- */
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+  .chip{
+    font-size:12.5px;font-weight:600;padding:5px 11px;border-radius:999px;
+    background:var(--gray-bg);border:1px solid var(--gray-line);color:var(--text);
+  }
+  .chip.matched{background:var(--good-bg);border-color:#86efac;color:var(--good)}
+  .chip.missing{background:var(--warn-bg);border-color:#fcd34d;color:var(--warn)}
+  .match-meter{height:10px;border-radius:999px;background:var(--gray-line);overflow:hidden;margin-top:10px}
+  .match-meter>div{height:100%;background:linear-gradient(90deg,var(--teal),#27c5a8);width:0%;transition:width .5s}
+  .match-score{font-size:13px;font-weight:700;color:var(--navy);margin-top:6px}
+  .empty{font-size:13px;color:var(--muted);font-style:italic;padding:8px 0}
+  /* ---------- File drop ---------- */
+  .drop{
+    border:2px dashed var(--gray-line);border-radius:10px;padding:18px;text-align:center;
+    color:var(--muted);font-size:13.5px;cursor:pointer;transition:border-color .15s,background .15s;
+  }
+  .drop:hover,.drop.over{border-color:var(--teal);background:var(--teal-light);color:var(--navy)}
+  .drop strong{color:var(--teal)}
+  /* ---------- Profile ---------- */
+  .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+  @media(max-width:560px){.profile-grid{grid-template-columns:1fr}}
+  /* ---------- Toggles ---------- */
+  .toggle-row{display:flex;align-items:center;gap:9px;margin-top:10px;font-size:13.5px}
+  .toggle-row input{width:auto;accent-color:var(--teal);transform:scale(1.15)}
+  /* ---------- Preview ---------- */
+  .doc{
+    background:#fff;border:1px solid var(--gray-line);border-radius:8px;
+    max-height:680px;overflow:auto;padding:44px 50px;
+    font-family:Calibri,Carlito,"Segoe UI",Arial,sans-serif;font-size:14.5px;color:#1b2430;
+    box-shadow:inset 0 0 0 1px #eef1f5;
+  }
+  .doc h3.docname{font-size:23px;color:var(--navy);letter-spacing:.4px;text-align:center}
+  .doc p.doccontact{text-align:center;font-size:13px;color:#44505e;margin:4px 0 14px;border-bottom:2px solid var(--navy);padding-bottom:12px}
+  .doc h4{
+    font-size:13.5px;color:var(--navy);text-transform:uppercase;letter-spacing:1.1px;
+    border-bottom:1px solid var(--gray-line);padding-bottom:3px;margin:16px 0 7px;
+  }
+  .doc ul{margin:4px 0 8px 20px}
+  .doc li{margin:3px 0}
+  .doc p.jobhead{font-weight:700;margin-top:9px}
+  .doc p.plain{margin:3px 0}
+  /* ---------- Export center ---------- */
+  .export-row{display:flex;gap:11px;flex-wrap:wrap;margin-top:6px}
+  /* ---------- Guide ---------- */
+  details.guide{border:1px solid var(--gray-line);border-radius:9px;margin-top:9px;background:#fff;overflow:hidden}
+  details.guide summary{
+    cursor:pointer;padding:11px 15px;font-weight:600;font-size:14px;color:var(--navy);
+    list-style:none;display:flex;justify-content:space-between;align-items:center;
+  }
+  details.guide summary::after{content:"+";font-size:17px;color:var(--teal);font-weight:700}
+  details.guide[open] summary::after{content:"\2212"}
+  details.guide summary:hover{background:var(--gray-bg)}
+  details.guide .body{padding:0 15px 13px;font-size:13.5px;color:var(--text)}
+  details.guide .body ol,details.guide .body ul{margin:6px 0 6px 20px}
+  details.guide .body li{margin:4px 0}
+  /* ---------- Toast ---------- */
+  #toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+    background:var(--navy);color:#fff;padding:12px 22px;border-radius:9px;font-size:14px;
+    box-shadow:var(--shadow);opacity:0;transition:all .25s;z-index:100;max-width:90vw;text-align:center;
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #toast.warn{background:var(--warn)}
+  footer{text-align:center;color:var(--muted);font-size:12.5px;padding:24px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>Resume Tailor Studio</h1>
+    <p>Tailor your real experience to any job posting. Runs fully in your browser. Nothing is uploaded anywhere.</p>
+  </div>
+  <div class="actions">
+    <button class="btn btn-ghost" onclick="loadSample()" title="Fill every field with example data so you can explore the tool">Load Sample Data</button>
+    <button class="btn btn-ghost" onclick="saveProfile()" title="Save everything to this browser">Save Profile</button>
+    <button class="btn btn-ghost" onclick="loadProfile()" title="Restore your last saved session">Load Profile</button>
+    <button class="btn btn-ghost" onclick="resetAll()" title="Clear all fields">Reset</button>
+  </div>
+</header>
+
+<nav class="stepper" id="stepper">
+  <div class="step" data-step="1" onclick="jumpTo('card-resume')"><span class="dot">1</span>Resume</div>
+  <div class="step" data-step="2" onclick="jumpTo('card-job')"><span class="dot">2</span>Job Posting</div>
+  <div class="step" data-step="3" onclick="jumpTo('card-match')"><span class="dot">3</span>Keyword Match</div>
+  <div class="step" data-step="4" onclick="jumpTo('card-build')"><span class="dot">4</span>Build Resume</div>
+  <div class="step" data-step="5" onclick="jumpTo('card-email')"><span class="dot">5</span>Email</div>
+  <div class="step" data-step="6" onclick="jumpTo('card-export')"><span class="dot">6</span>Export</div>
+</nav>
+
+<main>
+<div class="grid">
+
+  <!-- 1. RESUME INPUT -->
+  <section class="card" id="card-resume">
+    <h2><span class="num">1</span>Resume Upload or Paste
+      <span class="tip" data-tip="Your resume stays on your computer. The tool reads it locally in your browser and never sends it to a server.">?</span>
+    </h2>
+    <p class="sub">Upload a .txt or .docx file, or paste your current resume below.</p>
+    <div class="drop" id="dropzone" onclick="document.getElementById('fileInput').click()">
+      <strong>Click to choose a file</strong> or drag and drop here<br>
+      <span style="font-size:12px">Accepted: .txt and .docx</span>
+    </div>
+    <input type="file" id="fileInput" accept=".txt,.docx" style="display:none" onchange="handleFile(this.files[0])">
+    <label for="resumeText">Resume text <span class="req">*</span></label>
+    <textarea id="resumeText" rows="11" placeholder="Paste your current resume here, exactly as it is today..." oninput="onResumeInput()"></textarea>
+    <div class="field-warning" id="warnResume">Please add your resume before generating.</div>
+    <div class="hint">Tip: include your real job titles, employers, dates, and accomplishments. The tool only works with what you give it and never invents experience.</div>
+  </section>
+
+  <!-- 2. JOB POSTING -->
+  <section class="card" id="card-job">
+    <h2><span class="num">2</span>Job Posting Link or Paste
+      <span class="tip" data-tip="Paste the full posting for best results: duties, requirements, and preferred qualifications all feed the keyword engine.">?</span>
+    </h2>
+    <p class="sub">Paste the job posting text. You can also note the posting link for your records.</p>
+    <label for="jobUrl">Job posting link (optional)</label>
+    <input type="url" id="jobUrl" placeholder="https://careers.example.com/jobs/12345" oninput="onJobUrlInput()">
+    <div class="note" id="urlNote">
+      <strong>Heads up:</strong> browsers block pages from reading other websites (CORS security). This tool cannot scrape the link automatically. Please open the link, select the full posting text, and paste it below.
+    </div>
+    <label for="jobText">Job posting text <span class="req">*</span></label>
+    <textarea id="jobText" rows="11" placeholder="Paste the full job posting here: title, duties, requirements, preferred qualifications..." oninput="onJobInput()"></textarea>
+    <div class="field-warning" id="warnJob">Please paste the job posting before generating.</div>
+    <div style="margin-top:12px">
+      <button class="btn btn-primary" onclick="analyzeJob()">Analyze Job Posting</button>
+    </div>
+  </section>
+
+  <!-- 3. CANDIDATE PROFILE -->
+  <section class="card accent" id="card-profile">
+    <h2><span class="num">3</span>Candidate Profile
+      <span class="tip" data-tip="Auto filled from your resume when possible. Check and correct anything here; it appears at the top of your tailored resume and in the email.">?</span>
+    </h2>
+    <p class="sub">Confirm your contact details. These appear on the finished resume.</p>
+    <div class="profile-grid">
+      <div><label for="pName">Full name <span class="req">*</span></label><input type="text" id="pName" placeholder="Jordan Avery"></div>
+      <div><label for="pTitle">Professional title</label><input type="text" id="pTitle" placeholder="Information Security Analyst"></div>
+      <div><label for="pEmail">Email</label><input type="text" id="pEmail" placeholder="you@email.com"></div>
+      <div><label for="pPhone">Phone</label><input type="text" id="pPhone" placeholder="(555) 555-0100"></div>
+      <div><label for="pLocation">Location</label><input type="text" id="pLocation" placeholder="City, ST"></div>
+      <div><label for="pLinkedin">LinkedIn or portfolio</label><input type="text" id="pLinkedin" placeholder="linkedin.com/in/you"></div>
+    </div>
+    <div class="field-warning" id="warnName">Please enter your name.</div>
+  </section>
+
+  <!-- 4. KEYWORD MATCH -->
+  <section class="card accent" id="card-match">
+    <h2><span class="num">4</span>Keyword Match
+      <span class="tip" data-tip="Keywords are pulled from the job posting and compared against your resume text. Matched terms are woven into your tailored resume. Missing terms are shown so you can decide whether you truly have that experience.">?</span>
+    </h2>
+    <p class="sub">How well your current resume lines up with the posting.</p>
+    <div class="match-score" id="matchScore">No analysis yet. Add your resume and the job posting, then click Analyze Job Posting.</div>
+    <div class="match-meter"><div id="matchBar"></div></div>
+    <label style="margin-top:16px">Keywords found in the job posting</label>
+    <div class="chips" id="chipsAll"><div class="empty">Nothing analyzed yet.</div></div>
+    <label style="margin-top:14px">Matched in your resume <span class="tip" data-tip="These terms appear in both the posting and your resume. They get priority placement in your summary and competencies.">?</span></label>
+    <div class="chips" id="chipsMatched"><div class="empty">Nothing analyzed yet.</div></div>
+    <label style="margin-top:14px">Missing from your resume <span class="tip" data-tip="The posting asks for these but your resume never mentions them. Only add a missing term yourself if you genuinely have that experience. The tool will not invent it for you.">?</span></label>
+    <div class="chips" id="chipsMissing"><div class="empty">Nothing analyzed yet.</div></div>
+    <div class="hint" style="margin-top:12px">Honesty rule: missing keywords are never added to your resume automatically. If you really do have one of these skills, edit your resume text in step 1 to mention it, then analyze again.</div>
+  </section>
+
+  <!-- 5. RESUME BUILDER -->
+  <section class="card full" id="card-build">
+    <h2><span class="num">5</span>Resume Builder
+      <span class="tip" data-tip="Generates a tailored draft from your real resume plus the posting keywords. Every section below stays editable before export.">?</span>
+    </h2>
+    <p class="sub">Pick a tone and format, generate the draft, then fine tune any section.</p>
+    <div class="row">
+      <div>
+        <label for="tone">Resume tone</label>
+        <select id="tone">
+          <option value="professional">Professional</option>
+          <option value="govcon">Government contractor</option>
+          <option value="corporate">Corporate</option>
+          <option value="technical">Technical</option>
+          <option value="entry">Entry level</option>
+          <option value="executive">Executive</option>
+        </select>
+      </div>
+      <div>
+        <label for="format">Resume format
+          <span class="tip" data-tip="Chronological leads with work history. Functional leads with skills and competencies. Hybrid blends both and works well for most applicants.">?</span>
+        </label>
+        <select id="format">
+          <option value="chronological">Chronological</option>
+          <option value="functional">Functional</option>
+          <option value="hybrid" selected>Hybrid</option>
+        </select>
+      </div>
+      <div style="display:flex;flex-direction:column;justify-content:flex-end">
+        <div class="toggle-row"><input type="checkbox" id="incClearance"><label for="incClearance" style="margin:0">Include clearance / security section</label></div>
+        <div class="toggle-row"><input type="checkbox" id="incFederal"><label for="incFederal" style="margin:0">Include federal contractor section</label></div>
+      </div>
+      <div style="display:flex;align-items:flex-end">
+        <button class="btn btn-primary btn-lg" onclick="generateResume()">Generate Tailored Resume</button>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-top:18px">
+      <div>
+        <label for="outSummary">Professional summary</label>
+        <textarea id="outSummary" rows="4" oninput="renderPreview()"></textarea>
+        <label for="outCompetencies">Core competencies <span class="tip" data-tip="One per line or comma separated. Pulled from posting keywords that your resume actually supports.">?</span></label>
+        <textarea id="outCompetencies" rows="4" oninput="renderPreview()"></textarea>
+        <label for="outSkills">Skills</label>
+        <textarea id="outSkills" rows="3" oninput="renderPreview()"></textarea>
+        <label for="outEducation">Education</label>
+        <textarea id="outEducation" rows="3" oninput="renderPreview()"></textarea>
+      </div>
+      <div>
+        <label for="outExperience">Work experience <span class="tip" data-tip="Job headers on their own line. Start each bullet with a dash. Example: - Reduced ticket backlog 30 percent by reworking triage.">?</span></label>
+        <textarea id="outExperience" rows="12" oninput="renderPreview()"></textarea>
+        <label for="outCerts">Certifications</label>
+        <textarea id="outCerts" rows="2" oninput="renderPreview()"></textarea>
+        <label for="outClearance">Clearance / security (optional)</label>
+        <textarea id="outClearance" rows="2" oninput="renderPreview()" placeholder="Example: Active Secret clearance, adjudicated 2023."></textarea>
+        <label for="outFederal">Federal contractor details (optional)</label>
+        <textarea id="outFederal" rows="2" oninput="renderPreview()" placeholder="Example: Supported DoD and DHS programs under FAR and DFARS requirements."></textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. EMAIL -->
+  <section class="card" id="card-email">
+    <h2><span class="num">6</span>Hiring Manager Email
+      <span class="tip" data-tip="A short, human note to send with your application. Edit it so it sounds like you.">?</span>
+    </h2>
+    <p class="sub">Generate a brief email connecting your background to this role.</p>
+    <div class="row">
+      <div><label for="hmName">Hiring manager name (optional)</label><input type="text" id="hmName" placeholder="Ms. Rivera"></div>
+      <div><label for="hmCompany">Company name (optional)</label><input type="text" id="hmCompany" placeholder="Acme Federal Solutions"></div>
+    </div>
+    <div style="margin-top:12px"><button class="btn btn-primary" onclick="generateEmail()">Generate Email</button></div>
+    <label for="emailSubject">Subject line</label>
+    <input type="text" id="emailSubject">
+    <label for="emailBody">Email body</label>
+    <textarea id="emailBody" rows="11"></textarea>
+  </section>
+
+  <!-- 7. PREVIEW -->
+  <section class="card" id="card-preview">
+    <h2><span class="num">7</span>Preview
+      <span class="tip" data-tip="A live look at the document you will export. Edit any builder field and the preview updates instantly.">?</span>
+    </h2>
+    <p class="sub">This is exactly what your Word and PDF exports will contain.</p>
+    <div class="doc" id="preview">
+      <p class="empty" style="text-align:center;padding:50px 10px">Your tailored resume will appear here after you click Generate Tailored Resume.</p>
+    </div>
+  </section>
+
+  <!-- 8. EXPORT -->
+  <section class="card full" id="card-export">
+    <h2><span class="num">8</span>Export Center</h2>
+    <p class="sub">Download or copy your finished documents. Always proofread before sending.</p>
+    <div class="export-row">
+      <button class="btn btn-navy btn-lg" onclick="downloadWord()">Download Word Document</button>
+      <button class="btn btn-navy btn-lg" onclick="downloadPdf()">Download PDF</button>
+      <button class="btn btn-light btn-lg" onclick="copyResume()">Copy Resume</button>
+      <button class="btn btn-light btn-lg" onclick="copyEmail()">Copy Email</button>
+      <button class="btn btn-primary btn-lg" onclick="downloadPackage()">Download Full Package (.zip)</button>
+    </div>
+    <div class="hint" style="margin-top:10px">The full package contains the Word document, the PDF, a plain text resume for online applications, and the hiring manager email.</div>
+  </section>
+
+  <!-- 9. USER GUIDE -->
+  <section class="card full accent" id="card-guide">
+    <h2><span class="num">9</span>User Guide</h2>
+    <p class="sub">Everything a first time user needs to know.</p>
+
+    <details class="guide"><summary>1. How to paste or upload a resume</summary><div class="body">
+      <ol>
+        <li>Click the upload box in step 1 and pick a .txt or .docx file, or drag the file onto the box.</li>
+        <li>Or simply paste your resume into the text area.</li>
+        <li>Keep it complete and honest: real titles, employers, dates, schools, and certifications. The tool can only tailor what you give it.</li>
+      </ol>
+    </div></details>
+
+    <details class="guide"><summary>2. How to paste a job posting</summary><div class="body">
+      Open the posting, select all of it (title, duties, requirements, preferred qualifications), copy it, and paste into step 2. The more complete the posting, the better the keyword extraction.
+    </div></details>
+
+    <details class="guide"><summary>3. How to use a job posting link</summary><div class="body">
+      You can record the link in step 2 for your own reference, but browsers do not allow a web page to read other websites (a security rule called CORS). That means this tool cannot scrape the link for you. Open the link yourself, copy the posting text, and paste it in.
+    </div></details>
+
+    <details class="guide"><summary>4. How keyword matching works</summary><div class="body">
+      <ul>
+        <li>The tool scans the posting for skills, tools, duties, and qualifications using a built in dictionary plus phrase analysis.</li>
+        <li>Each keyword is checked against your resume text.</li>
+        <li><strong>Matched</strong> keywords exist in both, so they are emphasized in your tailored resume.</li>
+        <li><strong>Missing</strong> keywords are shown only as a heads up. They are never added automatically, because you should not claim skills you do not have. If you really do have one, mention it in your resume text and analyze again.</li>
+      </ul>
+    </div></details>
+
+    <details class="guide"><summary>5. How to review the tailored resume</summary><div class="body">
+      After you click Generate Tailored Resume, read every section in step 5 and the preview in step 7. Confirm that all dates, employers, numbers, and claims are accurate. The tool rewrites wording, but you own the facts.
+    </div></details>
+
+    <details class="guide"><summary>6. How to edit before export</summary><div class="body">
+      Every section in the builder is a normal text box. Edit anything: summary, competencies, bullets, skills, education, certifications, clearance, and contractor details. The preview and the exports always use your latest edits. In the experience box, lines starting with a dash become bullets and other lines become bold job headers.
+    </div></details>
+
+    <details class="guide"><summary>7. How to download Word and PDF files</summary><div class="body">
+      Use the Export Center. <strong>Download Word Document</strong> creates a clean .docx with simple headings and no tables, which applicant tracking systems read easily. <strong>Download PDF</strong> creates a text based PDF (real selectable text, not an image). <strong>Download Full Package</strong> bundles everything in one zip.
+    </div></details>
+
+    <details class="guide"><summary>8. How to copy the hiring manager email</summary><div class="body">
+      Generate the email in step 6, edit it so it sounds like you, then click <strong>Copy Email</strong> in the Export Center. Paste it into your email client, attach the resume, double check the recipient, and send.
+    </div></details>
+
+    <details class="guide"><summary>9. What this tool can and cannot do</summary><div class="body">
+      <ul>
+        <li><strong>Can:</strong> extract job posting keywords, measure your match, rewrite your real experience in a chosen tone and format, build a clean ATS friendly resume, draft a short email, and export Word, PDF, and text files. Everything runs locally in your browser.</li>
+        <li><strong>Cannot:</strong> scrape job links, invent experience or credentials, guarantee interviews, or replace your judgment. It also cannot read .pdf resumes; save those as .docx or .txt first, or paste the text.</li>
+      </ul>
+    </div></details>
+
+    <details class="guide"><summary>10. Final reminder: verify before you send</summary><div class="body">
+      Before submitting anything, verify every date, employer, title, metric, certification, and clearance on the finished resume and in the email. You are responsible for the accuracy of every application you submit. When in doubt, soften or remove the claim.
+    </div></details>
+  </section>
+
+</div>
+</main>
+
+<footer>Resume Tailor Studio. All processing happens in your browser. No data leaves your computer.</footer>
+<div id="toast"></div>
+
+<script>
+"use strict";
+
+/* =====================================================================
+   DATA: dictionaries used for extraction and humanizing
+===================================================================== */
+
+const STOPWORDS = new Set(("a,able,about,above,across,after,again,against,all,almost,along,already,also,although,among,an,and,any,are,as,at,be,because,been,before,being,below,between,both,but,by,can,could,date,day,days,did,do,does,doing,down,during,each,eg,eight,either,etc,even,every,few,five,for,four,from,further,had,has,have,having,he,her,here,hers,him,his,how,i,ie,if,in,include,includes,including,into,is,it,its,job,join,just,like,ll,looking,made,make,makes,many,may,me,might,more,most,much,must,my,new,nine,no,nor,not,now,of,off,offer,on,once,one,only,or,other,our,ours,out,over,own,part,per,plus,position,posting,re,role,s,same,seven,shall,she,should,since,six,so,some,such,t,team,than,that,the,their,theirs,them,then,there,these,they,this,those,three,through,time,to,too,two,under,until,up,us,use,used,using,ve,very,was,we,well,were,what,when,where,which,while,who,whom,why,will,with,within,without,work,would,year,years,you,your,yours,ability,strong,preferred,required,requirements,qualifications,responsibilities,duties,experience,knowledge,skills,candidate,applicant,applicants,company,employees,employee,benefits,salary,equal,opportunity,employer,apply,application,description,summary,about,seeking,ideal,successful").split(","));
+
+/* Known multi word and single word skill terms. Lowercase. Checked first, before generic extraction. */
+const SKILL_TERMS = [
+  "project management","program management","risk management","change management","stakeholder management",
+  "vulnerability management","incident response","threat analysis","threat intelligence","security operations",
+  "security clearance","access control","physical security","personnel security","industrial security",
+  "information security","cybersecurity","network security","cloud security","application security",
+  "nispom","nist 800-53","nist 800-171","rmf","fedramp","fisma","cmmc","dfars","far","itar","ear",
+  "disa","stig","stigs","poa&m","ato","jpas","diss","niss","sf-86","e-qip","scif","fso","cdse","sap","sci",
+  "top secret","secret clearance","public trust","counterintelligence","insider threat","opsec","comsec",
+  "continuous monitoring","security awareness","security education","visitor control","badge management",
+  "data analysis","data analytics","data visualization","business intelligence","reporting","dashboards",
+  "sql","python","java","javascript","typescript","c++","c#","powershell","bash","linux","windows server",
+  "active directory","azure","aws","gcp","office 365","microsoft 365","sharepoint","power bi","tableau",
+  "excel","microsoft excel","microsoft word","microsoft office","outlook","jira","confluence","servicenow",
+  "salesforce","sap erp","quickbooks","crm","erp","git","github","gitlab","devops","devsecops","ci/cd",
+  "docker","kubernetes","terraform","ansible","vmware","virtualization","firewalls","vpn","ids","ips",
+  "siem","splunk","wireshark","nessus","tenable","qualys","crowdstrike","endpoint security","edr",
+  "penetration testing","ethical hacking","forensics","malware analysis","zero trust","identity management",
+  "customer service","client relations","vendor management","contract management","procurement",
+  "budget management","budgeting","forecasting","financial analysis","accounts payable","accounts receivable",
+  "payroll","invoicing","auditing","compliance","regulatory compliance","quality assurance","quality control",
+  "process improvement","continuous improvement","lean","six sigma","kaizen","root cause analysis",
+  "scheduling","logistics","supply chain","inventory management","warehouse operations","fleet management",
+  "training","mentoring","coaching","onboarding","recruiting","talent acquisition","human resources",
+  "performance management","employee relations","benefits administration","hris",
+  "communication","written communication","verbal communication","public speaking","presentations",
+  "technical writing","documentation","standard operating procedures","sops","policy development",
+  "report writing","briefings","cross-functional collaboration","teamwork","leadership","team leadership",
+  "supervision","problem solving","critical thinking","attention to detail","time management",
+  "organization","multitasking","prioritization","decision making","conflict resolution","negotiation",
+  "strategic planning","business development","capture management","proposal writing","rfp","rfq",
+  "account management","sales","marketing","social media","seo","content creation","copywriting",
+  "agile","scrum","kanban","waterfall","sdlc","pmp","capm","itil","cissp","security+","comptia",
+  "cism","cisa","cap","casp","ceh","gsec","cysa+","network+","a+","ccna","aws certified","pmi",
+  "help desk","technical support","troubleshooting","system administration","network administration",
+  "database administration","data entry","records management","file management","case management",
+  "grant writing","fundraising","event planning","facilities management","emergency management",
+  "first aid","cpr","osha","safety compliance","hazmat","environmental compliance",
+  "healthcare","hipaa","patient care","medical terminology","ehr","epic","cerner",
+  "teaching","curriculum development","instructional design","e-learning","lms",
+  "graphic design","adobe photoshop","adobe illustrator","indesign","figma","ui design","ux design",
+  "user research","wireframing","prototyping","accessibility","html","css","react","angular","vue",
+  "node.js","rest api","apis","microservices","machine learning","artificial intelligence","nlp",
+  "etl","data warehousing","big data","hadoop","spark","r programming","sas","stata","matlab",
+  "autocad","solidworks","gis","arcgis","drafting","blueprint reading","cnc","welding","electrical",
+  "hvac","plumbing","carpentry","forklift","cdl","route planning","dispatch","customer success",
+  "kpi tracking","metrics","okrs","governance","due diligence","mergers and acquisitions",
+  "investigations","background investigations","law enforcement","security guard","surveillance",
+  "emergency response","crisis management","business continuity","disaster recovery","coop"
+];
+
+/* Turns "responsible for managing X" into "managed X" */
+const GERUND_PAST = {managing:"managed",overseeing:"oversaw",coordinating:"coordinated",maintaining:"maintained",
+  supporting:"supported",developing:"developed",creating:"created",leading:"led",handling:"handled",
+  providing:"provided",ensuring:"ensured",conducting:"conducted",tracking:"tracked",processing:"processed",
+  training:"trained",writing:"wrote",preparing:"prepared",reviewing:"reviewed",scheduling:"scheduled",
+  monitoring:"monitored",administering:"administered",delivering:"delivered",performing:"performed",
+  assisting:"assisted",updating:"updated",building:"built",running:"ran",organizing:"organized"};
+
+/* Phrases that sound machine written, with natural replacements. Order matters. */
+const HUMANIZE_RULES = [
+  [/\b(responsible for|duties included|tasked with|in charge of)\s+([a-z]+ing)\b/gi,
+    (m, p1, p2) => GERUND_PAST[p2.toLowerCase()] || ("handled " + p2)],
+  [/\bleverag(e|ed|es|ing)\b/gi, (m, p1) => ({e:"use",ed:"used",es:"uses",ing:"using"})[p1.toLowerCase()] || "use"],
+  [/\butiliz(e|ed|es|ing)\b/gi, (m, p1) => ({e:"use",ed:"used",es:"uses",ing:"using"})[p1.toLowerCase()] || "use"],
+  [/\bsynerg(y|ies|istic)\b/gi, "collaboration"],
+  [/\bdynamic professional\b/gi, "professional"],
+  [/\bproven track record of\b/gi, "consistent results in"],
+  [/\bproven track record\b/gi, "consistent results"],
+  [/\bresults[- ]driven\b/gi, "results focused"],
+  [/\bdetail[- ]oriented\b/gi, "careful with detail"],
+  [/\bself[- ]starter\b/gi, "works well independently"],
+  [/\bgo[- ]getter\b/gi, "motivated"],
+  [/\bthink outside the box\b/gi, "find practical solutions"],
+  [/\bspearheaded\b/gi, "led"],
+  [/\bfacilitated\b/gi, "led"],
+  [/\borchestrated\b/gi, "coordinated"],
+  [/\bchampioned\b/gi, "promoted"],
+  [/\brobust\b/gi, "reliable"],
+  [/\bcutting[- ]edge\b/gi, "modern"],
+  [/\bstate[- ]of[- ]the[- ]art\b/gi, "modern"],
+  [/\bbest[- ]in[- ]class\b/gi, "high quality"],
+  [/\bworld[- ]class\b/gi, "high quality"],
+  [/\bseamlessly\b/gi, "smoothly"],
+  [/\bholistic\b/gi, "complete"],
+  [/\bparadigm\b/gi, "approach"],
+  [/\bwheelhouse\b/gi, "strengths"],
+  [/\bcore competency of\b/gi, "strength in"],
+  [/\bin order to\b/gi, "to"],
+  [/\bresponsible for\b/gi, "handled"],
+  [/\bduties included\b/gi, "handled"],
+  [/\btasked with\b/gi, "assigned to"],
+  [/\bwas involved in\b/gi, "contributed to"],
+  [/\bassisted with\b/gi, "supported"],
+  [/\bworked on\b/gi, "delivered"],
+  [/\bhelped to\b/gi, "helped"],
+  [/[—–]/g, ", "],         /* em and en dashes become commas */
+  [/ ,/g, ","],
+  [/,\s*,/g, ","],
+  [/\s{2,}/g, " "]
+];
+
+const ACTION_VERBS = ["Led","Managed","Built","Created","Improved","Reduced","Increased","Delivered","Developed","Coordinated","Streamlined","Implemented","Designed","Launched","Resolved","Trained","Maintained","Audited","Negotiated","Produced","Directed","Authored","Tracked","Secured","Supported","Analyzed","Standardized","Modernized","Documented"];
+
+const WEAK_OPENERS = /^(i\s|my\s|the\s|a\s|an\s|also\s|additionally\s|various\s|other\s|some\s)/i;
+
+/* =====================================================================
+   STATE
+===================================================================== */
+let jobKeywords = [];      // [{term, weight}]
+let matchedKw = [];
+let missingKw = [];
+let parsedResume = null;
+let detectedJobTitle = "";
+let detectedCompany = "";
+
+const $ = id => document.getElementById(id);
+
+/* =====================================================================
+   SMALL HELPERS
+===================================================================== */
+function toast(msg, warn){
+  const t = $("toast");
+  t.textContent = msg;
+  t.className = warn ? "warn show" : "show";
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.className = "", 3200);
+}
+function jumpTo(id){ document.getElementById(id).scrollIntoView({behavior:"smooth", block:"start"}); }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function titleCase(s){
+  return s.split(" ").map(w => {
+    if (w.length <= 3 && w === w.toUpperCase()) return w;          // acronyms
+    if (/^[A-Z0-9+#./&-]+$/.test(w) && w.length <= 6) return w;    // SQL, CI/CD
+    return w.charAt(0).toUpperCase() + w.slice(1);
+  }).join(" ");
+}
+function humanize(text){
+  let out = String(text || "");
+  for (const [re, rep] of HUMANIZE_RULES) out = out.replace(re, rep);
+  return out.replace(/\s+([.,;:!?])/g, "$1").trim();
+}
+function updateSteps(){
+  const flags = [
+    $("resumeText").value.trim().length > 40,
+    $("jobText").value.trim().length > 40,
+    jobKeywords.length > 0,
+    $("outSummary").value.trim().length > 0,
+    $("emailBody").value.trim().length > 0,
+    false
+  ];
+  flags[5] = flags[3];
+  document.querySelectorAll(".step").forEach((el, i) => el.classList.toggle("done", flags[i]));
+}
+
+/* =====================================================================
+   STEP 1: resume intake
+===================================================================== */
+function handleFile(file){
+  if (!file) return;
+  const name = file.name.toLowerCase();
+  if (name.endsWith(".txt")){
+    const r = new FileReader();
+    r.onload = e => { $("resumeText").value = e.target.result; onResumeInput(); toast("Resume loaded from " + file.name); };
+    r.readAsText(file);
+  } else if (name.endsWith(".docx")){
+    if (typeof mammoth === "undefined"){ toast("The .docx reader library did not load. Please paste your resume text instead.", true); return; }
+    const r = new FileReader();
+    r.onload = e => {
+      mammoth.extractRawText({arrayBuffer: e.target.result})
+        .then(res => { $("resumeText").value = res.value.trim(); onResumeInput(); toast("Resume loaded from " + file.name); })
+        .catch(() => toast("Could not read that .docx file. Please paste the text instead.", true));
+    };
+    r.readAsArrayBuffer(file);
+  } else {
+    toast("Unsupported file type. Use .txt or .docx, or paste the text.", true);
+  }
+}
+(function initDrop(){
+  const dz = $("dropzone");
+  ["dragenter","dragover"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add("over"); }));
+  ["dragleave","drop"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove("over"); }));
+  dz.addEventListener("drop", e => handleFile(e.dataTransfer.files[0]));
+})();
+
+function onResumeInput(){
+  $("resumeText").classList.remove("invalid");
+  $("warnResume").classList.remove("show");
+  parsedResume = parseResume($("resumeText").value);
+  autofillProfile(parsedResume);
+  updateSteps();
+}
+function onJobInput(){
+  $("jobText").classList.remove("invalid");
+  $("warnJob").classList.remove("show");
+  updateSteps();
+}
+function onJobUrlInput(){
+  $("urlNote").classList.toggle("show", $("jobUrl").value.trim().length > 0);
+}
+
+/* =====================================================================
+   RESUME PARSING
+===================================================================== */
+const SECTION_PATTERNS = [
+  ["summary", /^(professional\s+summary|summary(\s+of\s+qualifications)?|profile|objective|career\s+objective|about(\s+me)?)\b[:\s]*$/i],
+  ["experience", /^((professional|work|relevant|employment)\s+(experience|history)|experience|employment|career\s+history|work\s+history)\b[:\s]*$/i],
+  ["education", /^(education(\s+and\s+training)?|academic\s+background|training\s+and\s+education)\b[:\s]*$/i],
+  ["skills", /^((technical|core|key|relevant)\s+(skills|competencies|proficiencies)|skills(\s+&\s+abilities)?|competencies|areas\s+of\s+expertise|expertise)\b[:\s]*$/i],
+  ["certs", /^(certifications?(\s+and\s+licenses?)?|licenses?(\s+and\s+certifications?)?|credentials)\b[:\s]*$/i],
+  ["clearance", /^((security\s+)?clearance|clearances)\b[:\s]*$/i]
+];
+
+function parseResume(text){
+  const lines = text.split(/\r?\n/);
+  const sections = {summary:[], experience:[], education:[], skills:[], certs:[], clearance:[], header:[]};
+  let cur = "header";
+  for (const raw of lines){
+    const line = raw.trim();
+    if (!line) continue;
+    let matchedSection = null;
+    const stripped = line.replace(/^[\s•·▪\-\*–—_=]+|[\s_=:]+$/g, "");
+    for (const [name, re] of SECTION_PATTERNS){
+      if (re.test(stripped)){ matchedSection = name; break; }
+    }
+    if (matchedSection){ cur = matchedSection; continue; }
+    if (cur === "header" && sections.header.length >= 6) cur = "summary";
+    sections[cur].push(line);
+  }
+  // contact details
+  const all = text;
+  const email = (all.match(/[\w.+-]+@[\w-]+\.[\w.]+/) || [""])[0];
+  const phone = (all.match(/(\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}/) || [""])[0];
+  const linkedin = (all.match(/(linkedin\.com\/[^\s|,]+|github\.com\/[^\s|,]+)/i) || [""])[0];
+  const location = (all.match(/\b[A-Z][a-zA-Z .]+,\s?(AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|DC)\b/) || [""])[0];
+  // name: first short header line without digits or @
+  let name = "";
+  for (const l of sections.header){
+    if (!/[@0-9]/.test(l) && l.split(/\s+/).length <= 5 && l.length < 40){ name = l.replace(/[|,].*$/, "").trim(); break; }
+  }
+  const clearance = (all.match(/\b(active\s+)?(top\s+secret(\/?sci)?|ts\/?sci|secret|public\s+trust)\s*(clearance)?[^\n]*/i) || [""])[0].trim();
+  return {sections, email, phone, linkedin, location, name, clearance};
+}
+
+function autofillProfile(p){
+  if (!p) return;
+  const set = (id, val) => { if (val && !$(id).value.trim()) $(id).value = val; };
+  set("pName", p.name);
+  set("pEmail", p.email);
+  set("pPhone", p.phone);
+  set("pLinkedin", p.linkedin);
+  set("pLocation", p.location);
+  if (p.clearance && !$("outClearance").value.trim()){
+    $("outClearance").value = titleCase(p.clearance.charAt(0).toUpperCase() + p.clearance.slice(1)).replace(/Ts\/sci/i,"TS/SCI");
+    $("incClearance").checked = true;
+  }
+}
+
+/* =====================================================================
+   STEP 2-4: job analysis and keyword matching
+===================================================================== */
+function analyzeJob(){
+  const job = $("jobText").value.trim();
+  const res = $("resumeText").value.trim();
+  let ok = true;
+  if (job.length < 40){ $("jobText").classList.add("invalid"); $("warnJob").classList.add("show"); ok = false; }
+  if (res.length < 40){ $("resumeText").classList.add("invalid"); $("warnResume").classList.add("show"); ok = false; }
+  if (!ok){ toast("Add both your resume and the job posting first.", true); return; }
+
+  detectJobMeta(job);
+  jobKeywords = extractKeywords(job);
+  const resLower = " " + res.toLowerCase().replace(/[—–]/g," ") + " ";
+  matchedKw = []; missingKw = [];
+  for (const kw of jobKeywords){
+    if (keywordInText(kw.term, resLower)) matchedKw.push(kw); else missingKw.push(kw);
+  }
+  renderMatch();
+  updateSteps();
+  toast("Job posting analyzed. " + matchedKw.length + " of " + jobKeywords.length + " keywords matched.");
+  jumpTo("card-match");
+}
+
+function keywordInText(term, lowerText){
+  const t = term.toLowerCase();
+  if (lowerText.includes(t)) return true;
+  // simple stem fallback for single words: match on first 5+ chars
+  if (!t.includes(" ") && t.length > 5){
+    const stem = t.replace(/(ing|ed|es|s|ion)$/,"");
+    if (stem.length >= 5 && new RegExp("\\b" + stem.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).test(lowerText)) return true;
+  }
+  return false;
+}
+
+function detectJobMeta(job){
+  const lines = job.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  detectedJobTitle = "";
+  detectedCompany = "";
+  const tMatch = job.match(/(?:job\s+title|position(?:\s+title)?|title)\s*[:\-]\s*([^\n]{3,70})/i);
+  if (tMatch) detectedJobTitle = tMatch[1].trim();
+  else if (lines[0] && lines[0].length < 70 && !/[.!?]$/.test(lines[0])) detectedJobTitle = lines[0].replace(/\s*[\(\[].*$/,"").trim();
+  const cMatch = job.match(/(?:company|organization|employer|agency)\s*[:\-]\s*([^\n]{2,60})/i)
+            || job.match(/\b(?:at|with|join)\s+([A-Z][A-Za-z0-9&.,' ]{2,45}?(?:Inc\.?|LLC|Corp\.?|Corporation|Company|Group|Solutions|Technologies|Systems|Services|Federal|Consulting))/);
+  if (cMatch) detectedCompany = cMatch[1].trim().replace(/[.,]$/,"");
+  if (detectedCompany && !$("hmCompany").value.trim()) $("hmCompany").value = detectedCompany;
+}
+
+function extractKeywords(job){
+  const lower = job.toLowerCase().replace(/[—–]/g, " ");
+  const found = new Map(); // term -> weight
+  // 1) dictionary terms
+  for (const term of SKILL_TERMS){
+    const safe = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const re = new RegExp("(?:^|[^a-z0-9])" + safe + "(?:$|[^a-z0-9])", "g");
+    const count = (lower.match(re) || []).length;
+    if (count > 0){
+      let w = count + (term.includes(" ") ? 1.5 : 0);
+      // boost terms in requirement style lines
+      if (new RegExp("(required|must|minimum|qualification)[^\\n]*" + safe, "i").test(lower)) w += 2;
+      found.set(term, w);
+    }
+  }
+  // drop dictionary terms fully contained in a longer matched term
+  for (const a of [...found.keys()]){
+    for (const b of found.keys()){
+      if (a !== b && b.includes(a) && b.split(" ").length > a.split(" ").length){ found.delete(a); break; }
+    }
+  }
+  // 2) frequent generic words not already covered
+  const words = lower.replace(/[^a-z0-9+#./&' -]/g, " ").split(/\s+/).filter(w =>
+    w.length > 3 && !STOPWORDS.has(w) && !/^\d+$/.test(w));
+  const freq = new Map();
+  for (const w of words) freq.set(w, (freq.get(w) || 0) + 1);
+  const covered = [...found.keys()].join(" ");
+  const generic = [...freq.entries()]
+    .filter(([w, c]) => c >= 3 && !covered.includes(w))
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8);
+  for (const [w, c] of generic) found.set(w, c * 0.6);
+  // 3) acronyms in the original casing
+  const acronyms = job.match(/\b[A-Z]{2,6}(?:\/[A-Z]{2,6})?\b/g) || [];
+  const skipAc = new Set(["AND","THE","FOR","YOU","OUR","ALL","ARE","EEO","USA","LLC","INC","PTO","GPA","PDF","NOT","PER","EST","PST","CST","MST"]);
+  for (const a of acronyms){
+    const al = a.toLowerCase();
+    if (skipAc.has(a) || covered.includes(al) || found.has(al)) continue;
+    const c = (job.match(new RegExp("\\b" + a + "\\b", "g")) || []).length;
+    if (c >= 1 && a.length >= 3) found.set(al, c + 1);
+  }
+  return [...found.entries()]
+    .map(([term, weight]) => ({term, weight}))
+    .sort((a, b) => b.weight - a.weight)
+    .slice(0, 26);
+}
+
+function renderMatch(){
+  const pct = jobKeywords.length ? Math.round(100 * matchedKw.length / jobKeywords.length) : 0;
+  $("matchBar").style.width = pct + "%";
+  let verdict = "Strong match. Your resume already speaks this posting's language.";
+  if (pct < 70) verdict = "Decent match. Review the missing keywords for real experience you forgot to mention.";
+  if (pct < 40) verdict = "Low match. Make sure your resume mentions the relevant experience you actually have.";
+  $("matchScore").textContent = "Match score: " + pct + "% (" + matchedKw.length + " of " + jobKeywords.length + " keywords). " + verdict;
+  const chip = (kw, cls) => '<span class="chip ' + cls + '">' + esc(titleCase(kw.term)) + '</span>';
+  $("chipsAll").innerHTML = jobKeywords.length ? jobKeywords.map(k => chip(k, "")).join("") : '<div class="empty">No keywords found.</div>';
+  $("chipsMatched").innerHTML = matchedKw.length ? matchedKw.map(k => chip(k, "matched")).join("") : '<div class="empty">No matches yet.</div>';
+  $("chipsMissing").innerHTML = missingKw.length ? missingKw.map(k => chip(k, "missing")).join("") : '<div class="empty">Nothing missing. Nice.</div>';
+}
+
+/* =====================================================================
+   STEP 5: resume generation
+===================================================================== */
+function generateResume(){
+  const res = $("resumeText").value.trim();
+  const job = $("jobText").value.trim();
+  let ok = true;
+  if (res.length < 40){ $("resumeText").classList.add("invalid"); $("warnResume").classList.add("show"); ok = false; }
+  if (job.length < 40){ $("jobText").classList.add("invalid"); $("warnJob").classList.add("show"); ok = false; }
+  if (!$("pName").value.trim()){ $("warnName").classList.add("show"); $("pName").classList.add("invalid"); ok = false; }
+  else { $("warnName").classList.remove("show"); $("pName").classList.remove("invalid"); }
+  if (!ok){ toast("Fill in the required fields marked with * first.", true); jumpTo("card-resume"); return; }
+  if (!jobKeywords.length) analyzeJobSilently();
+
+  parsedResume = parseResume(res);
+  const tone = $("tone").value;
+
+  $("outSummary").value = buildSummary(tone);
+  $("outCompetencies").value = buildCompetencies();
+  $("outExperience").value = buildExperience();
+  $("outSkills").value = buildSkills();
+  $("outEducation").value = parsedResume.sections.education.map(l => humanize(l)).join("\n");
+  $("outCerts").value = parsedResume.sections.certs.map(l => humanize(l.replace(/^[•\-\*•]\s*/, ""))).join("\n");
+  if (parsedResume.sections.clearance.length && !$("outClearance").value.trim()){
+    $("outClearance").value = humanize(parsedResume.sections.clearance.join(" "));
+    $("incClearance").checked = true;
+  }
+  if (!$("pTitle").value.trim() && detectedJobTitle) $("pTitle").value = titleCase(detectedJobTitle);
+
+  renderPreview();
+  updateSteps();
+  toast("Tailored resume generated. Review every section, then export.");
+  jumpTo("card-preview");
+}
+
+function analyzeJobSilently(){
+  const job = $("jobText").value.trim();
+  const res = $("resumeText").value.trim();
+  detectJobMeta(job);
+  jobKeywords = extractKeywords(job);
+  const resLower = " " + res.toLowerCase().replace(/[—–]/g," ") + " ";
+  matchedKw = jobKeywords.filter(k => keywordInText(k.term, resLower));
+  missingKw = jobKeywords.filter(k => !keywordInText(k.term, resLower));
+  renderMatch();
+}
+
+function detectYears(){
+  const m = $("resumeText").value.match(/(\d{1,2})\+?\s*years?/i);
+  if (m) return m[1];
+  // estimate from earliest year in experience
+  const years = ($("resumeText").value.match(/\b(19|20)\d{2}\b/g) || []).map(Number);
+  if (years.length){
+    const span = new Date().getFullYear() - Math.min(...years);
+    if (span > 0 && span < 45) return String(span);
+  }
+  return "";
+}
+
+function buildSummary(tone){
+  const role = detectedJobTitle ? titleCase(detectedJobTitle) : ($("pTitle").value.trim() || "professional");
+  const yrs = detectYears();
+  const top = matchedKw.slice(0, 4).map(k => titleCase(k.term));
+  const skillsPhrase = top.length >= 2
+    ? top.slice(0, -1).join(", ") + " and " + top[top.length - 1]
+    : (top[0] || "the core skills this role calls for");
+  const yrsPhrase = yrs ? yrs + " years of " : "";
+  const company = detectedCompany || $("hmCompany").value.trim();
+  const forCompany = company ? " at " + company : "";
+  let s = "";
+  switch (tone){
+    case "govcon":
+      s = (yrs ? role + " with " + yrsPhrase + "hands-on experience supporting government and contractor environments. " : role + " experienced in government and contractor environments. ")
+        + "Strengths include " + skillsPhrase + ". Comfortable working to federal standards, keeping documentation audit ready, and supporting mission goals" + forCompany + ".";
+      break;
+    case "corporate":
+      s = role + (yrs ? " with " + yrsPhrase + "experience helping organizations run smoother and hit their targets. " : " focused on helping organizations run smoother and hit their targets. ")
+        + "Brings practical strength in " + skillsPhrase + " and a habit of clear communication with stakeholders at every level.";
+      break;
+    case "technical":
+      s = role + (yrs ? " with " + yrsPhrase + "hands-on technical experience. " : " with hands-on technical depth. ")
+        + "Works daily with " + skillsPhrase + ". Known for clean documentation, careful troubleshooting, and solutions that hold up in production.";
+      break;
+    case "entry":
+      s = "Motivated early career candidate ready to contribute as a " + role.toLowerCase() + ". "
+        + "Brings real exposure to " + skillsPhrase + " through education, projects, and work to date, plus a genuine willingness to learn fast and pitch in.";
+      break;
+    case "executive":
+      s = "Senior leader" + (yrs ? " with " + yrsPhrase + "experience" : "") + " driving results across " + skillsPhrase + ". "
+        + "Builds capable teams, sets clear priorities, and is accountable for outcomes that matter to the business" + forCompany + ".";
+      break;
+    default: // professional
+      s = role + (yrs ? " with " + yrsPhrase + "relevant experience. " : " with relevant, hands-on experience. ")
+        + "Skilled in " + skillsPhrase + ". Dependable, easy to work with, and focused on doing the job right the first time.";
+  }
+  // If the original resume had a summary, fold one honest line of it in
+  const orig = parsedResume.sections.summary.join(" ").trim();
+  if (orig && orig.length > 30){
+    const firstSentence = humanize(orig.split(/(?<=[.!?])\s+/)[0]);
+    if (firstSentence.length < 160 && !/^(seeking|objective)/i.test(firstSentence)) s += " " + firstSentence;
+  }
+  return humanize(s);
+}
+
+function buildCompetencies(){
+  const comps = [];
+  for (const k of matchedKw.slice(0, 12)) comps.push(titleCase(k.term));
+  // backfill from resume skills if thin
+  if (comps.length < 6){
+    for (const line of parsedResume.sections.skills){
+      for (const part of line.replace(/^[•\-\*•]\s*/, "").split(/[,;|•]/)){
+        const p = part.trim();
+        if (p && p.length < 40 && !comps.some(c => c.toLowerCase() === p.toLowerCase())) comps.push(titleCase(p));
+        if (comps.length >= 10) break;
+      }
+      if (comps.length >= 10) break;
+    }
+  }
+  return comps.join("\n");
+}
+
+function buildExperience(){
+  const lines = parsedResume.sections.experience;
+  if (!lines.length) return "";
+  const out = [];
+  const bulletRe = /^[•·▪\-\*•▪●>]+\s*/;
+  for (const raw of lines){
+    const isBullet = bulletRe.test(raw);
+    const text = raw.replace(bulletRe, "").trim();
+    if (!text) continue;
+    if (isBullet) out.push("- " + rewriteBullet(text));
+    else out.push((out.length ? "\n" : "") + humanize(text));
+  }
+  return out.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+function rewriteBullet(text){
+  let t = humanize(text).replace(/[.;]\s*$/, "");
+  // strengthen weak openers
+  if (WEAK_OPENERS.test(t)) t = t.replace(WEAK_OPENERS, "");
+  t = t.charAt(0).toUpperCase() + t.slice(1);
+  const firstWord = t.split(/\s+/)[0].replace(/[^A-Za-z]/g, "");
+  const startsWithVerb = ACTION_VERBS.some(v => v.toLowerCase() === firstWord.toLowerCase());
+  if (!startsWithVerb && /^(daily|weekly|monthly|general|office|admin|various|all)$/i.test(firstWord)){
+    t = "Handled " + t.charAt(0).toLowerCase() + t.slice(1);
+  }
+  if (t.length > 220) t = t.slice(0, 217).replace(/\s+\S*$/, "") + "...";
+  return t + ".";
+}
+
+function buildSkills(){
+  const set = [];
+  const push = v => { const t = v.trim(); if (t && t.length < 45 && !set.some(s => s.toLowerCase() === t.toLowerCase())) set.push(t); };
+  for (const line of parsedResume.sections.skills)
+    for (const part of line.replace(/^[•\-\*•]\s*/, "").split(/[,;|•]/)) push(titleCase(part));
+  // add matched keywords not already present
+  for (const k of matchedKw) push(titleCase(k.term));
+  return set.slice(0, 18).join(", ");
+}
+
+/* =====================================================================
+   STEP 6: hiring manager email
+===================================================================== */
+function generateEmail(){
+  if (!$("outSummary").value.trim() && !$("resumeText").value.trim()){
+    toast("Add your resume first so the email reflects your real background.", true);
+    return;
+  }
+  if (!jobKeywords.length && $("jobText").value.trim().length > 40) analyzeJobSilently();
+  const name = $("pName").value.trim() || "the applicant";
+  const role = detectedJobTitle ? titleCase(detectedJobTitle) : ($("pTitle").value.trim() || "the open position");
+  const company = $("hmCompany").value.trim() || detectedCompany;
+  const hm = $("hmName").value.trim();
+  const yrs = detectYears();
+  const top = matchedKw.slice(0, 3).map(k => titleCase(k.term));
+  const skillsPhrase = top.length >= 2 ? top.slice(0, -1).join(", ") + " and " + top[top.length - 1] : (top[0] || "the areas this role focuses on");
+
+  $("emailSubject").value = "Application for " + role + (name !== "the applicant" ? " - " + name : "");
+
+  const greeting = hm ? "Dear " + hm + "," : "Dear Hiring Manager,";
+  const intro = "My name is " + name + " and I am writing to apply for the " + role + " position" + (company ? " at " + company : "") + ".";
+  const body1 = (yrs ? "I bring " + yrs + " years of experience" : "My background is") + " in " + skillsPhrase + ", which lines up closely with what the posting describes.";
+  const body2 = "In my recent work I have handled the kind of responsibilities this role calls for, and I am confident I could contribute quickly.";
+  const ask = "I have attached my resume and would welcome a short conversation about the role at your convenience. Thank you for your time and consideration.";
+  const closing = "Best regards,\n" + (name !== "the applicant" ? name : "") +
+    ($("pPhone").value.trim() ? "\n" + $("pPhone").value.trim() : "") +
+    ($("pEmail").value.trim() ? "\n" + $("pEmail").value.trim() : "");
+
+  $("emailBody").value = humanize([greeting, "", intro, "", body1 + " " + body2, "", ask, "", closing].join("\n"))
+    .replace(/\n /g, "\n");
+  updateSteps();
+  toast("Email drafted. Edit it so it sounds like you.");
+}
+
+/* =====================================================================
+   RESUME MODEL + PREVIEW
+===================================================================== */
+function buildModel(){
+  const contactBits = [$("pLocation").value, $("pPhone").value, $("pEmail").value, $("pLinkedin").value]
+    .map(v => v.trim()).filter(Boolean);
+  const model = {
+    name: $("pName").value.trim() || "Your Name",
+    title: $("pTitle").value.trim(),
+    contact: contactBits.join("  |  "),
+    sections: []
+  };
+  const add = (title, lines) => { if (lines.length) model.sections.push({title, lines}); };
+  const linesOf = (id, bulletize) => $(id).value.split(/\r?\n/).map(l => l.trim()).filter(Boolean)
+    .map(l => {
+      if (l.startsWith("- ")) return {text: l.slice(2).trim(), kind: "bullet"};
+      if (bulletize) return {text: l.replace(/^[•\-\*]\s*/, ""), kind: "bullet"};
+      return {text: l, kind: "plain"};
+    });
+
+  const summary = $("outSummary").value.trim();
+  if (summary) model.sections.push({title: "Professional Summary", lines: [{text: summary, kind: "plain"}]});
+
+  const comps = $("outCompetencies").value.split(/[\n,]/).map(s => s.trim()).filter(Boolean);
+  const compSection = comps.length ? {title: "Core Competencies", lines: comps.map(c => ({text: c, kind: "bullet"}))} : null;
+
+  const expLines = [];
+  for (const l of $("outExperience").value.split(/\r?\n/)){
+    const t = l.trim();
+    if (!t) continue;
+    if (/^[-•\*]\s+/.test(t)) expLines.push({text: t.replace(/^[-•\*]\s+/, ""), kind: "bullet"});
+    else expLines.push({text: t, kind: "jobhead"});
+  }
+  const expSection = expLines.length ? {title: "Professional Experience", lines: expLines} : null;
+
+  const fmt = $("format").value;
+  if (fmt === "chronological"){
+    if (expSection) model.sections.push(expSection);
+    if (compSection) model.sections.push(compSection);
+  } else if (fmt === "functional"){
+    if (compSection) model.sections.push(compSection);
+    addSkillsTo(model);
+    if (expSection) model.sections.push(expSection);
+  } else { // hybrid
+    if (compSection) model.sections.push(compSection);
+    if (expSection) model.sections.push(expSection);
+  }
+  if (fmt !== "functional") addSkillsTo(model);
+
+  add("Education", linesOf("outEducation", false));
+  add("Certifications", linesOf("outCerts", true));
+  if ($("incClearance").checked) add("Security Clearance", linesOf("outClearance", false));
+  if ($("incFederal").checked) add("Federal Contracting Experience", linesOf("outFederal", false));
+  return model;
+}
+function addSkillsTo(model){
+  const skills = $("outSkills").value.trim();
+  if (skills) model.sections.push({title: "Skills", lines: [{text: skills.replace(/\n/g, ", "), kind: "plain"}]});
+}
+
+function renderPreview(){
+  const m = buildModel();
+  if (!m.sections.length){
+    $("preview").innerHTML = '<p class="empty" style="text-align:center;padding:50px 10px">Your tailored resume will appear here after you click Generate Tailored Resume.</p>';
+    return;
+  }
+  let h = '<h3 class="docname">' + esc(m.name) + "</h3>";
+  const sub = [m.title, m.contact].filter(Boolean).join("<br>");
+  if (sub) h += '<p class="doccontact">' + (m.title ? "<strong>" + esc(m.title) + "</strong><br>" : "") + esc(m.contact) + "</p>";
+  for (const sec of m.sections){
+    h += "<h4>" + esc(sec.title) + "</h4>";
+    let openList = false;
+    for (const line of sec.lines){
+      if (line.kind === "bullet"){
+        if (!openList){ h += "<ul>"; openList = true; }
+        h += "<li>" + esc(line.text) + "</li>";
+      } else {
+        if (openList){ h += "</ul>"; openList = false; }
+        h += '<p class="' + (line.kind === "jobhead" ? "jobhead" : "plain") + '">' + esc(line.text) + "</p>";
+      }
+    }
+    if (openList) h += "</ul>";
+  }
+  $("preview").innerHTML = h;
+}
+
+function resumeAsText(){
+  const m = buildModel();
+  const out = [m.name];
+  if (m.title) out.push(m.title);
+  if (m.contact) out.push(m.contact);
+  for (const sec of m.sections){
+    out.push("", sec.title.toUpperCase());
+    for (const line of sec.lines) out.push(line.kind === "bullet" ? "  - " + line.text : line.text);
+  }
+  return out.join("\n");
+}
+
+/* =====================================================================
+   EXPORTS
+===================================================================== */
+function ensureContent(){
+  if (!buildModel().sections.length){
+    toast("Generate the tailored resume first (step 5).", true);
+    jumpTo("card-build");
+    return false;
+  }
+  return true;
+}
+function fileBase(){
+  const n = $("pName").value.trim() || "Resume";
+  return n.replace(/[^A-Za-z0-9]+/g, "_") + "_Resume";
+}
+function saveBlob(blob, filename){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+}
+
+/* ----- Word (.docx) using docx.js. Plain paragraphs and headings, no tables. ----- */
+function buildDocxBlob(){
+  if (typeof docx === "undefined") return Promise.reject(new Error("docx library not loaded"));
+  const {Document, Packer, Paragraph, TextRun, AlignmentType} = docx;
+  const m = buildModel();
+  const children = [];
+  children.push(new Paragraph({alignment: AlignmentType.CENTER,
+    children: [new TextRun({text: m.name, bold: true, size: 44, color: "10294B", font: "Calibri"})]}));
+  if (m.title) children.push(new Paragraph({alignment: AlignmentType.CENTER,
+    children: [new TextRun({text: m.title, bold: true, size: 24, color: "0E9594", font: "Calibri"})]}));
+  if (m.contact) children.push(new Paragraph({alignment: AlignmentType.CENTER, spacing: {after: 200},
+    children: [new TextRun({text: m.contact, size: 20, color: "44505E", font: "Calibri"})]}));
+  for (const sec of m.sections){
+    children.push(new Paragraph({spacing: {before: 220, after: 80},
+      border: {bottom: {color: "DDE3EA", size: 6, style: docx.BorderStyle.SINGLE}},
+      children: [new TextRun({text: sec.title.toUpperCase(), bold: true, size: 22, color: "10294B", font: "Calibri"})]}));
+    for (const line of sec.lines){
+      if (line.kind === "bullet"){
+        children.push(new Paragraph({bullet: {level: 0}, spacing: {after: 40},
+          children: [new TextRun({text: line.text, size: 21, font: "Calibri"})]}));
+      } else if (line.kind === "jobhead"){
+        children.push(new Paragraph({spacing: {before: 120, after: 40},
+          children: [new TextRun({text: line.text, bold: true, size: 21, font: "Calibri"})]}));
+      } else {
+        children.push(new Paragraph({spacing: {after: 60},
+          children: [new TextRun({text: line.text, size: 21, font: "Calibri"})]}));
+      }
+    }
+  }
+  const doc = new Document({sections: [{properties: {page: {margin: {top: 720, bottom: 720, left: 864, right: 864}}}, children}]});
+  return Packer.toBlob(doc);
+}
+function downloadWord(){
+  if (!ensureContent()) return;
+  buildDocxBlob()
+    .then(blob => { saveBlob(blob, fileBase() + ".docx"); toast("Word document downloaded."); })
+    .catch(() => toast("The Word library failed to load. Check your internet connection and reload the page, or use Copy Resume.", true));
+}
+
+/* ----- PDF using jsPDF, real text so it stays ATS readable ----- */
+function buildPdfDoc(){
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({unit: "pt", format: "letter"});
+  const m = buildModel();
+  const pageW = 612, pageH = 792, margin = 56;
+  const maxW = pageW - margin * 2;
+  let y = margin;
+  const ensure = h => { if (y + h > pageH - margin){ doc.addPage(); y = margin; } };
+
+  doc.setFont("helvetica", "bold"); doc.setFontSize(20); doc.setTextColor(16, 41, 75);
+  doc.text(m.name, pageW / 2, y, {align: "center"}); y += 22;
+  if (m.title){
+    doc.setFontSize(11.5); doc.setTextColor(14, 149, 148);
+    doc.text(m.title, pageW / 2, y, {align: "center"}); y += 15;
+  }
+  if (m.contact){
+    doc.setFont("helvetica", "normal"); doc.setFontSize(9.5); doc.setTextColor(68, 80, 94);
+    doc.text(m.contact, pageW / 2, y, {align: "center"}); y += 12;
+  }
+  doc.setDrawColor(16, 41, 75); doc.setLineWidth(1.2);
+  doc.line(margin, y, pageW - margin, y); y += 16;
+
+  for (const sec of m.sections){
+    ensure(34);
+    doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(16, 41, 75);
+    doc.text(sec.title.toUpperCase(), margin, y); y += 5;
+    doc.setDrawColor(221, 227, 234); doc.setLineWidth(0.7);
+    doc.line(margin, y, pageW - margin, y); y += 13;
+    for (const line of sec.lines){
+      const isBullet = line.kind === "bullet";
+      const isHead = line.kind === "jobhead";
+      doc.setFont("helvetica", isHead ? "bold" : "normal");
+      doc.setFontSize(10); doc.setTextColor(27, 36, 48);
+      const indent = isBullet ? 14 : 0;
+      const wrapped = doc.splitTextToSize(line.text, maxW - indent);
+      ensure(wrapped.length * 12.5 + (isHead ? 6 : 0));
+      if (isHead) y += 5;
+      if (isBullet) doc.text("•", margin + 3, y);
+      doc.text(wrapped, margin + indent, y);
+      y += wrapped.length * 12.5 + 2;
+    }
+    y += 6;
+  }
+  return doc;
+}
+function downloadPdf(){
+  if (!ensureContent()) return;
+  if (!window.jspdf){ toast("The PDF library failed to load. Check your internet connection and reload the page.", true); return; }
+  try {
+    buildPdfDoc().save(fileBase() + ".pdf");
+    toast("PDF downloaded.");
+  } catch (e){
+    toast("PDF generation failed: " + e.message, true);
+  }
+}
+
+/* ----- Copy buttons ----- */
+function copyText(text, label){
+  navigator.clipboard.writeText(text)
+    .then(() => toast(label + " copied to clipboard."))
+    .catch(() => {
+      const ta = document.createElement("textarea");
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand("copy"); ta.remove();
+      toast(label + " copied to clipboard.");
+    });
+}
+function copyResume(){ if (ensureContent()) copyText(resumeAsText(), "Resume"); }
+function copyEmail(){
+  const subj = $("emailSubject").value.trim();
+  const body = $("emailBody").value.trim();
+  if (!body){ toast("Generate the email first (step 6).", true); jumpTo("card-email"); return; }
+  copyText("Subject: " + subj + "\n\n" + body, "Email");
+}
+
+/* ----- Full package ----- */
+function downloadPackage(){
+  if (!ensureContent()) return;
+  if (typeof JSZip === "undefined"){ toast("The zip library failed to load. Download files individually instead.", true); return; }
+  const zip = new JSZip();
+  zip.file(fileBase() + ".txt", resumeAsText());
+  const emailTxt = $("emailBody").value.trim()
+    ? "Subject: " + $("emailSubject").value.trim() + "\n\n" + $("emailBody").value.trim()
+    : "";
+  if (emailTxt) zip.file("Hiring_Manager_Email.txt", emailTxt);
+  if (window.jspdf){
+    try { zip.file(fileBase() + ".pdf", buildPdfDoc().output("blob")); } catch (e) { /* skip pdf */ }
+  }
+  const finish = () => zip.generateAsync({type: "blob"})
+    .then(blob => { saveBlob(blob, fileBase() + "_Package.zip"); toast("Full package downloaded."); });
+  if (typeof docx !== "undefined"){
+    buildDocxBlob().then(b => { zip.file(fileBase() + ".docx", b); finish(); }).catch(finish);
+  } else finish();
+}
+
+/* =====================================================================
+   SAVE / LOAD / RESET / SAMPLE
+===================================================================== */
+const FIELD_IDS = ["resumeText","jobUrl","jobText","pName","pTitle","pEmail","pPhone","pLocation","pLinkedin",
+  "tone","format","outSummary","outCompetencies","outExperience","outSkills","outEducation","outCerts",
+  "outClearance","outFederal","hmName","hmCompany","emailSubject","emailBody"];
+const CHECK_IDS = ["incClearance","incFederal"];
+const LS_KEY = "resumeTailorStudio.v1";
+
+function saveProfile(){
+  const data = {fields: {}, checks: {}, savedAt: new Date().toISOString()};
+  FIELD_IDS.forEach(id => data.fields[id] = $(id).value);
+  CHECK_IDS.forEach(id => data.checks[id] = $(id).checked);
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(data));
+    toast("Profile saved to this browser.");
+  } catch (e){
+    toast("Could not save. Your browser may be blocking local storage.", true);
+  }
+}
+function loadProfile(silent){
+  let data;
+  try { data = JSON.parse(localStorage.getItem(LS_KEY)); } catch (e){ data = null; }
+  if (!data){ if (!silent) toast("No saved profile found in this browser.", true); return; }
+  FIELD_IDS.forEach(id => { if (id in data.fields) $(id).value = data.fields[id]; });
+  CHECK_IDS.forEach(id => { if (id in data.checks) $(id).checked = data.checks[id]; });
+  parsedResume = parseResume($("resumeText").value);
+  if ($("jobText").value.trim().length > 40 && $("resumeText").value.trim().length > 40) analyzeJobSilently();
+  renderPreview(); updateSteps(); onJobUrlInput();
+  if (!silent) toast("Saved profile loaded.");
+}
+function resetAll(){
+  if (!confirm("Clear every field? Your saved profile in this browser is kept unless you save again.")) return;
+  FIELD_IDS.forEach(id => $(id).value = "");
+  CHECK_IDS.forEach(id => $(id).checked = false);
+  jobKeywords = []; matchedKw = []; missingKw = []; parsedResume = null;
+  detectedJobTitle = ""; detectedCompany = "";
+  $("chipsAll").innerHTML = $("chipsMatched").innerHTML = $("chipsMissing").innerHTML = '<div class="empty">Nothing analyzed yet.</div>';
+  $("matchBar").style.width = "0%";
+  $("matchScore").textContent = "No analysis yet. Add your resume and the job posting, then click Analyze Job Posting.";
+  document.querySelectorAll(".invalid").forEach(el => el.classList.remove("invalid"));
+  document.querySelectorAll(".field-warning").forEach(el => el.classList.remove("show"));
+  renderPreview(); updateSteps(); onJobUrlInput();
+  toast("All fields cleared.");
+}
+
+/* ----- Sample data so a first time user can see the whole flow ----- */
+const SAMPLE_RESUME = [
+"Jordan Avery",
+"Arlington, VA | (555) 555-0142 | jordan.avery@email.com | linkedin.com/in/jordanavery",
+"",
+"SUMMARY",
+"Security professional with 7 years of experience supporting cleared facilities and government contracts. Background in industrial security, personnel security, and compliance.",
+"",
+"PROFESSIONAL EXPERIENCE",
+"Security Specialist, Beacon Defense Group, Arlington, VA | 2020 to Present",
+"- Managed personnel security actions for a 250 person cleared workforce, including initiations, periodic reinvestigations, and visit requests in DISS",
+"- Conducted annual self-inspections and supported two DCSA security reviews with zero major findings",
+"- Wrote and updated standard operating procedures for visitor control and badge management",
+"- Delivered security awareness and insider threat training to over 300 employees each year",
+"- Tracked and reported security incidents and worked corrective actions with program managers",
+"",
+"Security Assistant, Capitol Facility Services, Washington, DC | 2017 to 2020",
+"- Processed visit authorization requests and maintained access control records",
+"- Supported badge issuance and physical security checks across three facilities",
+"- Maintained security files and helped prepare for customer audits",
+"",
+"EDUCATION",
+"B.A. Criminal Justice, George Mason University, 2017",
+"",
+"CERTIFICATIONS",
+"FSO Program Management for Possessing Facilities, CDSE, 2021",
+"Security+ (CompTIA), 2022",
+"",
+"CLEARANCE",
+"Active Secret clearance, adjudicated 2023",
+"",
+"SKILLS",
+"DISS, NISS, e-QIP, access control, visitor control, security education, NISPOM, incident reporting, Microsoft Office, SharePoint"
+].join("\n");
+
+const SAMPLE_JOB = [
+"Facility Security Officer (FSO)",
+"Company: Meridian National Solutions",
+"Location: Reston, VA",
+"",
+"Meridian National Solutions is seeking a Facility Security Officer to lead industrial security operations for our cleared facility supporting Department of Defense customers.",
+"",
+"Responsibilities:",
+"- Administer the facility security program in compliance with the NISPOM and 32 CFR Part 117",
+"- Manage personnel security processing in DISS and NISS, including e-QIP initiations and periodic reinvestigations",
+"- Lead self-inspections and represent the company during DCSA security reviews",
+"- Develop and deliver security education, awareness, and insider threat training",
+"- Oversee visitor control, badge management, and physical security procedures",
+"- Investigate and report security incidents and administer corrective actions",
+"- Maintain classified document control and oversee COMSEC accountability",
+"",
+"Required Qualifications:",
+"- Active Secret clearance with the ability to obtain Top Secret",
+"- 5+ years of industrial security or personnel security experience",
+"- Working knowledge of NISPOM, DISS, NISS, and e-QIP",
+"- FSO certification for possessing facilities (CDSE) or ability to complete within 6 months",
+"- Strong written communication and experience writing standard operating procedures",
+"",
+"Preferred Qualifications:",
+"- Experience supporting DCSA assessments with favorable results",
+"- Security+ or similar certification",
+"- Experience with insider threat program management"
+].join("\n");
+
+function loadSample(){
+  $("resumeText").value = SAMPLE_RESUME;
+  $("jobText").value = SAMPLE_JOB;
+  $("jobUrl").value = "";
+  $("hmName").value = "Mr. Donnelly";
+  $("hmCompany").value = "Meridian National Solutions";
+  ["pName","pTitle","pEmail","pPhone","pLocation","pLinkedin"].forEach(id => $(id).value = "");
+  $("tone").value = "govcon";
+  $("format").value = "hybrid";
+  onResumeInput();
+  analyzeJob();
+  generateResume();
+  generateEmail();
+  toast("Sample data loaded and processed. Explore each section to see how it works.");
+}
+
+/* =====================================================================
+   INIT
+===================================================================== */
+window.addEventListener("load", () => {
+  loadProfile(true);   // quietly restore last session if present
+  updateSteps();
+});
+</script>
+</body>
+</html>
