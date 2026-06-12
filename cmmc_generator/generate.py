@@ -68,6 +68,9 @@ def main(argv=None):
     sub.add_parser("matrix",
                    help="Generate the control mapping matrix (Word and Excel)")
 
+    sub.add_parser("evidence",
+                   help="Generate the CMMC Level 2 Evidence Checklist")
+
     p_bind = sub.add_parser("binder",
                             help="Generate the full branded binder "
                                  "(SPP, policies, procedures, matrix, zip)")
@@ -102,6 +105,9 @@ def main(argv=None):
         out = os.path.join(args.out, "04_Control_Matrix")
         paths = [builders.build_matrix_docx(profile, out),
                  builders.build_matrix_xlsx(profile, out)]
+    elif args.command == "evidence":
+        paths = [builders.build_evidence_checklist(
+            profile, os.path.join(args.out, "05_Evidence"))]
     elif args.command == "binder":
         paths = builders.build_binder(profile, args.out,
                                       zip_output=not args.no_zip)

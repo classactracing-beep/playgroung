@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data: blob:;">
+<title>CMMC Level 2 Documentation Studio</title>
+<style>
+  :root{
+    --navy:#1f3864; --navy-dark:#15264a; --teal:#0e7c86; --teal-light:#e3f2f3;
+    --gray:#5a6678; --line:#d8dfea; --bg:#f4f6fa; --card:#ffffff;
+    --ok:#1b7f4d; --warn:#b3261e; --amber:#9a6700;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:"Segoe UI",Calibri,Arial,sans-serif;background:var(--bg);color:#1c2433;font-size:14px}
+  button{font-family:inherit}
+
+  /* ---------- navigation ---------- */
+  nav{background:var(--navy);color:#fff;display:flex;align-items:center;gap:6px;padding:0 20px;height:56px;position:sticky;top:0;z-index:50;box-shadow:0 2px 8px rgba(21,38,74,.25)}
+  nav .brand{font-weight:700;font-size:15px;margin-right:18px;display:flex;align-items:center;gap:8px}
+  nav .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--teal);display:inline-block}
+  nav a.tab{color:#cdd8ec;text-decoration:none;padding:8px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer}
+  nav a.tab:hover{background:rgba(255,255,255,.12);color:#fff}
+  nav a.tab.active{background:var(--teal);color:#fff}
+  nav .spacer{flex:1}
+  .score-chip{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer}
+  .score-chip b{color:#7fe3d2}
+  .ver{font-size:11px;opacity:.65;margin-left:10px}
+
+  main{max-width:1140px;margin:0 auto;padding:24px 18px 60px}
+  h1.page{font-size:22px;color:var(--navy);margin:6px 0 4px}
+  p.sub{color:var(--gray);margin:0 0 22px;max-width:760px;line-height:1.5}
+
+  /* ---------- cards ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(21,38,74,.06)}
+  .card h3{margin:0 0 2px;font-size:15px;color:var(--navy);display:flex;align-items:center;gap:8px}
+  .card .tag{font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--teal);background:var(--teal-light);border-radius:4px;padding:2px 7px;text-transform:uppercase}
+  .card p.desc{color:var(--gray);font-size:12.5px;line-height:1.55;margin:8px 0 4px}
+  .card .what{background:#f6f8fc;border-left:3px solid var(--teal);padding:8px 10px;font-size:12px;color:#33415c;border-radius:0 6px 6px 0;margin:8px 0}
+  .card .actions{margin-top:auto;padding-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .card select{padding:7px 8px;border:1px solid var(--line);border-radius:6px;font-size:12.5px;max-width:100%}
+
+  .btn{background:var(--navy);color:#fff;border:0;border-radius:6px;padding:9px 14px;font-size:12.5px;font-weight:600;cursor:pointer;transition:background .15s}
+  .btn:hover{background:var(--navy-dark)}
+  .btn.teal{background:var(--teal)} .btn.teal:hover{background:#0a626a}
+  .btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--navy)}
+  .btn.ghost:hover{background:#eef2f9}
+  .btn.danger{background:#fff;color:var(--warn);border:1px solid var(--warn)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+
+  /* ---------- readiness banner ---------- */
+  .readiness{background:linear-gradient(120deg,var(--navy) 0%,#2a4a82 70%,var(--teal) 130%);color:#fff;border-radius:12px;padding:20px 24px;display:flex;align-items:center;gap:22px;margin-bottom:22px}
+  .ring{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#7fe3d2 calc(var(--p)*1%),rgba(255,255,255,.18) 0);flex:none}
+  .ring>div{width:64px;height:64px;border-radius:50%;background:var(--navy);display:grid;place-items:center;font-weight:700;font-size:17px}
+  .readiness h2{margin:0 0 4px;font-size:17px}
+  .readiness p{margin:0;font-size:12.5px;opacity:.85;line-height:1.5;max-width:640px}
+  .readiness .miss{color:#ffd9d4}
+
+  /* ---------- wizard ---------- */
+  .steps{display:flex;gap:0;margin-bottom:24px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+  .step{flex:1;padding:12px 10px;text-align:center;font-size:12px;color:var(--gray);border-right:1px solid var(--line);cursor:pointer;position:relative}
+  .step:last-child{border-right:0}
+  .step b{display:block;font-size:11px;letter-spacing:.05em;color:#9aa6ba;margin-bottom:2px}
+  .step.active{background:var(--navy);color:#fff} .step.active b{color:#9fd8d0}
+  .step.done{background:var(--teal-light)} .step.done b{color:var(--teal)}
+  .step .tick{color:var(--ok);font-weight:700}
+  .progressbar{height:6px;background:var(--line);border-radius:3px;margin-bottom:20px;overflow:hidden}
+  .progressbar>div{height:100%;background:var(--teal);transition:width .3s}
+
+  .panel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:24px}
+  .panel h2{margin:0 0 4px;font-size:17px;color:var(--navy)}
+  .panel p.hint{color:var(--gray);font-size:12.5px;margin:0 0 18px;line-height:1.5}
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .field{margin-bottom:13px}
+  label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;margin-bottom:4px;color:#33415c}
+  label .req{color:var(--warn)}
+  input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:6px;font-size:13px;background:#fff}
+  input:focus,select:focus{outline:2px solid var(--teal);border-color:var(--teal)}
+  input.invalid{border-color:var(--warn);background:#fff7f6}
+  .fieldmsg{font-size:11px;color:var(--warn);margin-top:3px;display:none}
+  input.invalid+.fieldmsg{display:block}
+
+  .tip{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;background:var(--navy);color:#fff;font-size:10px;font-weight:700;cursor:help;position:relative;flex:none}
+  .tip:hover::after{content:attr(data-tip);position:absolute;left:50%;bottom:130%;transform:translateX(-50%);background:#15264a;color:#fff;font-weight:400;font-size:11.5px;line-height:1.45;padding:9px 11px;border-radius:7px;width:250px;z-index:60;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+
+  .wiznav{display:flex;justify-content:space-between;margin-top:20px}
+  .wiznav .right{display:flex;gap:8px}
+
+  .logo-drop{border:2px dashed var(--line);border-radius:10px;padding:26px;text-align:center;color:var(--gray);cursor:pointer;font-size:12.5px}
+  .logo-drop:hover{border-color:var(--teal);background:var(--teal-light)}
+  .logo-drop img{max-height:70px;max-width:260px;display:block;margin:0 auto 8px}
+
+  .summary{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;font-size:12.5px}
+  .summary dt{color:var(--gray)} .summary dd{margin:0 0 6px;font-weight:600}
+
+  /* ---------- modal ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(15,23,38,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+  .overlay.open{display:flex}
+  .modal{background:#fff;border-radius:12px;max-width:920px;width:100%;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+  .modal header{background:var(--navy);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+  .modal header h3{margin:0;font-size:15px}
+  .modal header .x{background:none;border:0;color:#fff;font-size:20px;cursor:pointer;line-height:1}
+  .modal .mbody{padding:18px 22px;overflow:auto}
+  .modal footer{padding:12px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px;background:#f8fafd}
+  .preview-frame{border:1px solid var(--line);background:#e8ecf3;padding:18px;border-radius:8px}
+  .preview-doc{background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.15);padding:48px 56px;max-width:760px;margin:0 auto;font-family:Calibri,Arial,sans-serif}
+  ul.misslist{margin:8px 0;padding-left:20px}
+  ul.misslist li{color:var(--warn);margin:4px 0;font-size:13px}
+
+  /* ---------- help ---------- */
+  .helppanel{position:fixed;top:0;right:-440px;width:420px;max-width:92vw;height:100vh;background:#fff;border-left:1px solid var(--line);box-shadow:-6px 0 24px rgba(21,38,74,.18);z-index:90;transition:right .25s;display:flex;flex-direction:column}
+  .helppanel.open{right:0}
+  .helppanel .hhead{background:var(--navy);color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
+  .helppanel .hbody{padding:16px 18px;overflow:auto;font-size:13px;line-height:1.6}
+  .helppanel h4{color:var(--navy);margin:16px 0 6px;font-size:13px;border-bottom:2px solid var(--teal-light);padding-bottom:4px}
+  .helppanel dt{font-weight:700;color:var(--teal);margin-top:8px}
+  .helppanel dd{margin:0 0 4px}
+  .helppanel ol{padding-left:18px}
+
+  /* ---------- toasts ---------- */
+  .toasts{position:fixed;bottom:18px;right:18px;z-index:120;display:flex;flex-direction:column;gap:8px}
+  .toast{background:var(--navy);color:#fff;border-radius:8px;padding:11px 16px;font-size:12.5px;box-shadow:0 4px 14px rgba(0,0,0,.25);display:flex;gap:8px;align-items:center;animation:slidein .25s}
+  .toast.ok{background:var(--ok)} .toast.warn{background:var(--warn)}
+  @keyframes slidein{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+
+  /* ---------- welcome ---------- */
+  .welcome{max-width:680px;margin:48px auto;text-align:center}
+  .welcome .seal{width:74px;height:74px;border-radius:50%;background:var(--navy);margin:0 auto 18px;display:grid;place-items:center;color:#7fe3d2;font-size:30px;font-weight:800}
+  .welcome h1{color:var(--navy);font-size:26px;margin:0 0 10px}
+  .welcome p{color:var(--gray);line-height:1.65;font-size:14px}
+  .welcome .wbtns{display:flex;gap:12px;justify-content:center;margin-top:24px}
+  .feature-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:34px;text-align:left}
+  .feature-strip .f{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;font-size:12px;color:var(--gray)}
+  .feature-strip .f b{display:block;color:var(--navy);margin-bottom:4px;font-size:12.5px}
+
+  footer.app{border-top:1px solid var(--line);background:#fff;color:var(--gray);font-size:11.5px;padding:16px 20px;text-align:center;line-height:1.6}
+  @media(max-width:760px){.frow{grid-template-columns:1fr}.steps{flex-wrap:wrap}.step{min-width:33%}}
+  @media print{nav,.helppanel,.toasts,footer.app{display:none}}
+</style>
+</head>
+<body>
+<nav>
+  <span class="brand"><span class="dot"></span>CMMC L2 Documentation Studio</span>
+  <a class="tab" data-view="dashboard">Dashboard</a>
+  <a class="tab" data-view="wizard">Setup Wizard</a>
+  <a class="tab" id="nav-help">Help</a>
+  <span class="spacer"></span>
+  <span class="score-chip" id="chip-score" title="Profile readiness">Readiness <b>0%</b></span>
+  <span class="ver" id="ver"></span>
+</nav>
+
+<main id="view-welcome">
+  <div class="welcome">
+    <div class="seal">L2</div>
+    <h1>CMMC Level 2 Documentation Studio</h1>
+    <p>Generate a complete, branded CMMC Level 2 documentation set: your Standard
+       Practices and Procedures (SPP), 14 domain policies, 52 procedures, forms,
+       logs, and checklists, a 110-row control mapping matrix, and an assessment
+       evidence checklist. Built for first-time FSOs and security managers:
+       answer the wizard's plain-English questions and download finished Word
+       documents. Everything runs in this page; nothing is uploaded anywhere.</p>
+    <div class="wbtns">
+      <button class="btn teal" id="w-start">Start guided setup</button>
+      <button class="btn ghost" id="w-sample">Explore with sample profile</button>
+    </div>
+    <div class="feature-strip">
+      <div class="f"><b>Guided wizard</b>Five short steps with tooltips that explain every acronym (SMO, FSO, CAGE, UEI...).</div>
+      <div class="f"><b>Real compliance documents</b>Cover pages, document history, approval and signature blocks, evidence sections.</div>
+      <div class="f"><b>Aligned to the rules</b>32 CFR Part 170, NIST SP 800-171 Rev. 2, DFARS 252.204-7012 / -7019 / -7020 / -7021.</div>
+    </div>
+  </div>
+</main>
+
+<main id="view-dashboard" hidden>
+  <div class="readiness" id="readiness">
+    <div class="ring" id="ring" style="--p:0"><div id="ring-num">0%</div></div>
+    <div>
+      <h2 id="rd-title">Welcome</h2>
+      <p id="rd-text"></p>
+      <p style="margin-top:8px"><button class="btn teal" id="rd-fix">Open setup wizard</button></p>
+    </div>
+  </div>
+  <h1 class="page">Document Generators</h1>
+  <p class="sub">Preview any document before downloading. Word downloads open directly
+     in Microsoft Word; use Preview then Print for a PDF. Every document includes the
+     compliance references required for CMMC and DFARS alignment.</p>
+  <div class="grid" id="cards"></div>
+</main>
+
+<main id="view-wizard" hidden>
+  <h1 class="page">Guided Setup Wizard</h1>
+  <p class="sub">Five steps. Fields marked <span style="color:var(--warn)">*</span> are
+     required before documents can be generated. Hover any
+     <span class="tip" data-tip="Tooltips like this explain every term.">?</span> icon for a
+     plain-English explanation. Your answers save automatically in this browser.</p>
+  <div class="steps" id="steps"></div>
+  <div class="progressbar"><div id="wprog" style="width:20%"></div></div>
+  <div class="panel" id="wpanel"></div>
+  <div class="wiznav">
+    <div><button class="btn ghost" id="wz-back">Back</button></div>
+    <div class="right">
+      <button class="btn danger" id="wz-reset">Reset all</button>
+      <button class="btn ghost" id="wz-load">Load profile JSON</button>
+      <button class="btn ghost" id="wz-save">Save profile JSON</button>
+      <button class="btn ghost" id="wz-sample">Use sample profile</button>
+      <button class="btn teal" id="wz-next">Next step</button>
+    </div>
+  </div>
+  <input type="file" id="file-json" accept="application/json" hidden>
+  <input type="file" id="file-logo" accept="image/png,image/jpeg" hidden>
+</main>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <header><h3 id="m-title">Preview</h3><button class="x" id="m-close">&times;</button></header>
+    <div class="mbody" id="m-body"></div>
+    <footer id="m-foot"></footer>
+  </div>
+</div>
+
+<div class="helppanel" id="help">
+  <div class="hhead"><b>Help &amp; Instructions</b><button class="x" id="h-close" style="background:none;border:0;color:#fff;font-size:20px;cursor:pointer">&times;</button></div>
+  <div class="hbody">
+    <h4>How to use this tool</h4>
+    <ol>
+      <li><b>Run the Setup Wizard.</b> Enter your company details, security roles, facility information, and logo. Everything saves automatically in this browser.</li>
+      <li><b>Watch your readiness score.</b> It reaches 100% when every required field is complete.</li>
+      <li><b>Generate documents from the Dashboard.</b> Preview first, then Download Word. Use "Full Binder" to get everything as one zip.</li>
+      <li><b>Open in Word and finish.</b> Review each document, adjust anything specific to your environment, and have your SMO sign the approval block.</li>
+      <li><b>Keep evidence.</b> Use the forms, logs, and checklists day to day; they are the records an assessor will ask to see. The Evidence Checklist card tells you exactly what to keep.</li>
+    </ol>
+    <h4>Word, PDF, and CSV</h4>
+    <p>"Download Word" saves a .doc file that opens in Microsoft Word (and LibreOffice). For a PDF, open the Preview and click "Print / Save as PDF". The control matrix also exports as CSV for Excel.</p>
+    <h4>Glossary</h4>
+    <dl id="glossary"></dl>
+    <h4>Compliance alignment</h4>
+    <p>All generated documents are aligned with applicable CMMC and DFARS requirements and carry a compliance references section covering 32 CFR Part 170 (CMMC Program Rule), CMMC Level 2, NIST SP 800-171 Rev. 2 (all 110 requirements), DFARS 252.204-7012, -7019, -7020, and -7021, DoD CUI Registry requirements, and any applicable contract, DD Form 254, SOW, security classification guide, or CUI handling instruction.</p>
+    <h4>Privacy</h4>
+    <p>This page makes no network requests. Your profile and logo stay in this browser (localStorage) until you reset them.</p>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<footer class="app">
+  CMMC Level 2 Documentation Studio <span id="ver2"></span> &middot; Generated documents
+  must be aligned with applicable CMMC and DFARS requirements (32 CFR Part 170, NIST SP
+  800-171 Rev. 2, DFARS 252.204-7012 / -7019 / -7020 / -7021, DoD CUI Registry).<br>
+  Documents are starting points: review and tailor them to your environment before an
+  assessment. This tool provides templates, not legal or certification advice.
+</footer>
+
+<script>
+"use strict";
+/* ============================ DATA ============================ */
+var CMMC = __CMMC_DATA__;
+
+/* ============================ STATE ============================ */
+var VERSION = CMMC.version;
+var REQUIRED = ["company_legal_name","company_short_name","cage_code","uei",
+  "smo_name","fso_name","itpso_name","effective_date","approved_by"];
+var ALL_FIELDS = ["company_legal_name","company_short_name","address_line1",
+  "address_line2","cage_code","uei","facility_clearance_level",
+  "storage_capability","smo_name","smo_title","fso_name","afso_name",
+  "itpso_name","isr_name","dcsa_field_office","security_contact_email",
+  "security_contact_phone","document_year","spp_version","effective_date",
+  "approved_by"];
+var VALIDATION_LABELS = {company_legal_name:"Company legal name",
+  cage_code:"CAGE code", uei:"UEI", smo_name:"SMO name", fso_name:"FSO name",
+  itpso_name:"ITPSO name", logo_data:"Company logo",
+  effective_date:"Effective date", approved_by:"Approval name (approved by)",
+  company_short_name:"Company short name"};
+
+var TIPS = {
+  SMO:"Senior Management Official: the senior company leader (often the CEO or President) accountable for the security program. The SMO signs approvals.",
+  FSO:"Facility Security Officer: the appointed employee who runs the day-to-day security program, training, and reporting.",
+  AFSO:"Assistant Facility Security Officer: backs up the FSO and acts in their absence.",
+  ITPSO:"Insider Threat Program Senior Official: oversees the insider threat program and information system security incidents.",
+  ISR:"Insider Threat Program Security Representative: supports the ITPSO at the facility level.",
+  CAGE:"Commercial and Government Entity code: the 5-character ID the government uses to identify your company. Find it in SAM.gov.",
+  UEI:"Unique Entity Identifier: the 12-character ID that replaced the DUNS number. Find it in SAM.gov.",
+  CUI:"Controlled Unclassified Information: government information that is not classified but must still be protected (marked CUI).",
+  SSP:"System Security Plan: the document that describes your systems and how each NIST SP 800-171 requirement is met.",
+  POAM:"Plan of Action and Milestones: your tracked to-do list for fixing security gaps, with owners and due dates.",
+  FCL:"Facility Clearance: a determination that your company may access classified information. Choose None if you only handle CUI.",
+  DCSA:"Defense Counterintelligence and Security Agency: the government agency that oversees cleared contractors.",
+  EFFECTIVE:"The date these documents take effect. Shown in every approval block.",
+  APPROVED:"The person who approves the documents, normally your SMO."
+};
+
+var sample = {
+  company_legal_name:"Avaso Federal Solutions, Inc.", company_short_name:"AFS",
+  address_line1:"1650 International Ct", address_line2:"Suite #200 Norcross, GA 30093",
+  cage_code:"8WNB5", uei:"SAMPLEUEI123", facility_clearance_level:"Secret",
+  storage_capability:"Non-possessing (no classified safeguarding capability)",
+  smo_name:"Paul Brothe", smo_title:"President and CEO", fso_name:"Robert Mooney",
+  afso_name:"Jordan Pierce", itpso_name:"Paul Brothe", isr_name:"Robert Mooney",
+  dcsa_field_office:"Atlanta", security_contact_email:"security@avasofed.com",
+  security_contact_phone:"(470) 687-6329", document_year:String(new Date().getFullYear()),
+  spp_version:"1.0", effective_date:todayStr(), approved_by:"Paul Brothe", logo_data:""
+};
+
+var profile = loadProfile();
+var wstep = 1;
+
+function todayStr(){
+  var d=new Date();
+  return (d.getMonth()+1).toString().padStart(2,"0")+"/"+d.getDate().toString().padStart(2,"0")+"/"+d.getFullYear();
+}
+function sanitize(v){
+  return String(v==null?"":v).slice(0,400).replace(/[\u0000-\u001F\u007F]/g,"").trim();
+}
+function loadProfile(){
+  try{
+    var raw=localStorage.getItem("cmmcStudioProfile");
+    if(raw){ var p=JSON.parse(raw); var out={};
+      ALL_FIELDS.forEach(function(f){ out[f]=sanitize(p[f]); });
+      out.logo_data=(typeof p.logo_data==="string"&&/^data:image\/(png|jpeg);base64,/.test(p.logo_data))?p.logo_data:"";
+      return out;
+    }
+  }catch(e){}
+  var blank={}; ALL_FIELDS.forEach(function(f){blank[f]="";});
+  blank.facility_clearance_level="None";
+  blank.storage_capability="Non-possessing (no classified safeguarding capability)";
+  blank.document_year=String(new Date().getFullYear());
+  blank.spp_version="1.0"; blank.logo_data="";
+  return blank;
+}
+function persist(){ try{ localStorage.setItem("cmmcStudioProfile",JSON.stringify(profile)); }catch(e){} }
+function esc(s){
+  return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function fill(t){
+  return String(t).replace(/\{([a-z_0-9]+)\}/g,function(m,k){
+    var v=profile[k]; return (v&&String(v).trim())?esc(v):"["+k.toUpperCase()+"]";
+  });
+}
+function missingFields(){
+  var miss=[];
+  REQUIRED.forEach(function(f){ if(!sanitize(profile[f])) miss.push(VALIDATION_LABELS[f]||f); });
+  if(!profile.logo_data) miss.push(VALIDATION_LABELS.logo_data);
+  return miss;
+}
+function readiness(){
+  var total=ALL_FIELDS.length+1, done=0;
+  ALL_FIELDS.forEach(function(f){ if(sanitize(profile[f])) done++; });
+  if(profile.logo_data) done++;
+  return Math.round(done/total*100);
+}
+
+/* ============================ TOASTS ============================ */
+function toast(msg,kind){
+  var t=document.createElement("div");
+  t.className="toast"+(kind?" "+kind:"");
+  t.textContent=msg;
+  document.getElementById("toasts").appendChild(t);
+  setTimeout(function(){ t.remove(); },3800);
+}
+
+/* ============================ NAV / VIEWS ============================ */
+function show(view){
+  ["welcome","dashboard","wizard"].forEach(function(v){
+    document.getElementById("view-"+v).hidden=(v!==view);
+  });
+  document.querySelectorAll("nav a.tab[data-view]").forEach(function(a){
+    a.classList.toggle("active",a.getAttribute("data-view")===view);
+  });
+  if(view==="dashboard") renderDashboard();
+  if(view==="wizard") renderWizard();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll("nav a.tab[data-view]").forEach(function(a){
+  a.addEventListener("click",function(){ show(a.getAttribute("data-view")); });
+});
+document.getElementById("nav-help").addEventListener("click",function(){
+  document.getElementById("help").classList.add("open");
+});
+document.getElementById("h-close").addEventListener("click",function(){
+  document.getElementById("help").classList.remove("open");
+});
+document.getElementById("w-start").addEventListener("click",function(){ show("wizard"); });
+document.getElementById("w-sample").addEventListener("click",function(){
+  applySample(); show("dashboard");
+  toast("Sample profile loaded. Replace it with your company details in the wizard.","ok");
+});
+document.getElementById("ver").textContent="v"+VERSION;
+document.getElementById("ver2").textContent="v"+VERSION;
+document.getElementById("chip-score").addEventListener("click",function(){ show("wizard"); });
+
+function applySample(){
+  Object.keys(sample).forEach(function(k){ profile[k]=sample[k]; });
+  profile.logo_data=CMMC.sampleLogo||"";
+  persist(); refreshScore();
+}
+function refreshScore(){
+  var s=readiness();
+  document.querySelector("#chip-score b").textContent=s+"%";
+  var ring=document.getElementById("ring");
+  if(ring){ ring.style.setProperty("--p",s);
+    document.getElementById("ring-num").textContent=s+"%"; }
+}
+
+/* ============================ GLOSSARY ============================ */
+(function(){
+  var order=["SMO","FSO","AFSO","ITPSO","ISR","CAGE","UEI","CUI","SSP","POAM","FCL","DCSA"];
+  var names={POAM:"POA&M"};
+  var g=document.getElementById("glossary");
+  order.forEach(function(k){
+    var dt=document.createElement("dt"); dt.textContent=names[k]||k;
+    var dd=document.createElement("dd"); dd.textContent=TIPS[k];
+    g.appendChild(dt); g.appendChild(dd);
+  });
+})();
+
+/* ============================ WIZARD ============================ */
+var STEPS=[
+  {n:1,name:"Company Profile",fields:[
+    ["company_legal_name","Company legal name",1,null,"Example Defense Solutions, Inc."],
+    ["company_short_name","Company short name",1,null,"EDS"],
+    ["address_line1","Address line 1",0,null,"1000 Industry Way"],
+    ["address_line2","Address line 2 (city, state, zip)",0,null,"Arlington, VA 22202"],
+    ["cage_code","CAGE code",1,"CAGE","5 characters"],
+    ["uei","UEI",1,"UEI","12 characters"]]},
+  {n:2,name:"Security Roles",fields:[
+    ["smo_name","SMO name",1,"SMO",""],
+    ["smo_title","SMO title",0,"SMO","President and CEO"],
+    ["fso_name","FSO name",1,"FSO",""],
+    ["afso_name","AFSO name",0,"AFSO",""],
+    ["itpso_name","ITPSO name",1,"ITPSO",""],
+    ["isr_name","ISR name",0,"ISR",""]]},
+  {n:3,name:"Facility & CUI",fields:[
+    ["facility_clearance_level","Facility clearance level",0,"FCL","select:None|Secret|Top Secret"],
+    ["storage_capability","Storage capability",0,"CUI","select:Non-possessing (no classified safeguarding capability)|Possessing - Secret safeguarding|Possessing - Top Secret safeguarding"],
+    ["dcsa_field_office","DCSA field office",0,"DCSA","Atlanta"],
+    ["security_contact_email","Security contact email",0,"CUI","security@yourcompany.com"],
+    ["security_contact_phone","Security contact phone",0,null,"(555) 555-5555"],
+    ["document_year","Document year",0,null,""]]},
+  {n:4,name:"Logo & Branding",fields:[
+    ["spp_version","SPP / policy version",0,null,"1.0"],
+    ["effective_date","Effective date (MM/DD/YYYY)",1,"EFFECTIVE","01/01/2026"],
+    ["approved_by","Approved by",1,"APPROVED","Usually the SMO"]]},
+  {n:5,name:"Generate",fields:[]}
+];
+
+function renderSteps(){
+  var html="";
+  STEPS.forEach(function(s){
+    var done=stepComplete(s.n)&&s.n!==wstep&&s.n<5;
+    html+='<div class="step'+(s.n===wstep?" active":"")+(done?" done":"")+'" data-step="'+s.n+'">'+
+      '<b>STEP '+s.n+(done?' <span class="tick">&#10003;</span>':"")+'</b>'+esc(s.name)+'</div>';
+  });
+  var el=document.getElementById("steps");
+  el.innerHTML=html;
+  el.querySelectorAll(".step").forEach(function(d){
+    d.addEventListener("click",function(){ wstep=parseInt(d.getAttribute("data-step"),10); renderWizard(); });
+  });
+  document.getElementById("wprog").style.width=(wstep*20)+"%";
+}
+function stepComplete(n){
+  var s=STEPS[n-1]; if(!s) return false;
+  if(n===4&&!profile.logo_data) return false;
+  return s.fields.every(function(f){ return !f[2]||sanitize(profile[f[0]]); });
+}
+function fieldHTML(f){
+  var key=f[0],label=f[1],req=f[2],tip=f[3],ph=f[4]||"";
+  var t=tip?'<span class="tip" data-tip="'+esc(TIPS[tip])+'">?</span>':"";
+  var r=req?' <span class="req">*</span>':"";
+  var inner;
+  if(ph.indexOf("select:")===0){
+    var opts=ph.slice(7).split("|").map(function(o){
+      return '<option'+(profile[key]===o?" selected":"")+'>'+esc(o)+'</option>';
+    }).join("");
+    inner='<select data-key="'+key+'">'+opts+'</select>';
+  }else{
+    inner='<input data-key="'+key+'" value="'+esc(profile[key])+'" placeholder="'+esc(ph)+'"'+(req?' data-req="1"':"")+'>'+
+      '<div class="fieldmsg">This field is required before documents can be generated.</div>';
+  }
+  return '<div class="field"><label>'+esc(label)+r+t+'</label>'+inner+'</div>';
+}
+function renderWizard(){
+  renderSteps();
+  var s=STEPS[wstep-1], p=document.getElementById("wpanel"), html="";
+  var hints={1:"Who you are. These details appear on every cover page, header, and footer.",
+    2:"Your key security people. Hover the ? icons if you are not sure what a role means. One person can hold several roles at a small company.",
+    3:"Your facility and CUI program details. If you only handle CUI and hold no facility clearance, choose None.",
+    4:"Your logo appears on every cover page. The effective date and approver appear in every approval block.",
+    5:"Review your profile and generate documents. Anything missing is listed below."};
+  html+='<h2>Step '+wstep+': '+esc(s.name)+'</h2><p class="hint">'+hints[wstep]+'</p>';
+  if(wstep===4){
+    html+='<div class="logo-drop" id="logo-drop">'+
+      (profile.logo_data?'<img src="'+profile.logo_data+'" alt="logo">':'')+
+      '<div>'+(profile.logo_data?"Logo loaded. Click to replace.":"Click to upload your company logo (PNG or JPG, under 5 MB) <span class=\"req\">*</span>")+'</div></div><br>';
+  }
+  if(s.fields.length){
+    html+='<div class="frow">'+s.fields.map(fieldHTML).join("")+'</div>';
+  }
+  if(wstep===5){
+    var miss=missingFields();
+    html+='<dl class="summary">';
+    [["Company","company_legal_name"],["Short name","company_short_name"],
+     ["CAGE","cage_code"],["UEI","uei"],["SMO","smo_name"],["FSO","fso_name"],
+     ["ITPSO","itpso_name"],["Clearance","facility_clearance_level"],
+     ["Effective date","effective_date"],["Approved by","approved_by"]
+    ].forEach(function(x){
+      html+='<dt>'+x[0]+'</dt><dd>'+(esc(profile[x[1]])||'<span style="color:var(--warn)">missing</span>')+'</dd>';
+    });
+    html+='</dl><br>';
+    if(miss.length){
+      html+='<p style="color:var(--warn);font-weight:600">Before exporting, complete: </p><ul class="misslist">'+
+        miss.map(function(m){return "<li>"+esc(m)+"</li>";}).join("")+"</ul>";
+    }else{
+      html+='<p style="color:var(--ok);font-weight:700">&#10003; Profile complete. Readiness '+readiness()+'%. You are ready to generate documents.</p>';
+    }
+    html+='<p><button class="btn teal" id="goto-dash">Go to Dashboard and generate</button></p>';
+  }
+  p.innerHTML=html;
+  p.querySelectorAll("[data-key]").forEach(function(el){
+    el.addEventListener("input",function(){
+      profile[el.getAttribute("data-key")]=sanitize(el.value);
+      if(el.getAttribute("data-req")) el.classList.toggle("invalid",!el.value.trim());
+      persist(); refreshScore(); renderSteps();
+    });
+    if(el.getAttribute("data-req")&&!el.value.trim()) el.classList.add("invalid");
+  });
+  var drop=document.getElementById("logo-drop");
+  if(drop) drop.addEventListener("click",function(){ document.getElementById("file-logo").click(); });
+  var gd=document.getElementById("goto-dash");
+  if(gd) gd.addEventListener("click",function(){ show("dashboard"); });
+  document.getElementById("wz-back").disabled=(wstep===1);
+  document.getElementById("wz-next").textContent=(wstep===5)?"Finish":"Next step";
+}
+document.getElementById("wz-back").addEventListener("click",function(){ if(wstep>1){wstep--;renderWizard();} });
+document.getElementById("wz-next").addEventListener("click",function(){
+  if(wstep<5){wstep++;renderWizard();} else show("dashboard");
+});
+document.getElementById("wz-sample").addEventListener("click",function(){
+  applySample(); renderWizard(); toast("Sample profile loaded.","ok");
+});
+document.getElementById("wz-reset").addEventListener("click",function(){
+  if(confirm("Reset the entire profile? This clears all saved fields and the logo.")){
+    localStorage.removeItem("cmmcStudioProfile"); profile=loadProfile();
+    refreshScore(); renderWizard(); toast("Profile reset.");
+  }
+});
+document.getElementById("wz-save").addEventListener("click",function(){
+  downloadBlob(JSON.stringify(profile,null,2),"company_profile.json","application/json");
+  toast("company_profile.json downloaded. Keep it as your backup.","ok");
+});
+document.getElementById("wz-load").addEventListener("click",function(){
+  document.getElementById("file-json").click();
+});
+document.getElementById("file-json").addEventListener("change",function(e){
+  var f=e.target.files[0]; if(!f||f.size>2*1024*1024) return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var d=JSON.parse(r.result);
+      ALL_FIELDS.forEach(function(k){ if(typeof d[k]==="string") profile[k]=sanitize(d[k]); });
+      if(typeof d.logo_data==="string"&&/^data:image\/(png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(d.logo_data)) profile.logo_data=d.logo_data;
+      if(typeof d.logo_path==="string"&&!profile.effective_date) profile.effective_date=todayStr();
+      persist(); refreshScore(); renderWizard(); toast("Profile loaded.","ok");
+    }catch(err){ toast("That file is not valid JSON.","warn"); }
+  };
+  r.readAsText(f); e.target.value="";
+});
+document.getElementById("file-logo").addEventListener("change",function(e){
+  var f=e.target.files[0]; if(!f) return;
+  if(!/^image\/(png|jpeg)$/.test(f.type)||f.size>5*1024*1024){
+    toast("Logo must be PNG or JPG under 5 MB.","warn"); e.target.value=""; return;
+  }
+  var r=new FileReader();
+  r.onload=function(){ profile.logo_data=r.result; persist(); refreshScore(); renderWizard(); toast("Logo saved.","ok"); };
+  r.readAsDataURL(f); e.target.value="";
+});
+
+/* ============================ DASHBOARD ============================ */
+function domainOptions(){
+  return Object.keys(CMMC.domains).map(function(c){
+    return '<option value="'+c+'">'+c+" - "+esc(CMMC.domains[c])+"</option>";
+  }).join("");
+}
+var CARDS=[
+  {id:"spp",tag:"SPP",title:"SPP Generator",
+   desc:"Your master security document: the Standard Practices and Procedures, with Forward, 29 numbered sections, and Appendices A and B.",
+   what:"What this is for: the SPP is the front door of your security program. Assessors and DCSA read it first to understand how your company protects CUI and classified information.",
+   actions:[["Preview","preview","spp"],["Download Word","word","spp"]]},
+  {id:"policy",tag:"Policies",title:"Policy Generator",
+   desc:"14 domain policies covering all 110 NIST SP 800-171 Rev. 2 requirements, each with purpose, scope, policy statements, evidence, assessor questions, and approval.",
+   what:"What this is for: policies prove management intent. Each CMMC domain needs a written policy that says what your company requires.",
+   select:true,
+   actions:[["Preview","preview","policy"],["Download Word","word","policy"],["Download all 14","wordall","policy"]]},
+  {id:"proc",tag:"Procedures",title:"Procedure Package Generator",
+   desc:"52 documents: a step-by-step procedure for each domain plus the forms, logs, and checklists your team fills in day to day.",
+   what:"What this is for: procedures prove the policy actually operates. The completed forms and logs become your assessment evidence.",
+   select:true,
+   actions:[["Preview procedure","preview","proc"],["Download package","wordpkg","proc"],["Download all 14","wordall","proc"]]},
+  {id:"matrix",tag:"Matrix",title:"Control Mapping Matrix",
+   desc:"All 110 requirements mapped to CMMC practice IDs, NIST IDs, policies, procedures, evidence, responsible roles, and review frequencies.",
+   what:"What this is for: your master crosswalk. Assessors use it to find which document answers each requirement.",
+   actions:[["Preview","preview","matrix"],["Download Word","word","matrix"],["Download CSV","csv","matrix"]]},
+  {id:"evidence",tag:"Evidence",title:"Evidence Checklist",
+   desc:"A domain-by-domain checklist of the exact records an assessor will ask to see, with common assessor questions.",
+   what:"What this is for: run this before every self-assessment so nothing is missing on assessment day.",
+   actions:[["Preview","preview","evidence"],["Download Word","word","evidence"]]},
+  {id:"binder",tag:"Binder",title:"Full Binder Export",
+   desc:"Everything in one zip: SPP, 14 policies, 52 procedure documents, evidence checklist, control matrix (Word + CSV), and your profile JSON.",
+   what:"What this is for: your complete CMMC Level 2 documentation set, ready to review, sign, and file.",
+   actions:[["Download full binder (zip)","binder","binder"],["Export profile JSON","json","binder"]]}
+];
+function renderDashboard(){
+  refreshScore();
+  var miss=missingFields();
+  document.getElementById("rd-title").textContent=
+    miss.length?"Profile readiness: "+readiness()+"%":"Profile complete: ready to generate";
+  document.getElementById("rd-text").innerHTML=miss.length?
+    'Complete the wizard before exporting. Missing: <span class="miss">'+miss.map(esc).join(", ")+"</span>":
+    "All required fields are complete. Generate your documents below, then review and sign them in Word.";
+  document.getElementById("rd-fix").style.display=miss.length?"":"none";
+  var g=document.getElementById("cards"); g.innerHTML="";
+  CARDS.forEach(function(c){
+    var card=document.createElement("div"); card.className="card";
+    var sel=c.select?'<select data-card="'+c.id+'">'+domainOptions()+"</select>":"";
+    card.innerHTML='<h3>'+esc(c.title)+' <span class="tag">'+esc(c.tag)+'</span></h3>'+
+      '<p class="desc">'+esc(c.desc)+'</p><div class="what">'+esc(c.what)+'</div>'+
+      '<div class="actions">'+sel+c.actions.map(function(a){
+        return '<button class="btn'+(a[1]==="preview"?" ghost":a[1].indexOf("word")===0||a[1]==="binder"?" teal":" ghost")+
+          '" data-act="'+a[1]+'" data-target="'+a[2]+'">'+esc(a[0])+"</button>";
+      }).join("")+"</div>";
+    g.appendChild(card);
+  });
+  g.querySelectorAll("button[data-act]").forEach(function(b){
+    b.addEventListener("click",function(){
+      var act=b.getAttribute("data-act"), target=b.getAttribute("data-target");
+      var sel=b.parentElement.querySelector("select");
+      handleAction(act,target,sel?sel.value:null);
+    });
+  });
+}
+document.getElementById("rd-fix").addEventListener("click",function(){ show("wizard"); });
+
+function handleAction(act,target,domain){
+  if(act==="json"){
+    downloadBlob(JSON.stringify(profile,null,2),"company_profile.json","application/json");
+    toast("company_profile.json downloaded.","ok"); return;
+  }
+  if(act==="preview"){ openPreview(target,domain); return; }
+  guardedExport(function(){
+    if(act==="word") downloadWordFor(target,domain);
+    else if(act==="wordall"&&target==="policy") downloadAllPolicies();
+    else if(act==="wordall"&&target==="proc") downloadAllProcedures();
+    else if(act==="wordpkg") downloadProcPackage(domain);
+    else if(act==="csv") downloadCSV();
+    else if(act==="binder") downloadBinder();
+  });
+}
+function guardedExport(go){
+  var miss=missingFields();
+  if(!miss.length){ go(); return; }
+  modal("Profile incomplete",
+    '<p>These items are required before export:</p><ul class="misslist">'+
+    miss.map(function(m){return "<li>"+esc(m)+"</li>";}).join("")+
+    '</ul><p style="color:var(--gray);font-size:12.5px">You can still generate now; missing values appear as placeholders like [CAGE_CODE] that you must replace in Word.</p>',
+    [["Fix in wizard","teal",function(){ closeModal(); show("wizard"); }],
+     ["Generate anyway","ghost",function(){ closeModal(); go(); }]]);
+}
+
+/* ============================ DOC ENGINE ============================ */
+var DOC_CSS='body{font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#1c2433;line-height:1.45}'+
+  'h1{font-family:"Calibri Light",Calibri,Arial;font-size:16pt;color:#1f3864;margin:18pt 0 6pt}'+
+  'h2{font-family:"Calibri Light",Calibri,Arial;font-size:13pt;color:#1f3864;margin:14pt 0 4pt}'+
+  'p{margin:6pt 0} ul{margin:4pt 0 8pt} li{margin:3pt 0}'+
+  'table{border-collapse:collapse;width:100%;margin:8pt 0} '+
+  'th{background:#1f3864;color:#fff;font-size:9pt;padding:5pt 6pt;border:1px solid #8aa;text-align:left}'+
+  'td{font-size:9pt;padding:5pt 6pt;border:1px solid #b9c4d6;vertical-align:top}'+
+  '.cover{text-align:center;page-break-after:always}'+
+  '.cover img{max-height:90pt;max-width:260pt;margin:30pt auto 16pt}'+
+  '.cover .doctitle{font-family:"Calibri Light",Calibri;font-size:26pt;color:#1f3864;font-weight:700;margin:12pt 0 4pt}'+
+  '.cover .subtitle{font-size:13pt;color:#0e7c86;margin-bottom:26pt}'+
+  '.cover .co{font-size:13pt;font-weight:700;margin:4pt 0}'+
+  '.cover .line{font-size:11pt;margin:2pt 0}'+
+  '.disc{font-size:8.5pt;font-style:italic;color:#444;border-top:1px solid #ccc;margin-top:36pt;padding-top:8pt;text-align:center}'+
+  '.histhead td,.hist th{font-size:8.5pt}'+
+  '.callout{background:#f2f6fb;border-left:4px solid #0e7c86;padding:8pt 10pt;margin:8pt 0;font-size:10.5pt}'+
+  '.callout b{color:#0e7c86}'+
+  '.sig{margin-top:18pt} .sig .rule{border-bottom:1px solid #333;width:260pt;height:22pt}'+
+  '.sig .nm{font-weight:700;margin-top:3pt} .pagebreak{page-break-before:always}'+
+  '.chk{margin:4pt 0} .footerline{font-size:8pt;color:#777;border-top:1px solid #ccc;margin-top:28pt;padding-top:5pt}';
+
+function coverHTML(title,subtitle){
+  var logo=profile.logo_data?'<img src="'+profile.logo_data+'" alt="logo">':"<div style='height:60pt'></div>";
+  return '<div class="cover">'+logo+
+    '<div class="doctitle">'+esc(title)+'</div>'+
+    '<div class="subtitle">'+esc(subtitle)+'</div>'+
+    '<div class="co">'+fill("{company_legal_name}")+'</div>'+
+    '<div class="line">'+fill("{address_line1}")+'</div>'+
+    '<div class="line">'+fill("{address_line2}")+'</div>'+
+    '<div class="line">CAGE CODE: '+fill("{cage_code}")+'</div>'+
+    '<div class="line">UEI: '+fill("{uei}")+'</div>'+
+    '<div class="line" style="margin-top:14pt">Effective date: '+fill("{effective_date}")+'</div>'+
+    '<div class="disc">DISCLOSURE STATEMENT: This document is the property of '+fill("{company_legal_name}")+
+    ' and contains company sensitive information. It is provided for official use by employees, consultants, and authorized government'+
+    ' representatives only. Reproduction or further distribution outside '+fill("{company_short_name}")+
+    ' requires the written approval of the Facility Security Officer.</div></div>';
+}
+function historyHTML(){
+  return '<h1>Document History</h1><table class="hist"><tr><th>Version</th><th>Author</th><th>Revision Date</th><th>Approved by</th><th>Approval Date</th><th>Reason / Description of Changes</th></tr>'+
+    '<tr><td>'+fill("{spp_version}")+'</td><td>'+fill("{fso_name}")+'</td><td>'+fill("{effective_date}")+
+    '</td><td>'+fill("{approved_by}")+'</td><td>'+fill("{effective_date}")+'</td><td>Initial release</td></tr></table>';
+}
+function approvalHTML(){
+  return '<h1>Approval</h1><table><tr><th>Role</th><th>Name</th><th>Signature</th><th>Date</th></tr>'+
+    '<tr><td>Prepared by (FSO)</td><td>'+fill("{fso_name}")+'</td><td></td><td></td></tr>'+
+    '<tr><td>Approved by (SMO)</td><td>'+fill("{approved_by}")+'</td><td></td><td></td></tr></table>'+
+    '<p><b>Effective date: '+fill("{effective_date}")+'</b></p>';
+}
+function signatureHTML(pairs){
+  return '<div class="sig">'+pairs.map(function(p){
+    return '<div class="rule"></div><div class="nm">'+fill(p[0])+'</div><div>'+fill(p[1])+'</div><br>';
+  }).join("")+"</div>";
+}
+function complianceHTML(){
+  return '<h1>Compliance References</h1><p>'+fill(CMMC.complianceStatement)+'</p><ul>'+
+    CMMC.references.map(function(r){return "<li>"+esc(r)+"</li>";}).join("")+"</ul>";
+}
+function calloutHTML(title,body){
+  return '<div class="callout"><b>'+esc(title)+":</b> "+body+"</div>";
+}
+function footerHTML(docname){
+  return '<div class="footerline">'+fill("{company_short_name}")+' | '+esc(docname)+
+    ' | Version '+fill("{spp_version}")+' | Company Sensitive | Aligned with 32 CFR Part 170, NIST SP 800-171 Rev. 2, and DFARS 252.204-7012/-7019/-7020/-7021</div>';
+}
+function blocksHTML(blocks){
+  return blocks.map(function(b){
+    if(b[0]==="p") return "<p>"+fill(b[1])+"</p>";
+    if(b[0]==="ul") return "<ul>"+b[1].map(function(i){return "<li>"+fill(i)+"</li>";}).join("")+"</ul>";
+    if(b[0]==="h2") return "<h2>"+fill(b[1])+"</h2>";
+    if(b[0]==="sig") return signatureHTML(b[1]);
+    return "";
+  }).join("");
+}
+
+/* ---------- document builders ---------- */
+function buildSPP(){
+  var h=coverHTML("STANDARD PRACTICES AND PROCEDURES (SPP)",
+    "CMMC Level 2 Security Program | "+(profile.document_year||new Date().getFullYear()));
+  h+="<h1>Forward</h1>"+blocksHTML(CMMC.spp.forward);
+  h+='<div class="pagebreak"></div><h1>Table of Contents</h1><ul>'+
+     CMMC.spp.sections.map(function(s,i){return "<li>"+(i+1)+". "+fill(s[0])+"</li>";}).join("")+
+     "<li>Appendix A: CMMC Level 2 Control Mapping Matrix</li><li>Appendix B: CMMC Level 2 Procedures, Forms, Logs, and Checklists</li></ul>";
+  CMMC.spp.sections.forEach(function(s,i){
+    h+='<h1>'+(i+1)+". "+fill(s[0])+"</h1>"+blocksHTML(s[1]);
+  });
+  h+='<div class="pagebreak"></div><h1>Appendix A: CMMC Level 2 Control Mapping Matrix</h1>'+matrixTableHTML();
+  h+='<div class="pagebreak"></div><h1>Appendix B: CMMC Level 2 Procedures, Forms, Logs, and Checklists</h1>'+appendixBHTML();
+  h+=historyHTML()+approvalHTML();
+  h+=footerHTML("Standard Practices and Procedures");
+  return {title:fill("{company_short_name}")+" Standard Practices and Procedures",html:h,
+          file:fileSafe(profile.company_short_name||"Company")+"_SPP.doc"};
+}
+function matrixRows(){
+  return CMMC.practices.map(function(p){
+    var gov=CMMC.governance[p.domain];
+    var pkg=CMMC.packages[p.domain];
+    return [p.domain_name,p.cmmc_id,p.nist_id,p.name,
+      CMMC.policyNames[p.domain],pkg.procedure.title,
+      pkg.documents.map(function(d){return d.title;}).join("; "),gov[0],gov[1]];
+  });
+}
+var MATRIX_HEADERS=["CMMC Domain","CMMC Practice ID","NIST SP 800-171 Rev. 2 ID","Requirement Title","Policy Document","Procedure Document","Evidence Artifact","Responsible Role","Review Frequency"];
+function matrixTableHTML(){
+  return "<table><tr>"+MATRIX_HEADERS.map(function(x){return "<th>"+esc(x)+"</th>";}).join("")+"</tr>"+
+    matrixRows().map(function(r){return "<tr>"+r.map(function(c){return "<td>"+esc(c)+"</td>";}).join("")+"</tr>";}).join("")+"</table>";
+}
+function appendixBHTML(){
+  return "<table><tr><th>Domain</th><th>Policy</th><th>Procedure</th><th>Forms, Logs, and Checklists</th></tr>"+
+    Object.keys(CMMC.domains).map(function(c){
+      var pkg=CMMC.packages[c];
+      return "<tr><td>"+c+" - "+esc(CMMC.domains[c])+"</td><td>"+esc(CMMC.policyNames[c])+"</td><td>"+
+        esc(pkg.procedure.title)+"</td><td>"+esc(pkg.documents.map(function(d){return d.title;}).join("; "))+"</td></tr>";
+    }).join("")+"</table>";
+}
+function buildPolicy(code){
+  var name=CMMC.policyNames[code], dn=CMMC.domains[code];
+  var plist=CMMC.practices.filter(function(p){return p.domain===code;});
+  var g=CMMC.guidance[code], gov=CMMC.governance[code];
+  var h=coverHTML(name,"CMMC Level 2 | NIST SP 800-171 Rev. 2");
+  h+=historyHTML();
+  h+=calloutHTML("What this document is for",fill(g.what)+
+    " This policy states management's requirements; the "+esc(CMMC.packages[code].procedure.title)+
+    " describes how they are carried out.");
+  h+="<h1>1&nbsp; Purpose</h1><p>"+fill("{company_legal_name} has adopted the "+dn+
+    " principles established in NIST SP 800-171 Rev. 2 and CMMC Level 2. This policy defines the requirements that protect the confidentiality of Controlled Unclassified Information (CUI) within the "+dn+" domain.")+"</p>";
+  h+="<h1>2&nbsp; Scope</h1><p>"+fill("This policy applies to all employees, contractors, consultants, and any others granted access to {company_legal_name} information systems, networks, and data, including all systems that process, store, or transmit CUI.")+"</p>";
+  h+="<h1>3&nbsp; Policy</h1>";
+  plist.forEach(function(p,i){
+    h+="<h2>3."+(i+1)+"&nbsp; "+esc(p.cmmc_id)+" - "+esc(p.name)+"</h2><p>"+
+      fill("{company_short_name} shall "+p.text.charAt(0).toLowerCase()+p.text.slice(1))+"</p>";
+  });
+  h+="<h1>4&nbsp; Roles and Responsibilities</h1><ul>"+
+    ["Senior Management Official ({smo_name}, {smo_title}): approves this policy and provides resources for its implementation.",
+     "Facility Security Officer ({fso_name}): integrates this policy with the company SPP and security education program.",
+     "Insider Threat Program Senior Official ({itpso_name}): oversees monitoring and incident escalation for this domain.",
+     "Responsible role for day-to-day execution: "+gov[0]+".",
+     "All personnel: comply with this policy and report violations to {security_contact_email}."]
+    .map(function(x){return "<li>"+fill(x)+"</li>";}).join("")+"</ul>";
+  h+="<h1>5&nbsp; Review Frequency and Compliance</h1><p>"+
+    fill("Violations may result in disciplinary action up to and including termination. This policy is reviewed at least annually by the FSO and ITPSO. Operational review frequency for this domain: "+gov[1]+".")+"</p>";
+  h+="<h1>6&nbsp; Evidence Records and Assessment Evidence Needed</h1><p>Maintain and be ready to show an assessor:</p><ul>"+
+    g.evidence.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+"</ul>";
+  h+="<h1>7&nbsp; Common Assessor Questions</h1><ul>"+
+    g.questions.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+"</ul>";
+  h+=complianceHTML();
+  h+="<p><b>Domain-specific references:</b> NIST SP 800-171 Rev. 2 requirements "+
+    plist.map(function(p){return p.nist_id;}).join(", ")+"; "+esc(CMMC.packages[code].procedure.title)+
+    "; "+fill("{company_short_name} Standard Practices and Procedures (SPP).")+"</p>";
+  h+=approvalHTML()+signatureHTML([["{approved_by}","{smo_title}, Senior Management Official"],["{fso_name}","Facility Security Officer"]]);
+  h+=footerHTML(name);
+  return {title:name,html:h,file:fileSafe(profile.company_short_name||"Company")+"_"+fileSafe(name)+".doc"};
+}
+function buildProcedure(code){
+  var pkg=CMMC.packages[code], proc=pkg.procedure, g=CMMC.guidance[code], gov=CMMC.governance[code];
+  var byId={}; CMMC.practices.forEach(function(p){byId[p.nist_id]=p;});
+  var h=coverHTML(proc.title,"CMMC Level 2 | "+CMMC.domains[code]);
+  h+=historyHTML();
+  h+=calloutHTML("What this document is for",fill(g.what));
+  h+="<h1>Supporting Controls</h1><ul>"+proc.controls.map(function(c){
+    return "<li><b>"+esc(c)+":</b> "+esc(byId[c]?byId[c].text:"")+"</li>";}).join("")+"</ul>";
+  proc.sections.forEach(function(s,i){
+    h+="<h1>"+(i+1)+". "+esc(s[0])+"</h1><p><b>Purpose:</b> "+fill(s[1])+"</p><p><b>Procedures:</b></p><ul>"+
+      s[2].map(function(st){return "<li>"+fill(st)+"</li>";}).join("")+"</ul>";
+  });
+  var n=proc.sections.length;
+  h+="<h1>"+(n+1)+". Evidence Records and Assessment Evidence Needed</h1><p>Completed copies of the following are the operating records of this procedure. Retain for at least 3 years or as required by contract:</p><ul>"+
+    g.evidence.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+"</ul>";
+  h+="<h1>"+(n+2)+". Common Assessor Questions</h1><ul>"+
+    g.questions.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+"</ul>";
+  h+="<h1>"+(n+3)+". Review Frequency</h1><p>Responsible role: "+esc(gov[0])+". Operational review frequency: "+esc(gov[1])+". Reviewed at least annually by the FSO and ITPSO.</p>";
+  h+=complianceHTML()+approvalHTML();
+  h+=footerHTML(proc.title);
+  return {title:proc.title,html:h,file:fileSafe(profile.company_short_name||"Company")+"_"+fileSafe(proc.title)+".doc"};
+}
+function buildArtifact(code,spec){
+  var pkg=CMMC.packages[code];
+  var h=coverHTML(spec.title,"CMMC Level 2 | "+CMMC.domains[code]);
+  if(spec.kind==="form"){
+    h+="<p>Complete all fields. Submit the signed form to the FSO or IT security lead as directed by the "+esc(pkg.procedure.title)+".</p>"+
+      "<table><tr><th style='width:45%'>Field</th><th>Entry</th></tr>"+
+      spec.fields.map(function(f){return "<tr><td>"+fill(f)+"</td><td>&nbsp;</td></tr>";}).join("")+"</table>";
+  }else if(spec.kind==="log"){
+    h+="<p>Maintain this log as the record of activity required by the "+esc(pkg.procedure.title)+". Retain completed logs for at least 3 years or as required by contract.</p>"+
+      "<table><tr>"+spec.columns.map(function(c){return "<th>"+esc(c)+"</th>";}).join("")+"</tr>"+
+      Array(12).fill("<tr>"+spec.columns.map(function(){return "<td>&nbsp;</td>";}).join("")+"</tr>").join("")+"</table>";
+  }else{
+    h+="<p>Check each item as it is verified. File the completed checklist with the records for the "+esc(pkg.procedure.title)+".</p>"+
+      spec.items.map(function(i){return '<p class="chk">&#9744;&nbsp; '+fill(i)+"</p>";}).join("")+
+      "<br><p>Completed by: ______________________ &nbsp; Date: ____________</p><p>Reviewed by: &nbsp;______________________ &nbsp; Date: ____________</p>";
+  }
+  h+=complianceHTML()+footerHTML(spec.title);
+  return {title:spec.title,html:h,file:fileSafe(profile.company_short_name||"Company")+"_"+fileSafe(spec.title)+".doc"};
+}
+function buildMatrixDoc(){
+  var h=coverHTML("CMMC Level 2 Control Mapping Matrix","NIST SP 800-171 Rev. 2 | 110 Requirements");
+  h+="<h1>CMMC Level 2 Control Mapping Matrix</h1>"+matrixTableHTML()+complianceHTML()+approvalHTML();
+  h+=footerHTML("Control Mapping Matrix");
+  return {title:"Control Mapping Matrix",html:h,file:fileSafe(profile.company_short_name||"Company")+"_Control_Mapping_Matrix.doc"};
+}
+function buildEvidence(){
+  var h=coverHTML("CMMC Level 2 Evidence Checklist","Assessment Evidence by Domain | NIST SP 800-171 Rev. 2");
+  h+="<p>Use this checklist to confirm that the records an assessor will ask for exist and are current. Check each item, note where the evidence is stored, and re-run this checklist before every self-assessment.</p>";
+  Object.keys(CMMC.domains).forEach(function(c){
+    var g=CMMC.guidance[c], gov=CMMC.governance[c];
+    h+="<h1>"+c+" - "+esc(CMMC.domains[c])+"</h1>"+
+      calloutHTML("What this domain is for",fill(g.what))+
+      g.evidence.map(function(i){return '<p class="chk">&#9744;&nbsp; '+esc(i)+"</p>";}).join("")+
+      "<p><b>Responsible role / review frequency:</b> "+esc(gov[0])+" / "+esc(gov[1])+"</p>"+
+      "<p><b>Common assessor questions:</b> "+g.questions.map(esc).join(" ")+"</p>";
+  });
+  h+=complianceHTML()+approvalHTML();
+  h+=footerHTML("Evidence Checklist");
+  return {title:"Evidence Checklist",html:h,file:fileSafe(profile.company_short_name||"Company")+"_Evidence_Checklist.doc"};
+}
+function buildFor(target,domain){
+  if(target==="spp") return buildSPP();
+  if(target==="policy") return buildPolicy(domain||"AC");
+  if(target==="proc") return buildProcedure(domain||"AC");
+  if(target==="matrix") return buildMatrixDoc();
+  if(target==="evidence") return buildEvidence();
+  return null;
+}
+
+/* ============================ EXPORT ============================ */
+function fileSafe(s){ return sanitize(s).replace(/&/g,"and").replace(/[^A-Za-z0-9._-]+/g,"_").replace(/^_+|_+$/g,"")||"Document"; }
+function fullHTML(doc){
+  return "<!DOCTYPE html><html><head><meta charset='utf-8'><title>"+esc(doc.title)+
+    "</title><style>"+DOC_CSS+"</style></head><body>"+doc.html+"</body></html>";
+}
+function wordMHT(doc){
+  /* MHTML container: Word opens it natively with the embedded logo intact. */
+  var html=fullHTML(doc), parts=[], boundary="----=_CMMC_Studio_Part";
+  var imgIdx=0;
+  html=html.replace(/src="(data:image\/(png|jpeg);base64,[^"]+)"/g,function(m,uri,kind){
+    imgIdx++;
+    var loc="image"+imgIdx+"."+(kind==="png"?"png":"jpg");
+    parts.push({loc:loc,type:"image/"+kind,b64:uri.split(",")[1]});
+    return 'src="'+loc+'"';
+  });
+  var out="MIME-Version: 1.0\r\nContent-Type: multipart/related; boundary=\""+boundary+"\"\r\n\r\n"+
+    "--"+boundary+"\r\nContent-Type: text/html; charset=\"utf-8\"\r\nContent-Location: document.html\r\n\r\n"+html+"\r\n";
+  parts.forEach(function(p){
+    var wrapped=p.b64.replace(/(.{76})/g,"$1\r\n");
+    out+="--"+boundary+"\r\nContent-Type: "+p.type+"\r\nContent-Transfer-Encoding: base64\r\nContent-Location: "+p.loc+"\r\n\r\n"+wrapped+"\r\n";
+  });
+  out+="--"+boundary+"--";
+  return out;
+}
+function downloadBlob(content,filename,mime){
+  var blob=content instanceof Blob?content:new Blob([content],{type:mime||"application/octet-stream"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download=filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){URL.revokeObjectURL(a.href);},4000);
+}
+function downloadWord(doc){
+  downloadBlob(wordMHT(doc),doc.file,"application/msword");
+  toast(doc.file+" downloaded. Open it in Microsoft Word.","ok");
+}
+function downloadWordFor(target,domain){ downloadWord(buildFor(target,domain)); }
+function allDocs(){
+  var docs=[{doc:buildSPP(),dir:"01_SPP/"}];
+  Object.keys(CMMC.domains).forEach(function(c){
+    docs.push({doc:buildPolicy(c),dir:"02_Policies/"});
+  });
+  Object.keys(CMMC.domains).forEach(function(c){
+    var dir="03_Procedures/"+c+"_"+fileSafe(CMMC.domains[c])+"/";
+    docs.push({doc:buildProcedure(c),dir:dir});
+    CMMC.packages[c].documents.forEach(function(spec){
+      docs.push({doc:buildArtifact(c,spec),dir:dir});
+    });
+  });
+  docs.push({doc:buildMatrixDoc(),dir:"04_Control_Matrix/"});
+  docs.push({doc:buildEvidence(),dir:"05_Evidence/"});
+  return docs;
+}
+function downloadAllPolicies(){
+  var files=Object.keys(CMMC.domains).map(function(c){
+    var d=buildPolicy(c); return {name:d.file,data:wordMHT(d)};
+  });
+  zipDownload(files,fileSafe(profile.company_short_name||"Company")+"_All_Policies.zip");
+}
+function downloadAllProcedures(){
+  var files=[];
+  Object.keys(CMMC.domains).forEach(function(c){
+    var dir=c+"_"+fileSafe(CMMC.domains[c])+"/";
+    var d=buildProcedure(c); files.push({name:dir+d.file,data:wordMHT(d)});
+    CMMC.packages[c].documents.forEach(function(spec){
+      var a=buildArtifact(c,spec); files.push({name:dir+a.file,data:wordMHT(a)});
+    });
+  });
+  zipDownload(files,fileSafe(profile.company_short_name||"Company")+"_All_Procedures.zip");
+}
+function downloadProcPackage(code){
+  var files=[]; var d=buildProcedure(code);
+  files.push({name:d.file,data:wordMHT(d)});
+  CMMC.packages[code].documents.forEach(function(spec){
+    var a=buildArtifact(code,spec); files.push({name:a.file,data:wordMHT(a)});
+  });
+  zipDownload(files,fileSafe(profile.company_short_name||"Company")+"_"+code+"_Procedure_Package.zip");
+}
+function downloadCSV(){
+  var rows=[MATRIX_HEADERS].concat(matrixRows());
+  var csv=rows.map(function(r){
+    return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(",");
+  }).join("\r\n");
+  downloadBlob("﻿"+csv,fileSafe(profile.company_short_name||"Company")+"_Control_Mapping_Matrix.csv","text/csv");
+  toast("Control matrix CSV downloaded. Opens directly in Excel.","ok");
+}
+function downloadBinder(){
+  toast("Building full binder... this takes a few seconds.");
+  setTimeout(function(){
+    var files=allDocs().map(function(x){ return {name:x.dir+x.doc.file,data:wordMHT(x.doc)}; });
+    var rows=[MATRIX_HEADERS].concat(matrixRows());
+    files.push({name:"04_Control_Matrix/"+fileSafe(profile.company_short_name||"Company")+"_Control_Mapping_Matrix.csv",
+      data:"﻿"+rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n")});
+    files.push({name:"company_profile.json",data:JSON.stringify(profile,null,2)});
+    zipDownload(files,fileSafe(profile.company_short_name||"Company")+"_CMMC_L2_Binder.zip",
+      "Full binder downloaded: "+files.length+" files. Review, tailor, and sign in Word.");
+  },50);
+}
+
+/* ---------- minimal ZIP writer (stored entries) ---------- */
+var CRC_TABLE=(function(){
+  var t=new Uint32Array(256);
+  for(var n=0;n<256;n++){ var c=n;
+    for(var k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);
+    t[n]=c>>>0; }
+  return t;
+})();
+function crc32(bytes){
+  var c=0xFFFFFFFF;
+  for(var i=0;i<bytes.length;i++) c=CRC_TABLE[(c^bytes[i])&0xFF]^(c>>>8);
+  return (c^0xFFFFFFFF)>>>0;
+}
+function strBytes(s){ return new TextEncoder().encode(s); }
+function num(v,len){ var a=[]; for(var i=0;i<len;i++){a.push(v&0xFF); v>>>=8;} return a; }
+function zipDownload(files,zipname,doneMsg){
+  var chunks=[],central=[],offset=0,now=new Date();
+  var dosTime=((now.getHours()<<11)|(now.getMinutes()<<5)|(now.getSeconds()>>1))&0xFFFF;
+  var dosDate=(((now.getFullYear()-1980)<<9)|((now.getMonth()+1)<<5)|now.getDate())&0xFFFF;
+  files.forEach(function(f){
+    var nameB=strBytes(f.name), dataB=typeof f.data==="string"?strBytes(f.data):f.data;
+    var crc=crc32(dataB);
+    var local=[].concat(num(0x04034b50,4),num(20,2),num(0x0800,2),num(0,2),
+      num(dosTime,2),num(dosDate,2),num(crc,4),num(dataB.length,4),num(dataB.length,4),
+      num(nameB.length,2),num(0,2));
+    chunks.push(new Uint8Array(local),nameB,dataB);
+    central.push({name:nameB,crc:crc,size:dataB.length,offset:offset,time:dosTime,date:dosDate});
+    offset+=local.length+nameB.length+dataB.length;
+  });
+  var cdStart=offset,cdSize=0;
+  central.forEach(function(e){
+    var hdr=[].concat(num(0x02014b50,4),num(20,2),num(20,2),num(0x0800,2),num(0,2),
+      num(e.time,2),num(e.date,2),num(e.crc,4),num(e.size,4),num(e.size,4),
+      num(e.name.length,2),num(0,2),num(0,2),num(0,2),num(0,2),num(0,4),num(e.offset,4));
+    chunks.push(new Uint8Array(hdr),e.name);
+    cdSize+=hdr.length+e.name.length;
+  });
+  var end=[].concat(num(0x06054b50,4),num(0,2),num(0,2),num(files.length,2),
+    num(files.length,2),num(cdSize,4),num(cdStart,4),num(0,2));
+  chunks.push(new Uint8Array(end));
+  downloadBlob(new Blob(chunks,{type:"application/zip"}),zipname);
+  toast(doneMsg||zipname+" downloaded ("+files.length+" files).","ok");
+}
+
+/* ============================ PREVIEW / MODAL ============================ */
+function modal(title,bodyHTML,buttons){
+  document.getElementById("m-title").textContent=title;
+  document.getElementById("m-body").innerHTML=bodyHTML;
+  var foot=document.getElementById("m-foot");
+  foot.innerHTML="";
+  (buttons||[["Close","ghost",closeModal]]).forEach(function(b){
+    var btn=document.createElement("button");
+    btn.className="btn "+b[1]; btn.textContent=b[0];
+    btn.addEventListener("click",b[2]); foot.appendChild(btn);
+  });
+  document.getElementById("overlay").classList.add("open");
+}
+function closeModal(){ document.getElementById("overlay").classList.remove("open"); }
+document.getElementById("m-close").addEventListener("click",closeModal);
+document.getElementById("overlay").addEventListener("click",function(e){
+  if(e.target===this) closeModal();
+});
+var currentPreview=null;
+function openPreview(target,domain){
+  var doc=buildFor(target,domain); currentPreview=doc;
+  modal("Preview: "+doc.title,
+    '<div class="preview-frame"><div class="preview-doc"><style>'+scopedDocCss()+'</style>'+doc.html+"</div></div>",
+    [["Download Word","teal",function(){ guardedExport(function(){ downloadWord(currentPreview); }); }],
+     ["Print / Save as PDF","ghost",function(){ printDoc(currentPreview); }],
+     ["Close","ghost",closeModal]]);
+}
+var _scopedCss=null;
+function scopedDocCss(){
+  if(_scopedCss) return _scopedCss;
+  _scopedCss=DOC_CSS.split("}").map(function(rule){
+    if(!rule.trim()) return "";
+    var i=rule.indexOf("{"); if(i<0) return "";
+    var sels=rule.slice(0,i).split(",").map(function(s){
+      s=s.trim();
+      if(s==="body") return ".preview-doc";
+      return ".preview-doc "+s;
+    }).join(",");
+    return sels+"{"+rule.slice(i+1)+"}";
+  }).join("");
+  return _scopedCss;
+}
+function printDoc(doc){
+  var w=window.open("","_blank");
+  if(!w){ toast("Allow pop-ups to print.","warn"); return; }
+  w.document.write(fullHTML(doc));
+  w.document.close();
+  setTimeout(function(){ w.focus(); w.print(); },350);
+}
+
+/* ============================ BOOT ============================ */
+refreshScore();
+if(localStorage.getItem("cmmcStudioSeen")){
+  show(readiness()>10?"dashboard":"wizard");
+}else{
+  localStorage.setItem("cmmcStudioSeen","1");
+  show("welcome");
+}
+</script>
+</body>
+</html>

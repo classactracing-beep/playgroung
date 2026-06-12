@@ -1,142 +1,156 @@
-# CMMC Level 2 Policy, Procedure, and SPP Generator
+# CMMC Level 2 Documentation Studio
 
-A self-contained generator for a complete, branded CMMC Level 2
-documentation set:
+A professional CMMC Level 2 documentation assistant for first-time FSOs
+and security managers. It generates a complete, branded documentation
+set:
 
-- One branded Standard Practices and Procedures (SPP) Word document,
-  modeled on the AVASO Federal Solutions SPP 2026 template (cover page,
-  logo placement, company name and address block, CAGE code, disclosure
-  statement, Forward section, table of contents, header and footer
-  style, section numbering, security program layout, and references)
-- 14 branded domain policy Word documents, modeled on the AVASO
-  Awareness and Training Policy template
-- Procedure packages for all 14 CMMC Level 2 domains (52 documents:
-  procedures, forms, logs, and checklists)
-- A CMMC Level 2 Control Mapping Matrix covering all 110 NIST SP
-  800-171 Rev. 2 requirements, exported as a Word table and an Excel
-  spreadsheet
-- SPP Appendix A: CMMC Level 2 Control Mapping Matrix
-- SPP Appendix B: CMMC Level 2 Procedures, Forms, Logs, and Checklists
-- An optional full binder export (zip)
+- One branded Standard Practices and Procedures (SPP), modeled on the
+  AVASO Federal Solutions SPP 2026 template, with Appendix A (control
+  mapping matrix) and Appendix B (procedures, forms, logs, checklists)
+- 14 branded domain policies covering all 110 NIST SP 800-171 Rev. 2
+  requirements
+- Procedure packages for all 14 domains (52 procedures, forms, logs,
+  and checklists)
+- A CMMC Level 2 Control Mapping Matrix (Word, Excel, and CSV)
+- A CMMC Level 2 Evidence Checklist (what an assessor will ask to see)
+- A full binder export
 
-Every document is branded from a single `company_profile.json` file, so
-the whole set can be regenerated for any company.
+Every generated document includes a cover page, document history,
+approval block, purpose, scope, roles and responsibilities, policy or
+procedure steps, evidence records, review frequency, references, and a
+signature block, plus plain-English "What this document is for",
+"Assessment evidence needed", and "Common assessor questions" sections.
 
-## Requirements
+## Compliance requirement
+
+All generated documents must be aligned with applicable CMMC and DFARS
+requirements. Every document (SPP, policies, procedures, evidence
+checklist, and control mapping matrix) carries a compliance references
+section covering:
+
+- 32 CFR Part 170, CMMC Program Rule
+- CMMC Level 2 requirements
+- NIST SP 800-171 Rev. 2, all 110 security requirements
+- DFARS 252.204-7012, Safeguarding Covered Defense Information and
+  Cyber Incident Reporting
+- DFARS 252.204-7019, NIST SP 800-171 DoD Assessment Requirements
+- DFARS 252.204-7020, NIST SP 800-171 DoD Assessment Requirements
+- DFARS 252.204-7021, Cybersecurity Maturity Model Certification
+  Requirements
+- DoD CUI Registry requirements
+- Any applicable contract, DD Form 254, SOW, security classification
+  guide, or CUI handling instruction
+
+## Two ways to use the tool
+
+### Option 1: The self-contained HTML app (no install)
+
+Open **`index.html`** in any modern browser. It is fully
+self-contained: no installation, no server, no network requests. Your
+data stays in your browser.
+
+User instructions:
+
+1. **Welcome screen.** Click "Start guided setup" (or "Explore with
+   sample profile" to see everything filled in first).
+2. **Setup wizard, 5 steps.**
+   - Step 1: Company profile (legal name, short name, address, CAGE,
+     UEI)
+   - Step 2: Security roles (SMO, FSO, AFSO, ITPSO, ISR)
+   - Step 3: Facility and CUI details (clearance level, storage
+     capability, DCSA field office, security contacts)
+   - Step 4: Logo and branding (logo upload, version, effective date,
+     approver)
+   - Step 5: Review and generate
+   Hover any "?" icon for a plain-English explanation of SMO, FSO,
+   AFSO, ITPSO, ISR, CAGE, UEI, CUI, SSP, and POA&M. Required fields
+   are marked with * and warn when empty. Answers save automatically;
+   use "Save profile JSON" / "Load profile JSON" to back up or move
+   profiles, "Use sample profile" to demo, and "Reset all" to start
+   over.
+3. **Watch the readiness score** in the navigation bar and on the
+   dashboard. It reaches 100% when every field is complete.
+4. **Dashboard.** Six cards: SPP Generator, Policy Generator,
+   Procedure Package Generator, Control Mapping Matrix, Evidence
+   Checklist, and Full Binder Export. Each card explains what the
+   document is for. Click **Preview** to read any document before
+   downloading, then **Download Word** (a .doc file that opens in
+   Microsoft Word with your logo embedded) or **Print / Save as PDF**
+   from the preview.
+5. **Validation.** Before any export the app checks for missing
+   company name, CAGE, UEI, SMO, FSO, ITPSO, logo, effective date, and
+   approval name, and offers to take you back to the wizard.
+6. **Export options.** Single document (Word), all policies (zip), a
+   procedure package (zip), all procedures (zip), the full binder
+   (zip of everything plus matrix CSV and your profile JSON), control
+   matrix CSV, company_profile.json, and print/PDF.
+7. **Finish in Word.** Review each document, tailor it to your real
+   environment, and have your SMO sign the approval block. Use the
+   Help panel (top right) any time.
+
+### Option 2: The Python generator (native .docx and .xlsx)
 
 ```bash
 pip install python-docx openpyxl
 ```
 
-Python 3.9 or later. No network access is required; everything runs
-locally.
-
-## Quick start
-
-1. Open `index.html` in a browser (it is fully self-contained and sends
-   no data anywhere). Fill in your company fields and click "Download
-   company_profile.json". Save the file into this folder, and copy your
-   logo into `assets/`.
-
-   Or edit `company_profile.json` directly in a text editor.
-
-2. Generate documents into `./output`:
+Edit `company_profile.json` (or export it from the HTML app), then:
 
 ```bash
-# The branded SPP (with Appendix A and Appendix B)
-python generate.py spp
-
-# One policy (domain codes: AC AT AU CM IA IR MA MP PS PE RA CA SC SI)
-python generate.py policy --domain AC
-
-# All 14 policies
-python generate.py policy --all
-
-# One procedure package (procedure + forms, logs, checklists)
-python generate.py procedures --domain IR
-
-# All 14 procedure packages
-python generate.py procedures --all
-
-# The control mapping matrix (Word table and Excel spreadsheet)
-python generate.py matrix
-
-# The full branded binder: SPP, 14 policies, 14 procedure packages,
-# matrix in Word and Excel, plus a single zip archive
-python generate.py binder
-
-# List the 14 domains
-python generate.py domains
+python generate.py spp                    # the branded SPP
+python generate.py policy --domain AC     # one policy
+python generate.py policy --all           # all 14 policies
+python generate.py procedures --domain IR # one procedure package
+python generate.py procedures --all       # all 14 packages
+python generate.py matrix                 # matrix as .docx and .xlsx
+python generate.py evidence               # the evidence checklist
+python generate.py binder                 # everything + zip
+python generate.py domains                # list domain codes
 ```
 
-Use `--profile path/to/profile.json` to brand for a different company
-and `--out path` to change the output directory.
+Use `--profile path.json` to brand for another company and `--out dir`
+to change the output directory. Output lands in `./output/01_SPP`,
+`02_Policies`, `03_Procedures/<domain>`, `04_Control_Matrix`, and
+`05_Evidence`.
+
+Note: the Word table of contents in .docx output is a field; in Word,
+right-click it and choose "Update Field".
 
 ## company_profile.json fields
 
 | Field | Description |
 | --- | --- |
-| company_legal_name | Full legal name used on covers and policy text |
-| company_short_name | Abbreviation used in headers, footers, file names |
-| logo_path | Path to the logo image (relative to the profile file) |
-| address_line1 / address_line2 | Company address block on the cover |
-| cage_code | CAGE code shown on the cover page |
-| uei | Unique Entity Identifier |
-| facility_clearance_level | FCL level (None, Secret, Top Secret) |
-| storage_capability | Classified storage capability statement |
-| smo_name / smo_title | Senior Management Official |
-| fso_name | Facility Security Officer |
-| afso_name | Assistant FSO |
-| itpso_name | Insider Threat Program Senior Official |
-| isr_name | Insider Threat Program Security Representative |
+| company_legal_name / company_short_name | Names used on covers, headers, file names |
+| logo_path (Python) / logo_data (HTML app) | Company logo |
+| address_line1 / address_line2 | Address block on the cover |
+| cage_code / uei | CAGE code and Unique Entity Identifier |
+| facility_clearance_level / storage_capability | FCL and safeguarding capability |
+| smo_name, smo_title, fso_name, afso_name, itpso_name, isr_name | Security roles |
 | dcsa_field_office | Cognizant DCSA field office |
 | security_contact_email / security_contact_phone | Security contacts |
-| document_year, spp_version, policy_version, approved_by | Optional metadata |
+| effective_date, approved_by | Approval block on every document |
+| document_year, spp_version, policy_version | Versioning metadata |
 
-## Output layout
+## Project layout
 
 ```
-output/
-  01_SPP/                       <ShortName>_SPP_<year>.docx
-  02_Policies/                  14 policy .docx files
-  03_Procedures/<domain>/       procedure + forms, logs, checklists
-  04_Control_Matrix/            matrix .docx and .xlsx
-  <ShortName>_CMMC_L2_Binder.zip  (binder command only)
+index.html          self-contained HTML app (generated by build_app.py)
+app_template.html   app shell and logic (edit this, not index.html)
+build_app.py        injects content data from cmmc_gen/ into index.html
+generate.py         Python CLI
+company_profile.json  branding profile (sample values included)
+cmmc_gen/           content: practices, SPP sections, procedures,
+                    guidance, compliance references, docx builders
+templates/          the AVASO source documents used as style templates
+assets/             sample logo
 ```
 
-## Procedure packages
+After editing any content in `cmmc_gen/`, run `python build_app.py` to
+regenerate `index.html` so both generators stay in sync.
 
-| Domain | Procedure | Forms, Logs, Checklists |
-| --- | --- | --- |
-| Access Control | Access Authorization Procedure | Account Request Form; Access Review Checklist; User Access Termination Checklist |
-| Awareness and Training | Security Training Procedure | Annual Training Log; New Hire Training Checklist; Training Acknowledgment Form |
-| Audit and Accountability | Audit Log Review Procedure | Audit Review Log; Security Event Review Checklist |
-| Configuration Management | Configuration Management Procedure | Change Request Form; Change Approval Log; Baseline Configuration Checklist |
-| Identification and Authentication | Identification and Authentication Procedure | MFA Enrollment Checklist; Password Reset Log; Account Verification Checklist |
-| Incident Response | Incident Response Procedure | Incident Report Form; Incident Handling Checklist; Incident Lessons Learned Form |
-| Maintenance | System Maintenance Procedure | Maintenance Log; Remote Maintenance Approval Form |
-| Media Protection | Media Protection Procedure | Media Inventory Log; Media Sanitization Log; Media Destruction Certificate |
-| Personnel Security | Personnel Security Procedure | Pre-Access Screening Checklist; Offboarding Checklist; Access Removal Verification Form |
-| Physical Protection | Physical Access Procedure | Visitor Log; Visitor Access Request Form; Physical Security Inspection Checklist |
-| Risk Assessment | Risk Assessment Procedure | Risk Register; Risk Review Checklist |
-| Security Assessment | Security Assessment Procedure | Self-Assessment Checklist; POA&M Tracker; Corrective Action Plan Form |
-| System and Communications Protection | System and Communications Protection Procedure | Boundary Protection Checklist; Network Security Review Log |
-| System and Information Integrity | System and Information Integrity Procedure | Vulnerability Tracking Log; Patch Management Log; Malicious Code Protection Checklist |
+## Disclaimer
 
-## Notes
-
-- The Word table of contents is inserted as a field. After opening a
-  generated document, right-click the TOC and choose "Update Field" (or
-  press Ctrl+A then F9) to populate it.
-- The control mapping matrix maps every requirement to its CMMC
-  domain, CMMC practice ID, NIST SP 800-171 Rev. 2 requirement ID,
-  requirement title, policy document, procedure document, evidence
-  artifacts, responsible role, and review frequency.
-- The two AVASO source documents used as style templates are kept in
-  `templates/` for reference.
-- `index.html` is a static page with a restrictive Content Security
-  Policy. It performs no network requests; the profile JSON is built
-  and downloaded entirely in the browser.
-- The generated documents are starting points. Review and tailor them
-  to your actual environment before relying on them for a CMMC
-  assessment.
+Generated documents are professional starting points aligned to CMMC
+Level 2 and DFARS requirements. Review and tailor them to your actual
+environment, contracts, and DD Form 254s before relying on them in an
+assessment. This tool is not legal or certification advice.

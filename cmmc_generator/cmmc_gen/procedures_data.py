@@ -938,3 +938,191 @@ def evidence_for(domain):
     """Primary evidence artifacts (non-procedure docs) for a domain."""
     docs = PACKAGES[domain]["documents"]
     return "; ".join(d["title"] for d in docs)
+
+
+# Plain-English guidance shown to end users and embedded in documents:
+# what each package is for, the evidence an assessor will ask to see,
+# and common assessor questions for the domain.
+DOMAIN_GUIDANCE = {
+    "AC": {
+        "what": "Controls who can use your systems and what they can do. "
+                "It proves that only approved people can reach CUI.",
+        "evidence": [
+            "Completed Account Request Forms for a sample of current users",
+            "The most recent completed Access Review Checklist",
+            "User Access Termination Checklists for recent departures",
+            "A system-generated user list showing unique accounts"],
+        "questions": [
+            "How does a new employee get access to systems that hold CUI?",
+            "Show me how access was removed for your last departed employee.",
+            "Who has administrator rights, and why?"],
+    },
+    "AT": {
+        "what": "Makes sure everyone is trained on security and CUI "
+                "handling before they get access, and every year after.",
+        "evidence": [
+            "The Annual Training Log for the current year",
+            "Signed Training Acknowledgment Forms",
+            "New Hire Training Checklists for recent hires",
+            "Training material covering insider threat awareness"],
+        "questions": [
+            "When was your last company-wide security training?",
+            "How do you train new hires before they touch CUI?",
+            "How would an employee recognize an insider threat?"],
+    },
+    "AU": {
+        "what": "Keeps records of what happens on your systems so "
+                "suspicious activity can be spotted and investigated.",
+        "evidence": [
+            "Completed Audit Review Log entries showing regular reviews",
+            "Sample audit logs from CUI systems",
+            "A completed Security Event Review Checklist",
+            "Evidence of alerting when logging fails"],
+        "questions": [
+            "Who reviews your audit logs, and how often?",
+            "How long do you keep logs?",
+            "Show me how a failed logon attempt appears in your logs."],
+    },
+    "CM": {
+        "what": "Keeps systems configured securely and makes sure changes "
+                "are approved and documented before they happen.",
+        "evidence": [
+            "The hardware and software inventory",
+            "Completed Change Request Forms and the Change Approval Log",
+            "The most recent Baseline Configuration Checklist",
+            "The approved software list"],
+        "questions": [
+            "How do you decide and document what software is allowed?",
+            "Walk me through your last system change.",
+            "How do you know your systems match the secure baseline?"],
+    },
+    "IA": {
+        "what": "Makes sure every person and device proves who they are, "
+                "with MFA and strong passwords, before getting in.",
+        "evidence": [
+            "MFA Enrollment Checklists and MFA configuration screenshots",
+            "Password policy settings exported from each system",
+            "The Password Reset Log",
+            "The most recent Account Verification Checklist"],
+        "questions": [
+            "Show me MFA working on a CUI system.",
+            "What are your password length and complexity settings?",
+            "How do you verify identity before resetting a password?"],
+    },
+    "IR": {
+        "what": "Defines how you detect, contain, and report security "
+                "incidents, including the 72-hour DoD reporting rule.",
+        "evidence": [
+            "Completed Incident Report Forms (or a tested blank process)",
+            "The Incident Handling Checklist",
+            "Evidence of the annual incident response test or tabletop",
+            "Incident Lessons Learned Forms"],
+        "questions": [
+            "Who do employees call when something looks wrong?",
+            "When must you report a cyber incident to the DoD, and how?",
+            "When did you last test your incident response plan?"],
+    },
+    "MA": {
+        "what": "Controls who maintains your systems and how, so repairs "
+                "and updates do not expose CUI.",
+        "evidence": [
+            "The Maintenance Log showing recent maintenance",
+            "Approved Remote Maintenance Approval Forms",
+            "Sanitization records for equipment sent off site"],
+        "questions": [
+            "How do you supervise an outside technician in your facility?",
+            "What happens before a laptop is sent out for repair?",
+            "How is remote vendor maintenance approved and monitored?"],
+    },
+    "MP": {
+        "what": "Protects USB drives, disks, paper, and backups that hold "
+                "CUI, from creation to certified destruction.",
+        "evidence": [
+            "The Media Inventory Log",
+            "The Media Sanitization Log",
+            "Signed Media Destruction Certificates",
+            "Encryption settings for removable media"],
+        "questions": [
+            "How do you track USB drives that contain CUI?",
+            "Show me how you destroyed your last retired hard drive.",
+            "How is CUI protected when media leaves the building?"],
+    },
+    "PS": {
+        "what": "Makes sure people are screened before they get access to "
+                "CUI and that access ends cleanly when they leave.",
+        "evidence": [
+            "Completed Pre-Access Screening Checklists",
+            "Offboarding Checklists for recent departures",
+            "Signed Access Removal Verification Forms"],
+        "questions": [
+            "What screening happens before someone can access CUI?",
+            "Walk me through your last employee departure.",
+            "How fast is access removed after a termination?"],
+    },
+    "PE": {
+        "what": "Controls who can physically enter areas where CUI is "
+                "processed, and keeps records of visitors.",
+        "evidence": [
+            "The Visitor Log",
+            "Approved Visitor Access Request Forms",
+            "The quarterly Physical Security Inspection Checklist",
+            "The badge / key inventory"],
+        "questions": [
+            "How do visitors get into your facility, and who escorts them?",
+            "Show me your visitor log for last month.",
+            "What happens to a badge when an employee leaves?"],
+    },
+    "RA": {
+        "what": "Identifies what could go wrong, scans for "
+                "vulnerabilities, and makes sure risks get fixed or "
+                "formally accepted.",
+        "evidence": [
+            "The current Risk Register",
+            "Recent vulnerability scan reports",
+            "The quarterly Risk Review Checklist",
+            "Evidence of remediation within defined timeframes"],
+        "questions": [
+            "When was your last risk assessment, and who did it?",
+            "How often do you scan for vulnerabilities?",
+            "Show me a vulnerability you found and how you fixed it."],
+    },
+    "CA": {
+        "what": "Checks your own compliance: the annual self-assessment, "
+                "the SPRS score, the SSP, and the POA&M that tracks gaps.",
+        "evidence": [
+            "The completed Self-Assessment Checklist",
+            "The current System Security Plan",
+            "The POA&M Tracker and Corrective Action Plan Forms",
+            "The SPRS submission confirmation"],
+        "questions": [
+            "Where is your System Security Plan, and when was it updated?",
+            "What is on your POA&M right now?",
+            "How was your SPRS score calculated?"],
+    },
+    "SC": {
+        "what": "Protects your network boundary and encrypts CUI in "
+                "transit and at rest using FIPS-validated cryptography.",
+        "evidence": [
+            "The quarterly Boundary Protection Checklist",
+            "The Network Security Review Log",
+            "Firewall rule exports showing deny-by-default",
+            "FIPS validation certificates for encryption in use"],
+        "questions": [
+            "Show me your firewall's default inbound policy.",
+            "How is CUI encrypted in transit and at rest?",
+            "Is your VPN configured to block split tunneling?"],
+    },
+    "SI": {
+        "what": "Keeps systems patched, runs anti-malware everywhere, and "
+                "watches for attacks.",
+        "evidence": [
+            "The Patch Management Log",
+            "The Vulnerability Tracking Log",
+            "The quarterly Malicious Code Protection Checklist",
+            "Anti-malware console screenshots showing coverage"],
+        "questions": [
+            "How fast do you apply critical patches?",
+            "Show me that anti-malware is on every endpoint and current.",
+            "How would you detect an attack in progress?"],
+    },
+}

@@ -471,25 +471,37 @@ SECTIONS = [
         ]),
     ]),
     ("References", [
+        ("p", "All {company_short_name} security documents, including this "
+              "SPP, the 14 domain policies, the procedure packages, the "
+              "evidence checklist, and the control mapping matrix, must be "
+              "aligned with applicable CMMC and DFARS requirements, "
+              "including:"),
         ("ul", [
-            "32 CFR Part 117, National Industrial Security Program Operating "
-            "Manual (NISPOM)",
-            "32 CFR Part 2002, Controlled Unclassified Information",
+            "32 CFR Part 170, Cybersecurity Maturity Model Certification "
+            "(CMMC) Program Rule",
+            "CMMC Model Version 2.0, Level 2 requirements",
             "NIST SP 800-171 Rev. 2, Protecting Controlled Unclassified "
-            "Information in Nonfederal Systems and Organizations",
-            "NIST SP 800-171A, Assessing Security Requirements for Controlled "
-            "Unclassified Information",
-            "NIST SP 800-88 Rev. 1, Guidelines for Media Sanitization",
-            "CMMC Model Overview, Version 2.0, Department of Defense",
-            "DFARS 252.204-7012, Safeguarding Covered Defense Information and "
-            "Cyber Incident Reporting",
+            "Information in Nonfederal Systems and Organizations (all 110 "
+            "security requirements)",
+            "NIST SP 800-171A, Assessing Security Requirements for "
+            "Controlled Unclassified Information",
+            "DFARS 252.204-7012, Safeguarding Covered Defense Information "
+            "and Cyber Incident Reporting",
+            "DFARS 252.204-7019, Notice of NIST SP 800-171 DoD Assessment "
+            "Requirements",
+            "DFARS 252.204-7020, NIST SP 800-171 DoD Assessment Requirements",
             "DFARS 252.204-7021, Cybersecurity Maturity Model Certification "
             "Requirements",
-            "Security Executive Agent Directive (SEAD) 3, Reporting Requirements "
-            "for Personnel with Access to Classified Information",
-            "Executive Order 13526, Classified National Security Information",
-            "Executive Order 13556, Controlled Unclassified Information",
-            "DoD Instruction 5200.48, Controlled Unclassified Information",
+            "DoD CUI Registry requirements (dodcui.mil) and DoD Instruction "
+            "5200.48, Controlled Unclassified Information",
+            "Any applicable contract, DD Form 254, statement of work, "
+            "security classification guide, or CUI handling instruction",
+            "32 CFR Part 117, National Industrial Security Program "
+            "Operating Manual (NISPOM)",
+            "32 CFR Part 2002, Controlled Unclassified Information",
+            "NIST SP 800-88 Rev. 1, Guidelines for Media Sanitization",
+            "Security Executive Agent Directive (SEAD) 3",
+            "Executive Order 13526 and Executive Order 13556",
         ]),
     ]),
 ]

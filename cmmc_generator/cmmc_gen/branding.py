@@ -232,6 +232,22 @@ def add_signature_block(doc, lines):
         doc.add_paragraph()
 
 
+def add_approval_block(doc, profile):
+    """Approval table: prepared by FSO, approved by SMO, effective date."""
+    table = styled_table(doc, ["Role", "Name", "Signature", "Date"],
+                         shade="D9E2F3", font_color=RGBColor(0x1F, 0x38, 0x64))
+    effective = profile.get("effective_date") or \
+        datetime.date.today().strftime("%m/%d/%Y")
+    add_table_row(table, ["Prepared by (FSO)", profile.get("fso_name", ""),
+                          "", ""], size=10)
+    add_table_row(table, ["Approved by (SMO)",
+                          profile.get("approved_by") or profile.get("smo_name", ""),
+                          "", ""], size=10)
+    p = doc.add_paragraph()
+    p.add_run(f"Effective date: {effective}").bold = True
+    return table
+
+
 def add_checkbox_item(doc, text):
     p = doc.add_paragraph()
     p.add_run("☐  ")

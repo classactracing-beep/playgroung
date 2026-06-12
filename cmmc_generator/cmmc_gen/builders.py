@@ -7,8 +7,9 @@ from docx.shared import Pt
 
 from . import branding as br
 from .practices import DOMAINS, practices, practices_by_domain
-from .procedures_data import (DOMAIN_GOVERNANCE, PACKAGES, POLICY_NAMES,
-                              evidence_for)
+from .procedures_data import (DOMAIN_GOVERNANCE, DOMAIN_GUIDANCE, PACKAGES,
+                              POLICY_NAMES, evidence_for)
+from .references import COMPLIANCE_REFERENCES, COMPLIANCE_STATEMENT
 from .profile import fill
 from . import spp_content
 
@@ -233,18 +234,43 @@ def build_policy(profile, domain, out_dir):
         "annually by the FSO and ITPSO. Operational review frequency for "
         "this domain: " + freq + ".", profile))
 
-    doc.add_heading("6  References", level=1)
+    doc.add_heading("6  What This Document Is For", level=1)
+    doc.add_paragraph(fill(DOMAIN_GUIDANCE[domain]["what"], profile))
+    doc.add_paragraph(fill(
+        "During a CMMC Level 2 assessment, this policy demonstrates "
+        "management intent for the " + DOMAINS[domain] + " domain. The "
+        "matching procedure and its records demonstrate that the policy is "
+        "actually operating.", profile))
+
+    doc.add_heading("7  Evidence Records and Assessment Evidence Needed",
+                    level=1)
+    doc.add_paragraph(
+        "Maintain and be ready to show an assessor the following records:")
+    for item in DOMAIN_GUIDANCE[domain]["evidence"]:
+        doc.add_paragraph(item, style="List Bullet")
+    doc.add_paragraph(
+        "Primary evidence artifacts for this domain: " + evidence_for(domain)
+        + ".")
+
+    doc.add_heading("8  Common Assessor Questions", level=1)
+    for q in DOMAIN_GUIDANCE[domain]["questions"]:
+        doc.add_paragraph(q, style="List Bullet")
+
+    doc.add_heading("9  Compliance References", level=1)
+    doc.add_paragraph(fill(COMPLIANCE_STATEMENT, profile))
+    for ref in COMPLIANCE_REFERENCES:
+        doc.add_paragraph(ref, style="List Bullet")
     for ref in [
         "NIST SP 800-171 Rev. 2, requirements " + ", ".join(
             p["nist_id"] for p in plist),
-        "CMMC Model Version 2.0, " + DOMAINS[domain] + " domain",
-        "32 CFR Part 2002, Controlled Unclassified Information",
-        "DFARS 252.204-7012 and 252.204-7021",
         fill("{company_short_name} Standard Practices and Procedures (SPP)",
              profile),
         PACKAGES[domain]["procedure"]["title"],
     ]:
         doc.add_paragraph(ref, style="List Bullet")
+
+    doc.add_heading("10  Approval", level=1)
+    br.add_approval_block(doc, profile)
 
     br.add_header(doc, profile, name)
     br.add_page_number_footer(
@@ -289,6 +315,8 @@ def build_procedure_package(profile, domain, out_dir):
     proc = pkg["procedure"]
     doc = _doc_shell(profile, proc["title"],
                      f"CMMC Level 2 | {DOMAINS[domain]}")
+    br.add_document_history_table(doc, profile)
+    doc.add_paragraph()
     doc.add_paragraph("Supporting Controls:").runs[0].bold = True
     for cid in proc["controls"]:
         match = next(p for p in practices() if p["nist_id"] == cid)
@@ -301,6 +329,32 @@ def build_procedure_package(profile, domain, out_dir):
         doc.add_paragraph("Procedures:").runs[0].bold = True
         for step in steps:
             doc.add_paragraph(fill(step, profile), style="List Bullet")
+    n = len(proc["sections"])
+    doc.add_heading(f"{n + 1}. What This Document Is For", level=1)
+    doc.add_paragraph(fill(DOMAIN_GUIDANCE[domain]["what"], profile))
+    doc.add_heading(f"{n + 2}. Evidence Records and Assessment Evidence "
+                    "Needed", level=1)
+    doc.add_paragraph(
+        "Completed copies of the following are the operating records of "
+        "this procedure. Retain them for at least 3 years or as required by "
+        "contract, and be ready to show an assessor:")
+    for item in DOMAIN_GUIDANCE[domain]["evidence"]:
+        doc.add_paragraph(item, style="List Bullet")
+    doc.add_heading(f"{n + 3}. Common Assessor Questions", level=1)
+    for q in DOMAIN_GUIDANCE[domain]["questions"]:
+        doc.add_paragraph(q, style="List Bullet")
+    doc.add_heading(f"{n + 4}. Review Frequency", level=1)
+    role, freq = DOMAIN_GOVERNANCE[domain]
+    doc.add_paragraph(fill(
+        "Responsible role: " + role + ". Operational review frequency: "
+        + freq + ". This procedure is reviewed at least annually by the FSO "
+        "and ITPSO.", profile))
+    doc.add_heading(f"{n + 5}. Compliance References", level=1)
+    doc.add_paragraph(fill(COMPLIANCE_STATEMENT, profile))
+    for ref in COMPLIANCE_REFERENCES:
+        doc.add_paragraph(ref, style="List Bullet")
+    doc.add_heading(f"{n + 6}. Approval", level=1)
+    br.add_approval_block(doc, profile)
     paths.append(_finish(doc, profile, proc["title"], os.path.join(
         dom_dir, f"{_safe(profile['company_short_name'])}_{_safe(proc['title'])}.docx")))
 
@@ -375,6 +429,11 @@ def build_matrix_docx(profile, out_dir):
     for row in _matrix_rows(profile):
         br.add_table_row(table, row, size=7)
 
+    doc.add_heading("Compliance References", level=1)
+    doc.add_paragraph(fill(COMPLIANCE_STATEMENT, profile))
+    for ref in COMPLIANCE_REFERENCES:
+        doc.add_paragraph(ref, style="List Bullet")
+
     br.add_header(doc, profile, title)
     br.add_page_number_footer(
         doc, f"{profile['company_short_name']} | {title} | Company Sensitive")
@@ -424,6 +483,16 @@ def build_matrix_xlsx(profile, out_dir):
     ws.freeze_panes = "A3"
     ws.auto_filter.ref = f"A2:{get_column_letter(len(MATRIX_HEADERS))}{ws.max_row}"
 
+    refs = wb.create_sheet("Compliance References")
+    refs.append(["Compliance References"])
+    refs.cell(1, 1).font = Font(bold=True, size=12)
+    refs.append([fill(COMPLIANCE_STATEMENT, profile)])
+    for ref in COMPLIANCE_REFERENCES:
+        refs.append([ref])
+    refs.column_dimensions["A"].width = 120
+    for r in range(1, refs.max_row + 1):
+        refs.cell(r, 1).alignment = Alignment(wrap_text=True, vertical="top")
+
     path = os.path.join(_ensure(out_dir),
                         f"{_safe(profile['company_short_name'])}_Control_Mapping_Matrix.xlsx")
     wb.save(path)
@@ -432,14 +501,51 @@ def build_matrix_xlsx(profile, out_dir):
 
 # --------------------------------------------------------------- Binder
 
+def build_evidence_checklist(profile, out_dir):
+    """Assessment evidence checklist across all 14 domains."""
+    title = "CMMC Level 2 Evidence Checklist"
+    doc = _doc_shell(profile, title,
+                     "Assessment Evidence by Domain | NIST SP 800-171 Rev. 2")
+    doc.add_paragraph(fill(
+        "Use this checklist to confirm that the records an assessor will "
+        "ask for actually exist and are current. Check each item, note "
+        "where the evidence is stored, and re-run this checklist before "
+        "every self-assessment and assessment.", profile))
+    for code, name in DOMAINS.items():
+        g = DOMAIN_GUIDANCE[code]
+        role, freq = DOMAIN_GOVERNANCE[code]
+        doc.add_heading(f"{code} - {name}", level=1)
+        p = doc.add_paragraph()
+        p.add_run("What this domain is for: ").bold = True
+        p.add_run(fill(g["what"], profile))
+        for item in g["evidence"]:
+            br.add_checkbox_item(doc, item)
+        p = doc.add_paragraph()
+        p.add_run("Responsible role / review frequency: ").bold = True
+        p.add_run(f"{role} / {freq}")
+        p = doc.add_paragraph()
+        p.add_run("Common assessor questions: ").bold = True
+        p.add_run(" ".join(g["questions"]))
+    doc.add_heading("Compliance References", level=1)
+    doc.add_paragraph(fill(COMPLIANCE_STATEMENT, profile))
+    for ref in COMPLIANCE_REFERENCES:
+        doc.add_paragraph(ref, style="List Bullet")
+    doc.add_heading("Approval", level=1)
+    br.add_approval_block(doc, profile)
+    return _finish(doc, profile, title, os.path.join(
+        _ensure(out_dir),
+        f"{_safe(profile['company_short_name'])}_Evidence_Checklist.docx"))
+
+
 def build_binder(profile, out_dir, zip_output=True):
-    """Full branded binder: SPP, 14 policies, 14 procedure packages, matrix."""
+    """Full branded binder: SPP, policies, procedures, matrix, evidence."""
     paths = []
     paths.append(build_spp(profile, os.path.join(out_dir, "01_SPP")))
     paths.extend(build_all_policies(profile, os.path.join(out_dir, "02_Policies")))
     paths.extend(build_all_procedures(profile, os.path.join(out_dir, "03_Procedures")))
     paths.append(build_matrix_docx(profile, os.path.join(out_dir, "04_Control_Matrix")))
     paths.append(build_matrix_xlsx(profile, os.path.join(out_dir, "04_Control_Matrix")))
+    paths.append(build_evidence_checklist(profile, os.path.join(out_dir, "05_Evidence")))
 
     if zip_output:
         import zipfile

@@ -31,6 +31,7 @@ REQUIRED_FIELDS = [
 
 OPTIONAL_DEFAULTS = {
     "document_year": "",
+    "effective_date": "",
     "spp_version": "1.0",
     "policy_version": "1.0",
     "approved_by": "",
