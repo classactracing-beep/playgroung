@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FCL Package Builder</title>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --navy:#1a2b4a; --navy2:#243b63; --teal:#0d7377; --teal2:#14a3a8;
+  --gray:#4a5568; --lgray:#f5f7fa; --border:#dde3ec; --white:#fff;
+  --red:#c0392b; --green:#1e8e5a; --amber:#b8860b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--lgray);color:#222;font-size:14px}
+header{background:var(--navy);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+header img#hdrLogo{height:42px;background:#fff;border-radius:4px;padding:3px;display:none}
+header h1{font-size:20px;font-weight:600;letter-spacing:.5px}
+header .sub{font-size:12px;color:#b9c5da}
+.hdr-btns{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:none;border-radius:5px;padding:8px 14px;font-size:13px;cursor:pointer;font-weight:600;transition:.15s}
+.btn-teal{background:var(--teal);color:#fff}.btn-teal:hover{background:var(--teal2)}
+.btn-navy{background:var(--navy2);color:#fff;border:1px solid #3c5585}.btn-navy:hover{background:#2e4a7a}
+.btn-gray{background:#e2e8f0;color:var(--navy)}.btn-gray:hover{background:#cbd5e1}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{background:#a93226}
+.btn-sm{padding:4px 10px;font-size:12px}
+.disclaimer{background:#fff8e6;border-bottom:2px solid #e6c200;color:#5a4500;padding:8px 24px;font-size:12px;line-height:1.5}
+nav{background:#fff;border-bottom:2px solid var(--border);display:flex;overflow-x:auto;padding:0 12px}
+nav button{background:none;border:none;padding:13px 16px;font-size:13px;font-weight:600;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+nav button.active{color:var(--teal);border-bottom-color:var(--teal)}
+nav button:hover{color:var(--navy)}
+main{max-width:1200px;margin:0 auto;padding:24px}
+.tab{display:none}.tab.active{display:block}
+.card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:22px;margin-bottom:20px;box-shadow:0 1px 3px rgba(26,43,74,.06)}
+.card h2{color:var(--navy);font-size:17px;margin-bottom:4px;border-bottom:2px solid var(--teal);padding-bottom:8px;margin-bottom:14px}
+.card h3{color:var(--teal);font-size:14px;margin:14px 0 8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+label{display:block;font-size:12px;font-weight:600;color:var(--gray);margin-bottom:4px}
+label .req{color:var(--red)}
+input[type=text],input[type=email],input[type=tel],input[type=date],input[type=number],input[type=url],select,textarea{
+  width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:5px;font-size:13px;background:#fff}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--teal2);border-color:var(--teal)}
+input.invalid{border-color:var(--red);background:#fff5f5}
+.warn{color:var(--red);font-size:11px;margin-top:3px;display:none}
+.invalid+.warn{display:block}
+.infobox{background:#eaf6f6;border-left:4px solid var(--teal);padding:12px 14px;border-radius:0 6px 6px 0;font-size:13px;line-height:1.6;margin-bottom:14px}
+.tip{border-bottom:1px dotted var(--teal);cursor:help;position:relative;color:var(--teal);font-weight:600}
+.tip:hover::after{content:attr(data-tip);position:absolute;left:0;bottom:125%;background:var(--navy);color:#fff;padding:8px 12px;border-radius:6px;font-size:12px;font-weight:400;width:280px;z-index:50;line-height:1.5;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--navy);color:#fff;text-align:left;padding:8px 10px;font-size:12px}
+td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:nth-child(even) td{background:#f9fafc}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.dash-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:18px;cursor:pointer;transition:.15s}
+.dash-card:hover{box-shadow:0 4px 12px rgba(13,115,119,.18);transform:translateY(-2px)}
+.dash-card h4{color:var(--navy);font-size:14px;margin-bottom:8px}
+.pbar{height:8px;background:#e6ebf2;border-radius:4px;overflow:hidden;margin:8px 0 4px}
+.pbar div{height:100%;background:var(--teal);transition:width .3s}
+.pct{font-size:12px;color:var(--gray)}
+.chk{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-bottom:1px solid var(--border)}
+.chk:nth-child(even){background:#f9fafc}
+.chk input{margin-top:3px;width:16px;height:16px;accent-color:var(--teal)}
+.chk .t{flex:1}
+.chk .t b{font-size:13px;color:var(--navy)}
+.chk .t span{display:block;font-size:12px;color:var(--gray)}
+.timeline{position:relative;padding-left:30px}
+.timeline::before{content:'';position:absolute;left:9px;top:6px;bottom:6px;width:3px;background:var(--teal)}
+.tl-item{position:relative;padding:0 0 20px 14px}
+.tl-item::before{content:'';position:absolute;left:-27px;top:3px;width:15px;height:15px;border-radius:50%;background:#fff;border:4px solid var(--teal)}
+.tl-item h4{color:var(--navy);font-size:14px}
+.tl-item .days{display:inline-block;background:var(--navy);color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;margin-bottom:4px}
+.tl-item p{font-size:13px;color:var(--gray);line-height:1.5}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
+.b-ok{background:#d8f3e4;color:var(--green)}.b-no{background:#fde2e0;color:var(--red)}.b-na{background:#e6ebf2;color:var(--gray)}.b-fg{background:#fde8c8;color:var(--amber)}
+.row-actions button{margin-right:4px}
+#orgCanvas{width:100%;border:1px solid var(--border);border-radius:6px;background:#fff}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.wizard-steps{display:flex;gap:4px;margin-bottom:18px;flex-wrap:wrap}
+.wizard-steps span{flex:1;min-width:90px;text-align:center;font-size:11px;font-weight:700;padding:8px 4px;background:#e6ebf2;color:var(--gray);border-radius:4px}
+.wizard-steps span.on{background:var(--teal);color:#fff}
+.preview-page{background:#fff;border:1px solid var(--border);padding:34px 40px;margin-bottom:18px;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.preview-page h2{color:var(--navy);border-bottom:3px solid var(--teal);padding-bottom:6px;font-size:18px;margin-bottom:14px}
+.pv-kv{display:grid;grid-template-columns:220px 1fr;gap:4px 14px;font-size:13px}
+.pv-kv dt{font-weight:700;color:var(--gray)}.pv-kv dd{color:#222}
+footer{text-align:center;padding:20px;font-size:12px;color:var(--gray)}
+.logo-prev{max-height:70px;margin-top:8px;border:1px solid var(--border);border-radius:4px;padding:4px;background:#fff;display:none}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;padding:12px 20px;border-radius:6px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.3);opacity:0;transition:.3s;z-index:99;pointer-events:none}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<header>
+  <img id="hdrLogo" alt="logo">
+  <div>
+    <h1>FCL Package Builder</h1>
+    <div class="sub">Facility Clearance Readiness Toolkit &mdash; based on the DCSA FCL Orientation Handbook</div>
+  </div>
+  <div class="hdr-btns">
+    <button class="btn btn-teal" onclick="exportPPT()">Export PowerPoint</button>
+    <button class="btn btn-teal" onclick="exportPDF()">Export PDF</button>
+    <button class="btn btn-navy" onclick="exportJSON()">Export JSON</button>
+    <button class="btn btn-navy" onclick="document.getElementById('importFile').click()">Import JSON</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+    <button class="btn btn-gray" onclick="loadSample()">Sample Profile</button>
+    <button class="btn btn-red" onclick="resetAll()">Reset</button>
+  </div>
+</header>
+
+<div class="disclaimer"><b>DISCLAIMER:</b> This tool is for internal FCL package preparation support only and does not constitute legal advice. Final requirements must be confirmed with DCSA, your assigned Industrial Security Representative (ISR), the <span class="tip" data-tip="National Industrial Security Program Operating Manual — the rulebook (32 CFR Part 117) governing protection of classified information by industry.">NISPOM</span>, and current DCSA guidance at www.dcsa.mil.</div>
+
+<nav id="nav">
+  <button data-tab="dash" class="active">Dashboard</button>
+  <button data-tab="profile">Company Profile</button>
+  <button data-tab="structure">Business Structure</button>
+  <button data-tab="kmp">KMP</button>
+  <button data-tab="org">Org Structure</button>
+  <button data-tab="docs">Documents</button>
+  <button data-tab="excluded">Excluded Tier</button>
+  <button data-tab="systems">Accounts &amp; Systems</button>
+  <button data-tab="training">Training</button>
+  <button data-tab="roadmap">FCL Roadmap</button>
+  <button data-tab="chart">Org Chart</button>
+  <button data-tab="preview">Package Preview</button>
+</nav>
+
+<main>
+
+<!-- DASHBOARD -->
+<div class="tab active" id="tab-dash">
+  <div class="card">
+    <h2>FCL Readiness Dashboard</h2>
+    <div class="infobox">Welcome! Work through each section below. A new <span class="tip" data-tip="Facility Security Officer — the U.S. citizen employee appointed in writing to supervise and direct security measures at a cleared facility.">FSO</span> should start with the guided wizard, then complete each section. Your data saves automatically in this browser.
+      <div style="margin-top:8px"><button class="btn btn-teal" onclick="startWizard()">Start Guided Setup Wizard</button></div>
+    </div>
+    <div class="dash-grid" id="dashGrid"></div>
+  </div>
+  <div class="card" id="wizardCard" style="display:none">
+    <h2>Guided Setup Wizard</h2>
+    <div class="wizard-steps" id="wizSteps"></div>
+    <div id="wizBody"></div>
+    <div style="margin-top:14px;display:flex;gap:8px">
+      <button class="btn btn-gray" onclick="wizPrev()">Back</button>
+      <button class="btn btn-teal" onclick="wizNext()">Next</button>
+      <button class="btn btn-navy" onclick="document.getElementById('wizardCard').style.display='none'">Close Wizard</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMPANY PROFILE -->
+<div class="tab" id="tab-profile">
+  <div class="card">
+    <h2>Company Profile</h2>
+    <div class="grid2">
+      <div><label>Legal Company Name <span class="req">*</span></label><input type="text" id="f_name" data-req="1"><div class="warn">Required for FCL submission</div></div>
+      <div><label>DBA / Trade Name</label><input type="text" id="f_dba"></div>
+      <div><label>EIN / Tax ID <span class="req">*</span></label><input type="text" id="f_ein" data-req="1" placeholder="12-3456789"><div class="warn">Required</div></div>
+      <div><label><span class="tip" data-tip="Commercial and Government Entity code — a 5-character ID assigned via SAM.gov registration, required for the FCL package.">CAGE</span> Code <span class="req">*</span></label><input type="text" id="f_cage" data-req="1" maxlength="5" placeholder="1ABC2"><div class="warn">Register at SAM.gov</div></div>
+      <div><label><span class="tip" data-tip="Unique Entity Identifier — 12-character ID issued through SAM.gov; replaced the DUNS number.">UEI</span></label><input type="text" id="f_uei" maxlength="12"></div>
+      <div><label>State of Incorporation <span class="req">*</span></label><input type="text" id="f_state" data-req="1"><div class="warn">Required</div></div>
+      <div><label>Business Address <span class="req">*</span></label><input type="text" id="f_addr" data-req="1"><div class="warn">Required</div></div>
+      <div><label>Mailing Address (if different)</label><input type="text" id="f_mail"></div>
+      <div><label>Phone</label><input type="tel" id="f_phone"></div>
+      <div><label>Website</label><input type="url" id="f_web"></div>
+    </div>
+    <h3>Security Personnel</h3>
+    <div class="grid3">
+      <div><label><span class="tip" data-tip="Facility Security Officer — U.S. citizen employee appointed in writing; must complete FSO training in STEPP.">FSO</span> Name <span class="req">*</span></label><input type="text" id="f_fso" data-req="1"><div class="warn">An FSO must be appointed</div></div>
+      <div><label>FSO Email</label><input type="email" id="f_fsoEmail"></div>
+      <div><label>FSO Phone</label><input type="tel" id="f_fsoPhone"></div>
+      <div><label><span class="tip" data-tip="Insider Threat Program Senior Official — senior official appointed in writing to establish and execute the insider threat program. May be the same person as the FSO.">ITPSO</span> Name <span class="req">*</span></label><input type="text" id="f_itpso" data-req="1"><div class="warn">An ITPSO must be appointed</div></div>
+      <div><label><span class="tip" data-tip="Assistant Facility Security Officer — backup to the FSO.">AFSO</span> Name</label><input type="text" id="f_afso"></div>
+      <div><label><span class="tip" data-tip="Senior Management Official — the company's most senior official at the cleared facility; must be cleared as part of the FCL.">SMO</span> Name</label><input type="text" id="f_smo"></div>
+    </div>
+    <h3>Company Logo</h3>
+    <p style="font-size:12px;color:var(--gray);margin-bottom:6px">Upload your approved company logo (PNG/JPG). It appears on the org chart, PDF, and PowerPoint exports.</p>
+    <input type="file" id="f_logoFile" accept="image/*" onchange="loadLogo(event)">
+    <button class="btn btn-gray btn-sm" onclick="clearLogo()" style="margin-left:8px">Remove Logo</button>
+    <br><img id="logoPreview" class="logo-prev" alt="logo preview">
+  </div>
+</div>
+
+<!-- BUSINESS STRUCTURE -->
+<div class="tab" id="tab-structure">
+  <div class="card">
+    <h2>Business Structure</h2>
+    <div class="infobox">Your legal business structure determines which organizational documents DCSA requires in your FCL package. Select one:</div>
+    <div class="grid3" id="bsRadios"></div>
+    <div id="bsInfo" style="margin-top:16px"></div>
+  </div>
+</div>
+
+<!-- KMP -->
+<div class="tab" id="tab-kmp">
+  <div class="card">
+    <h2><span class="tip" data-tip="Key Management Personnel — officials who occupy positions enabling them to affect the organization's policies or classified contract performance (e.g., SMO, FSO, ITPSO, officers, directors).">KMP</span> — Key Management Personnel</h2>
+    <div class="infobox"><b>Who counts as KMP?</b> The President/CEO, the SMO, the FSO, the ITPSO, and other officers, directors, partners, or officials who can affect the organization's policies or performance on classified contracts. KMP must generally be U.S. citizens; foreign nationals in KMP positions raise <span class="tip" data-tip="Foreign Ownership, Control or Influence — a condition that must be mitigated (e.g., SSA, Proxy Agreement, Voting Trust) before an FCL can be granted.">FOCI</span> concerns that require mitigation. Non-essential KMP may be formally excluded by board resolution.</div>
+    <table>
+      <thead><tr><th>Name</th><th>Title</th><th>Role</th><th>Citizenship</th><th>US Citizen</th><th>Clearance Needed</th><th></th></tr></thead>
+      <tbody id="kmpRows"></tbody>
+    </table>
+    <button class="btn btn-teal" style="margin-top:12px" onclick="addKMP()">+ Add KMP</button>
+  </div>
+</div>
+
+<!-- ORG STRUCTURE -->
+<div class="tab" id="tab-org">
+  <div class="card">
+    <h2>Parents, Subsidiaries, Affiliates &amp; Owners</h2>
+    <div class="infobox">List every entity in your legal ownership chain — up to the <b>ultimate holding company</b> — plus subsidiaries and affiliates. Include ownership percentages, state/country of incorporation, EIN, CAGE code (if any), and FCL status. This drives the legal organization chart required by DCSA.</div>
+    <table>
+      <thead><tr><th>Entity Name</th><th>Type</th><th>State/Country</th><th>EIN</th><th>CAGE</th><th>FCL Status</th><th>Owns % of Applicant</th><th>Foreign?</th><th>FOCI Flag</th><th></th></tr></thead>
+      <tbody id="entRows"></tbody>
+    </table>
+    <button class="btn btn-teal" style="margin-top:12px" onclick="addEntity()">+ Add Entity</button>
+    <h3>Foreign Ownership / FOCI Screening</h3>
+    <div class="grid2">
+      <div><label>Any foreign ownership, control, or influence (<span class="tip" data-tip="Foreign Ownership, Control or Influence — disclosed on the SF 328; must be mitigated before FCL grant.">FOCI</span>)?</label>
+        <select id="f_foci"><option value="no">No</option><option value="yes">Yes</option><option value="unsure">Unsure — needs review</option></select></div>
+      <div><label>FOCI Notes (foreign investors, board members, debt, contracts, etc.)</label><input type="text" id="f_fociNotes"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DOCUMENTS -->
+<div class="tab" id="tab-docs">
+  <div class="card">
+    <h2>Required Document Checklist</h2>
+    <div class="infobox">This checklist updates based on your selected business structure. Core items required for <b>every</b> structure include the <span class="tip" data-tip="SF 328 — Certificate Pertaining to Foreign Interests; the form on which the company discloses FOCI factors.">SF 328</span> and the <span class="tip" data-tip="DD Form 441 — the Department of Defense Security Agreement between the company and the U.S. Government.">DD 441</span>.</div>
+    <div id="docList"></div>
+  </div>
+</div>
+
+<!-- EXCLUDED TIER -->
+<div class="tab" id="tab-excluded">
+  <div class="card">
+    <h2>Excluded Tier Entity</h2>
+    <div class="infobox"><b>What is an excluded tier entity?</b> When a parent company in the ownership chain does not need access to classified information, it can be formally <b>excluded</b> from the FCL by board resolutions, so the parent does not need its own clearance. The exclusion resolution must state that the excluded entity will not be given access to classified information and will not influence classified performance. FOCI in the chain may still require mitigation (SSA, Proxy Agreement, Voting Trust, Board Resolution).</div>
+    <label style="font-size:14px"><input type="checkbox" id="f_hasExcl" style="width:16px;height:16px;accent-color:var(--teal);vertical-align:middle"> &nbsp;This company has an excluded tier entity (excluded parent)</label>
+    <div id="exclFields" class="grid2" style="display:none;margin-top:14px">
+      <div><label>Excluded Entity Name</label><input type="text" id="f_exclName"></div>
+      <div><label>Relationship</label><select id="f_exclRel"><option>Parent</option><option>Ultimate Holding Company</option><option>Intermediate Holding Company</option><option>Other</option></select></div>
+      <div><label>Reason for Exclusion</label><input type="text" id="f_exclReason" placeholder="No requirement for access to classified information"></div>
+      <div><label>Mitigation / Instrument Type</label><select id="f_exclMit"><option>Board Exclusion Resolution</option><option>SSA — Special Security Agreement</option><option>Proxy Agreement</option><option>Voting Trust</option><option>SCA — Security Control Agreement</option><option>Other</option></select></div>
+      <div><label>Date Executed</label><input type="date" id="f_exclDate"></div>
+      <div><label>DCSA Point of Contact</label><input type="text" id="f_exclPoc"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ACCOUNTS & SYSTEMS -->
+<div class="tab" id="tab-systems">
+  <div class="card">
+    <h2>Government Accounts &amp; Systems</h2>
+    <div class="infobox">These registrations and system accounts are needed during the FCL process. Track status for each.</div>
+    <div id="sysList"></div>
+  </div>
+</div>
+
+<!-- TRAINING -->
+<div class="tab" id="tab-training">
+  <div class="card">
+    <h2>Required Training (<span class="tip" data-tip="Security Training, Education and Professionalization Portal — CDSE's online learning system where FSO and ITPSO curricula are completed.">STEPP</span>)</h2>
+    <div class="infobox">The FSO must complete FSO program management training within 6 months of appointment. The ITPSO must complete insider threat training. Courses are free via CDSE's STEPP portal (cdse.usalearning.gov).</div>
+    <h3>FSO Curriculum</h3><div id="trnFso"></div>
+    <h3>ITPSO Curriculum</h3><div id="trnItpso"></div>
+  </div>
+</div>
+
+<!-- ROADMAP -->
+<div class="tab" id="tab-roadmap">
+  <div class="card">
+    <h2>FCL Roadmap — 45-Day Timeline</h2>
+    <div class="infobox">Once sponsored, DCSA aims to process complete FCL packages quickly — incomplete packages are the #1 cause of delay. An FCL requires sponsorship by a government activity or a cleared prime contractor; a company cannot self-sponsor.</div>
+    <div class="timeline" id="roadmapTl"></div>
+  </div>
+</div>
+
+<!-- ORG CHART -->
+<div class="tab" id="tab-chart">
+  <div class="card">
+    <h2>Legal Organization Chart — Live Preview</h2>
+    <div class="infobox">Chart style follows the DCSA-accepted format: <b>red oval</b> = ultimate holding company, <b>rectangles</b> = companies/subsidiaries, <b>blue rectangle</b> = the FCL applicant, <b>ovals</b> = U.S. person KMP. Solid lines show ownership (with %); dashed lines show control.</div>
+    <div class="toolbar"><button class="btn btn-teal btn-sm" onclick="drawOrgChart()">Refresh Chart</button>
+    <button class="btn btn-navy btn-sm" onclick="downloadChartPNG()">Download Chart PNG</button></div>
+    <canvas id="orgCanvas" width="1280" height="760"></canvas>
+  </div>
+</div>
+
+<!-- PREVIEW -->
+<div class="tab" id="tab-preview">
+  <div class="toolbar">
+    <button class="btn btn-teal" onclick="exportPDF()">Export this Preview to PDF</button>
+    <button class="btn btn-teal" onclick="exportPPT()">Export PowerPoint Deck</button>
+  </div>
+  <div id="preview-content"></div>
+</div>
+
+</main>
+
+<footer>FCL Package Builder &mdash; internal preparation aid only. Verify all requirements with DCSA, your ISR, and the NISPOM (32 CFR Part 117).</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ DATA MODEL ============ */
+const LS_KEY='fclBuilderV1';
+let D = blank();
+function blank(){return{
+  profile:{name:'',dba:'',ein:'',cage:'',uei:'',state:'',addr:'',mail:'',phone:'',web:'',fso:'',fsoEmail:'',fsoPhone:'',itpso:'',afso:'',smo:'',logo:''},
+  structure:'',
+  kmp:[],
+  entities:[],
+  foci:'no', fociNotes:'',
+  docs:{}, systems:{}, training:{},
+  excl:{has:false,name:'',rel:'Parent',reason:'',mit:'Board Exclusion Resolution',date:'',poc:''}
+};}
+
+/* ============ REFERENCE DATA ============ */
+const STRUCTURES={
+ 'Corporation':['Articles of Incorporation (certified)','Corporate Bylaws','List of all Officers and Directors','Stock ledger / certificates showing ownership','Corporate resolution authorizing pursuit of FCL','Most recent meeting minutes identifying officers/directors'],
+ 'LLC':['Articles of Organization (certified)','Operating Agreement','List of all Members and Managers with ownership %','Resolution/consent authorizing pursuit of FCL'],
+ 'Partnership':['Partnership Agreement (signed)','List of all General and Limited Partners with ownership %','Certificate of partnership / state registration'],
+ 'Sole Proprietorship':['DBA / trade-name registration','Business license','Owner identification and personal attestation'],
+ 'Joint Venture':['Joint Venture Agreement','Organizational documents for each JV member','List of JV management committee / officers','Ownership breakdown of JV members'],
+ 'University':['Charter or enabling legislation','List of Board of Trustees / Regents','Delegation of authority documents','Governance bylaws']
+};
+const CORE_DOCS=[
+ ['SF 328 — Certificate Pertaining to Foreign Interests','Discloses FOCI factors; signed by an authorized official'],
+ ['DD Form 441 — DoD Security Agreement','Executed security agreement with the U.S. Government'],
+ ['DD Form 441-1 — Appendage (if multiple facilities)','For branch/division facilities, if applicable'],
+ ['FSO Appointment Letter','Written appointment of the Facility Security Officer'],
+ ['ITPSO Appointment Letter','Written appointment of the Insider Threat Program Senior Official'],
+ ['Proof of U.S. citizenship for all KMP','Passport, birth certificate, or naturalization certificate'],
+ ['CAGE Code registration (SAM.gov)','Active SAM.gov registration with CAGE code'],
+ ['UEI registration (SAM.gov)','Unique Entity Identifier on file'],
+ ['Legal organization chart','Showing ownership chain, percentages, KMP — see Org Chart tab'],
+ ['KMP list with citizenship and position data','Submitted via NISS'],
+ ['Sponsorship letter (GCA or cleared prime)','A company cannot self-sponsor an FCL']
+];
+const SYSTEMS=[
+ ['CAGE Code','Commercial and Government Entity code — obtained automatically with SAM.gov registration. Required before FCL submission.'],
+ ['UEI / SAM.gov','Unique Entity Identifier — register the company at SAM.gov (free).'],
+ ['NISS','National Industrial Security System — DCSA's portal of record; the FCL package and sponsorship are processed here. Register for an account.'],
+ ['DISS','Defense Information System for Security — system of record for personnel security clearances; used to manage KMP eligibility.'],
+ ['e-QIP','Electronic Questionnaires for Investigations Processing — where KMP complete the SF-86 for their personnel investigations.'],
+ ['SWFT','Secure Web Fingerprint Transmission — electronic fingerprint submission for KMP investigations.'],
+ ['STEPP','Security Training, Education and Professionalization Portal — CDSE training system for FSO/ITPSO curricula.']
+];
+const TRN_FSO=[
+ ['FSO Program Management for Possessing Facilities (IS030.CU) or Non-Possessing (IS023.CU)','Required FSO curriculum — within 6 months of appointment'],
+ ['FSO Orientation for Non-Possessing Facilities (IS020.CU)','For facilities without classified holdings'],
+ ['Introduction to Industrial Security (IS011.16)','Foundation course'],
+ ['Personnel Security (PS113.16 / PS001 series)','Managing personnel clearances'],
+ ['Derivative Classification (IF103.16)','If creating derivative documents'],
+ ['Marking Classified Information (IF105.16)','Proper markings'],
+ ['NISS familiarization','Learn package submission and facility profile maintenance']
+];
+const TRN_ITPSO=[
+ ['Establishing an Insider Threat Program (INT122.16)','Core ITPSO requirement'],
+ ['Insider Threat Awareness (INT101.16)','Annual awareness baseline'],
+ ['Insider Threat Program Operations Personnel curriculum (INT311.CU)','Recommended for program operators']
+];
+const ROADMAP=[
+ ['Days 1–5','Foundation','Obtain sponsorship (GCA or cleared prime). Register at SAM.gov for UEI and CAGE code. Gather business structure documents. Identify all KMP and the ownership chain to the ultimate holding company.'],
+ ['Days 6–10','Forms & Appointments','Appoint the FSO and ITPSO in writing. Complete the SF 328 (Certificate Pertaining to Foreign Interests) and assemble citizenship verification for every KMP. Build the legal organization chart.'],
+ ['Days 11–20','Submission','Register in NISS. Submit the complete FCL package via NISS. Execute the DD 441 DoD Security Agreement when issued. Respond promptly to DCSA requests.'],
+ ['Days 21–30','DCSA Review','DCSA reviews the package for completeness, analyzes FOCI on the SF 328, and verifies business documents. Incomplete packages are returned — the most common cause of delay.'],
+ ['Days 31–40','KMP Investigations','KMP personnel investigations initiated: SF-86 via e-QIP, fingerprints via SWFT, eligibility tracked in DISS. KMP must be granted eligibility (or formally excluded) before FCL grant.'],
+ ['Days 41–45','FCL Grant & Program Stand-up','FCL granted in NISS. Establish the security program: FSO completes STEPP curriculum, insider threat program stands up, begin self-inspections and required briefings.']
+];
+const SECT_LIST=[['profile','Company Profile'],['structure','Business Structure'],['kmp','KMP'],['org','Org Structure'],['docs','Documents'],['excluded','Excluded Tier'],['systems','Accounts & Systems'],['training','Training']];
+
+/* ============ PERSISTENCE ============ */
+function save(){localStorage.setItem(LS_KEY,JSON.stringify(D));renderDash();}
+function load(){try{const s=localStorage.getItem(LS_KEY);if(s)D=Object.assign(blank(),JSON.parse(s));}catch(e){}}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+
+/* ============ TABS ============ */
+document.getElementById('nav').addEventListener('click',e=>{
+  if(e.target.dataset.tab) showTab(e.target.dataset.tab);
+});
+function showTab(id){
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.id==='tab-'+id));
+  if(id==='chart')drawOrgChart();
+  if(id==='preview')renderPreview();
+  if(id==='dash')renderDash();
+}
+
+/* ============ PROFILE BINDING ============ */
+const PF=['name','dba','ein','cage','uei','state','addr','mail','phone','web','fso','fsoEmail','fsoPhone','itpso','afso','smo'];
+function bindProfile(){
+  PF.forEach(k=>{
+    const el=document.getElementById('f_'+k);
+    el.value=D.profile[k]||'';
+    el.oninput=()=>{D.profile[k]=el.value;validate(el);save();};
+    validate(el);
+  });
+  document.getElementById('f_foci').value=D.foci;
+  document.getElementById('f_foci').onchange=e=>{D.foci=e.target.value;save();};
+  document.getElementById('f_fociNotes').value=D.fociNotes;
+  document.getElementById('f_fociNotes').oninput=e=>{D.fociNotes=e.target.value;save();};
+  // excluded tier
+  const hx=document.getElementById('f_hasExcl');
+  hx.checked=D.excl.has;
+  document.getElementById('exclFields').style.display=D.excl.has?'grid':'none';
+  hx.onchange=()=>{D.excl.has=hx.checked;document.getElementById('exclFields').style.display=hx.checked?'grid':'none';save();};
+  [['exclName','name'],['exclRel','rel'],['exclReason','reason'],['exclMit','mit'],['exclDate','date'],['exclPoc','poc']].forEach(([id,k])=>{
+    const el=document.getElementById('f_'+id);el.value=D.excl[k]||'';
+    el.oninput=el.onchange=()=>{D.excl[k]=el.value;save();};
+  });
+  updateLogoUI();
+}
+function validate(el){ if(el.dataset.req) el.classList.toggle('invalid', !el.value.trim()); }
+
+/* ============ LOGO ============ */
+function loadLogo(ev){
+  const f=ev.target.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{D.profile.logo=r.result;save();updateLogoUI();toast('Logo uploaded');};
+  r.readAsDataURL(f);
+}
+function clearLogo(){D.profile.logo='';save();updateLogoUI();}
+function updateLogoUI(){
+  const p=document.getElementById('logoPreview'),h=document.getElementById('hdrLogo');
+  if(D.profile.logo){p.src=D.profile.logo;p.style.display='inline-block';h.src=D.profile.logo;h.style.display='block';}
+  else{p.style.display='none';h.style.display='none';}
+}
+
+/* ============ BUSINESS STRUCTURE ============ */
+function renderStructure(){
+  const box=document.getElementById('bsRadios');box.innerHTML='';
+  Object.keys(STRUCTURES).forEach(s=>{
+    const l=document.createElement('label');
+    l.style.cssText='display:flex;align-items:center;gap:8px;padding:12px;border:2px solid '+(D.structure===s?'var(--teal)':'var(--border)')+';border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;color:var(--navy)';
+    l.innerHTML=`<input type="radio" name="bs" value="${s}" ${D.structure===s?'checked':''} style="accent-color:var(--teal)"> ${s}`;
+    l.querySelector('input').onchange=()=>{D.structure=s;save();renderStructure();renderDocs();};
+    box.appendChild(l);
+  });
+  const info=document.getElementById('bsInfo');
+  if(D.structure){
+    info.innerHTML='<div class="infobox"><b>'+D.structure+' — structure-specific documents:</b><ul style="margin:6px 0 0 20px">'+
+      STRUCTURES[D.structure].map(d=>'<li>'+d+'</li>').join('')+'</ul><br>See the <b>Documents</b> tab for the full combined checklist.</div>';
+  } else info.innerHTML='';
+}
+
+/* ============ KMP ============ */
+const ROLES=['CEO/President','SMO','FSO','ITPSO','AFSO','Director','Board Member','CFO','COO','VP','Partner','Member/Manager','Other'];
+function addKMP(o){D.kmp.push(o||{name:'',title:'',role:'Other',cit:'United States',us:true,clr:true});save();renderKMP();}
+function renderKMP(){
+  const tb=document.getElementById('kmpRows');tb.innerHTML='';
+  D.kmp.forEach((k,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><input type="text" value="${esc(k.name)}" data-k="name"></td>
+      <td><input type="text" value="${esc(k.title)}" data-k="title"></td>
+      <td><select data-k="role">${ROLES.map(r=>`<option ${k.role===r?'selected':''}>${r}</option>`).join('')}</select></td>
+      <td><input type="text" value="${esc(k.cit)}" data-k="cit"></td>
+      <td style="text-align:center"><input type="checkbox" ${k.us?'checked':''} data-k="us" style="width:16px;height:16px;accent-color:var(--teal)"></td>
+      <td style="text-align:center"><input type="checkbox" ${k.clr?'checked':''} data-k="clr" style="width:16px;height:16px;accent-color:var(--teal)"></td>
+      <td class="row-actions"><button class="btn btn-red btn-sm" onclick="D.kmp.splice(${i},1);save();renderKMP()">✕</button></td>`;
+    tr.querySelectorAll('[data-k]').forEach(el=>{
+      el.oninput=el.onchange=()=>{k[el.dataset.k]=el.type==='checkbox'?el.checked:el.value;save();};
+    });
+    tb.appendChild(tr);
+  });
+}
+
+/* ============ ENTITIES ============ */
+const ETYPES=['Ultimate Holding Company','Parent','Intermediate Holding','Subsidiary','Affiliate','Owner (Individual)','Joint Venture Member'];
+const FCLS=['None','In Process','Confidential','Secret','Top Secret','N/A'];
+function addEntity(o){D.entities.push(o||{name:'',type:'Parent',loc:'',ein:'',cage:'',fcl:'None',pct:'',foreign:false,foci:false});save();renderEnts();}
+function renderEnts(){
+  const tb=document.getElementById('entRows');tb.innerHTML='';
+  D.entities.forEach((e,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><input type="text" value="${esc(e.name)}" data-k="name"></td>
+     <td><select data-k="type">${ETYPES.map(t=>`<option ${e.type===t?'selected':''}>${t}</option>`).join('')}</select></td>
+     <td><input type="text" value="${esc(e.loc)}" data-k="loc" style="width:90px"></td>
+     <td><input type="text" value="${esc(e.ein)}" data-k="ein" style="width:95px"></td>
+     <td><input type="text" value="${esc(e.cage)}" data-k="cage" style="width:60px" maxlength="5"></td>
+     <td><select data-k="fcl">${FCLS.map(f=>`<option ${e.fcl===f?'selected':''}>${f}</option>`).join('')}</select></td>
+     <td><input type="number" value="${esc(e.pct)}" data-k="pct" min="0" max="100" style="width:65px"></td>
+     <td style="text-align:center"><input type="checkbox" ${e.foreign?'checked':''} data-k="foreign" style="width:16px;height:16px;accent-color:var(--amber)"></td>
+     <td style="text-align:center"><input type="checkbox" ${e.foci?'checked':''} data-k="foci" style="width:16px;height:16px;accent-color:var(--red)"></td>
+     <td><button class="btn btn-red btn-sm" onclick="D.entities.splice(${i},1);save();renderEnts()">✕</button></td>`;
+    tr.querySelectorAll('[data-k]').forEach(el=>{
+      el.oninput=el.onchange=()=>{e[el.dataset.k]=el.type==='checkbox'?el.checked:el.value;save();};
+    });
+    tb.appendChild(tr);
+  });
+}
+
+/* ============ CHECKLISTS ============ */
+function currentDocs(){
+  const list=[];
+  (STRUCTURES[D.structure]||[]).forEach(d=>list.push([d,'Required for '+(D.structure||'your structure')]));
+  CORE_DOCS.forEach(d=>list.push(d));
+  return list;
+}
+function chkList(containerId, items, store){
+  const box=document.getElementById(containerId);box.innerHTML='';
+  items.forEach(([title,desc])=>{
+    const id=title;
+    const div=document.createElement('div');div.className='chk';
+    div.innerHTML=`<input type="checkbox" ${store[id]?'checked':''}><div class="t"><b>${title}</b><span>${desc}</span></div>
+      <span class="badge ${store[id]?'b-ok':'b-no'}">${store[id]?'Complete':'Open'}</span>`;
+    div.querySelector('input').onchange=ev=>{store[id]=ev.target.checked;save();chkList(containerId,items,store);};
+    box.appendChild(div);
+  });
+}
+function renderDocs(){ chkList('docList', currentDocs(), D.docs); }
+function renderSystems(){ chkList('sysList', SYSTEMS, D.systems); }
+function renderTraining(){ chkList('trnFso', TRN_FSO, D.training); chkList('trnItpso', TRN_ITPSO, D.training); }
+
+/* ============ ROADMAP ============ */
+function renderRoadmap(){
+  document.getElementById('roadmapTl').innerHTML=ROADMAP.map(([d,t,p])=>
+    `<div class="tl-item"><span class="days">${d}</span><h4>${t}</h4><p>${p}</p></div>`).join('');
+}
+
+/* ============ DASHBOARD ============ */
+function pctSection(id){
+  const p=D.profile;
+  switch(id){
+    case 'profile':{const req=['name','ein','cage','state','addr','fso','itpso'];return Math.round(req.filter(k=>p[k]&&p[k].trim()).length/req.length*100);}
+    case 'structure':return D.structure?100:0;
+    case 'kmp':return D.kmp.length&&D.kmp.every(k=>k.name)?100:(D.kmp.length?60:0);
+    case 'org':return D.entities.length?100:0;
+    case 'docs':{const c=currentDocs();if(!c.length)return 0;return Math.round(c.filter(([t])=>D.docs[t]).length/c.length*100);}
+    case 'excluded':return D.excl.has?(D.excl.name?100:50):100;
+    case 'systems':return Math.round(SYSTEMS.filter(([t])=>D.systems[t]).length/SYSTEMS.length*100);
+    case 'training':{const all=[...TRN_FSO,...TRN_ITPSO];return Math.round(all.filter(([t])=>D.training[t]).length/all.length*100);}
+  }
+  return 0;
+}
+function renderDash(){
+  const g=document.getElementById('dashGrid');if(!g)return;g.innerHTML='';
+  SECT_LIST.forEach(([id,label])=>{
+    const pc=pctSection(id);
+    const c=document.createElement('div');c.className='dash-card';c.onclick=()=>showTab(id);
+    c.innerHTML=`<h4>${label}</h4><div class="pbar"><div style="width:${pc}%"></div></div><span class="pct">${pc}% complete</span>`;
+    g.appendChild(c);
+  });
+}
+
+/* ============ WIZARD ============ */
+const WIZ=[
+ ['Welcome','<p style="line-height:1.7">This wizard walks a first-time FSO through FCL package preparation, following the DCSA FCL Orientation Handbook. You will: (1) enter the company profile, (2) pick your business structure, (3) list KMP, (4) map the legal ownership chain, (5) work the document, systems and training checklists, then (6) preview and export your package. Click <b>Next</b> to begin.</p>'],
+ ['Company Profile','<p>Enter your legal company name, EIN, CAGE code, address, and appoint your FSO and ITPSO. Upload your approved company logo too.</p><p style="margin-top:8px"><button class="btn btn-teal btn-sm" onclick="showTab(\'profile\')">Open Company Profile →</button></p>'],
+ ['Business Structure','<p>Select Corporation, LLC, Partnership, Sole Proprietorship, Joint Venture, or University. This sets your required documents.</p><p style="margin-top:8px"><button class="btn btn-teal btn-sm" onclick="showTab(\'structure\')">Open Business Structure →</button></p>'],
+ ['KMP','<p>List every Key Management Person: CEO/President, SMO, FSO, ITPSO, officers and directors, with citizenship.</p><p style="margin-top:8px"><button class="btn btn-teal btn-sm" onclick="showTab(\'kmp\')">Open KMP →</button></p>'],
+ ['Ownership Chain','<p>Add every parent up to the ultimate holding company, plus subsidiaries, affiliates, and major owners — with ownership percentages and any foreign/FOCI flags.</p><p style="margin-top:8px"><button class="btn btn-teal btn-sm" onclick="showTab(\'org\')">Open Org Structure →</button></p>'],
+ ['Checklists','<p>Work through the Documents, Excluded Tier, Accounts &amp; Systems, and Training tabs, checking items as you complete them.</p><p style="margin-top:8px"><button class="btn btn-teal btn-sm" onclick="showTab(\'docs\')">Open Documents →</button></p>'],
+ ['Export','<p>Review the live <b>Org Chart</b> and <b>Package Preview</b>, then export PowerPoint and PDF from the header buttons. You\'re done!</p><p style="margin-top:8px"><button class="btn btn-teal btn-sm" onclick="showTab(\'preview\')">Open Preview →</button></p>']
+];
+let wizIdx=0;
+function startWizard(){wizIdx=0;document.getElementById('wizardCard').style.display='block';renderWiz();}
+function wizNext(){if(wizIdx<WIZ.length-1){wizIdx++;renderWiz();}}
+function wizPrev(){if(wizIdx>0){wizIdx--;renderWiz();}}
+function renderWiz(){
+  document.getElementById('wizSteps').innerHTML=WIZ.map((w,i)=>`<span class="${i<=wizIdx?'on':''}">${i+1}. ${w[0]}</span>`).join('');
+  document.getElementById('wizBody').innerHTML='<h3>'+WIZ[wizIdx][0]+'</h3>'+WIZ[wizIdx][1];
+}
+
+/* ============ ORG CHART (canvas) ============ */
+function drawOrgChart(){
+  const cv=document.getElementById('orgCanvas'),ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+  // title bar
+  ctx.fillStyle='#1a2b4a';ctx.fillRect(230,18,W-260,46);
+  ctx.fillStyle='#9aa7bd';ctx.fillRect(230,64,W-260,8);
+  ctx.fillStyle='#fff';ctx.font='bold 19px Segoe UI, Arial';ctx.textAlign='center';
+  ctx.fillText('Organizational Chart with Key Management Personnel for FCL Submission',230+(W-260)/2,48);
+  // logo
+  if(D.profile.logo){const img=new Image();img.onload=()=>{const h=52,w=h*img.width/img.height;ctx.drawImage(img,20,14,Math.min(w,190),h);};img.src=D.profile.logo;}
+  else{ctx.fillStyle='#1a2b4a';ctx.font='bold 22px Segoe UI';ctx.textAlign='left';ctx.fillText(D.profile.name||'COMPANY',20,48);}
+
+  const cx=W/2;
+  const parents=D.entities.filter(e=>['Ultimate Holding Company','Parent','Intermediate Holding'].includes(e.type));
+  const subs=D.entities.filter(e=>['Subsidiary','Affiliate'].includes(e.type));
+  const owners=D.entities.filter(e=>['Owner (Individual)','Joint Venture Member'].includes(e.type));
+  // order parents: UHC first
+  parents.sort((a,b)=>(a.type==='Ultimate Holding Company'?-1:1)-(b.type==='Ultimate Holding Company'?-1:1));
+
+  function box(x,y,w,h,lines,opts={}){
+    ctx.lineWidth=opts.lw||1.6;ctx.strokeStyle=opts.stroke||'#222';ctx.fillStyle='#fff';
+    if(opts.oval){ctx.beginPath();ctx.ellipse(x,y,w/2,h/2,0,0,Math.PI*2);ctx.fill();ctx.stroke();}
+    else{ctx.fillRect(x-w/2,y-h/2,w,h);ctx.strokeRect(x-w/2,y-h/2,w,h);}
+    ctx.fillStyle='#111';ctx.textAlign='center';ctx.font=(opts.font||'12px Segoe UI');
+    const lh=14,sy=y-((lines.length-1)*lh)/2;
+    lines.forEach((t,i)=>ctx.fillText(t,x,sy+i*lh+4));
+  }
+  function line(x1,y1,x2,y2,dashed,label){
+    ctx.beginPath();ctx.setLineDash(dashed?[6,5]:[]);ctx.strokeStyle=dashed?'#2e6da4':'#222';ctx.lineWidth=1.5;
+    ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.setLineDash([]);
+    if(label){ctx.fillStyle='#111';ctx.font='11px Segoe UI';ctx.textAlign='center';ctx.fillText(label,(x1+x2)/2+24,(y1+y2)/2);}
+  }
+  function entLines(e){const l=[e.name||'(unnamed)'];if(e.loc)l.push('('+e.loc+')');if(e.ein)l.push(e.ein);if(e.cage)l.push(e.cage);if(e.fcl&&e.fcl!=='None'&&e.fcl!=='N/A')l.push('FCL '+e.fcl);return l;}
+
+  // parents stacked vertically above applicant
+  let y=110;const chain=[];
+  parents.forEach((p,i)=>{
+    const isU=p.type==='Ultimate Holding Company'||i===0;
+    chain.push({e:p,y,oval:isU&&p.type==='Ultimate Holding Company'});
+    y+=92;
+  });
+  const appY=y+10;
+  // draw chain links
+  let prevY=null;
+  chain.forEach((c,i)=>{
+    if(prevY!==null) line(cx,prevY+30,cx,c.y-30,false,(chain[i].e.pct?chain[i].e.pct+'%':''));
+    prevY=c.y;
+  });
+  if(chain.length) line(cx,prevY+30,cx,appY-32,false,(chain[chain.length-1].e.pct?chain[chain.length-1].e.pct+'%':'100%'));
+  chain.forEach(c=>{
+    box(cx,c.y,200,58,entLines(c.e),{oval:c.oval,stroke:c.oval?'#cc2222':'#222',lw:c.oval?2.5:1.6});
+    if(c.e.foreign){ctx.fillStyle='#b8860b';ctx.font='bold 10px Segoe UI';ctx.fillText('FOREIGN',cx+118,c.y);}
+  });
+
+  // applicant box
+  const p=D.profile;
+  const appLines=[p.name||'Applicant Company'];
+  if(p.dba)appLines.push('DBA '+p.dba);
+  if(p.state)appLines.push('('+p.state+')');
+  if(p.ein)appLines.push(p.ein);
+  if(p.cage)appLines.push(p.cage+'  •  FCL In Process');
+  box(cx,appY,230,84,appLines,{stroke:'#2e6da4',lw:3,font:'bold 12px Segoe UI'});
+
+  // subsidiaries left/right of applicant
+  const subY=appY+8;
+  subs.forEach((s,i)=>{
+    const side=i%2===0?-1:1, off=200+Math.floor(i/2)*210;
+    const x=cx+side*off;
+    line(cx+side*115,appY,x,subY,false,(s.pct?s.pct+'%':''));
+    box(x,subY,180,64,entLines(s),{});
+    if(s.foreign){ctx.fillStyle='#b8860b';ctx.font='bold 10px Segoe UI';ctx.fillText('FOREIGN',x,subY+44);}
+  });
+
+  // KMP ovals at bottom
+  const kY=appY+170;
+  const kmps=D.kmp.filter(k=>k.name);
+  const span=Math.min(240,(W-120)/Math.max(kmps.length,1));
+  const startX=cx-((kmps.length-1)*span)/2;
+  kmps.forEach((k,i)=>{
+    const x=startX+i*span;
+    line(cx,appY+42,x,kY-34,true);
+    box(x,kY,Math.min(span-14,210),74,[k.name,k.title||k.role,(k.us?'U.S. Citizen':k.cit||'')],{oval:true,stroke:'#1a2b4a',lw:2});
+  });
+  // owners (individual) above-left
+  owners.forEach((o,i)=>{
+    const x=140,yy=140+i*92;
+    box(x,yy,180,58,entLines(o).concat([(o.pct?o.pct+'% owner':'')]),{oval:true,stroke:'#1a2b4a',lw:2});
+    line(x+90,yy, cx-118, chain.length?chain[0].y:appY, false,'');
+  });
+
+  // legend
+  const lx=30,ly=H-130;
+  ctx.fillStyle='#1a2b4a';ctx.font='bold 13px Segoe UI';ctx.textAlign='left';
+  ctx.fillText('Legend'+(p.cage?' — '+p.cage:''),lx,ly-12);
+  ctx.lineWidth=2;ctx.strokeStyle='#cc2222';ctx.beginPath();ctx.ellipse(lx+16,ly+8,16,9,0,0,Math.PI*2);ctx.stroke();
+  ctx.fillStyle='#222';ctx.font='12px Segoe UI';ctx.fillText('Ultimate Holding Company',lx+42,ly+12);
+  ctx.strokeStyle='#222';ctx.strokeRect(lx+2,ly+26,28,16);ctx.fillText('Subsidiary (U.S. or foreign)',lx+42,ly+38);
+  ctx.beginPath();ctx.setLineDash([6,5]);ctx.strokeStyle='#2e6da4';ctx.moveTo(lx,ly+58);ctx.lineTo(lx+30,ly+58);ctx.stroke();ctx.setLineDash([]);ctx.fillText('Control',lx+42,ly+62);
+  ctx.beginPath();ctx.strokeStyle='#222';ctx.moveTo(lx,ly+80);ctx.lineTo(lx+30,ly+80);ctx.stroke();ctx.fillText('Ownership',lx+42,ly+84);
+  ctx.strokeStyle='#1a2b4a';ctx.beginPath();ctx.ellipse(lx+16,ly+102,16,9,0,0,Math.PI*2);ctx.stroke();ctx.fillText('U.S. Persons (KMP)',lx+42,ly+106);
+}
+function downloadChartPNG(){
+  drawOrgChart();
+  setTimeout(()=>{const a=document.createElement('a');a.download='legal-org-chart.png';a.href=document.getElementById('orgCanvas').toDataURL('image/png');a.click();},250);
+}
+
+/* ============ PREVIEW ============ */
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
+function badge(b){return b?'<span class="badge b-ok">Complete</span>':'<span class="badge b-no">Open</span>';}
+function renderPreview(){
+  const p=D.profile,el=document.getElementById('preview-content');
+  drawOrgChart();
+  const docRows=currentDocs().map(([t])=>`<tr><td>${esc(t)}</td><td>${badge(D.docs[t])}</td></tr>`).join('');
+  const sysRows=SYSTEMS.map(([t,d])=>`<tr><td><b>${esc(t)}</b><br><span style="font-size:11px;color:#666">${esc(d)}</span></td><td>${badge(D.systems[t])}</td></tr>`).join('');
+  const trnRows=[...TRN_FSO.map(x=>['FSO',...x]),...TRN_ITPSO.map(x=>['ITPSO',...x])].map(([w,t])=>`<tr><td>${w}</td><td>${esc(t)}</td><td>${badge(D.training[t])}</td></tr>`).join('');
+  const kmpRows=D.kmp.map(k=>`<tr><td>${esc(k.name)}</td><td>${esc(k.title)}</td><td>${esc(k.role)}</td><td>${esc(k.cit)}</td><td>${k.us?'Yes':'<b style="color:var(--red)">No</b>'}</td></tr>`).join('')||'<tr><td colspan=5>No KMP entered</td></tr>';
+  const entRows=D.entities.map(e=>`<tr><td>${esc(e.name)}</td><td>${esc(e.type)}</td><td>${esc(e.loc)}</td><td>${esc(e.cage)}</td><td>${esc(e.fcl)}</td><td>${e.pct?esc(e.pct)+'%':''}</td><td>${e.foreign?'<span class="badge b-fg">Foreign</span>':''} ${e.foci?'<span class="badge b-no">FOCI</span>':''}</td></tr>`).join('')||'<tr><td colspan=7>No entities entered</td></tr>';
+  setTimeout(()=>{ // capture chart after draw
+    const chartImg=document.getElementById('orgCanvas').toDataURL('image/png');
+    el.innerHTML=`
+    <div class="preview-page" style="text-align:center;padding:80px 40px;background:linear-gradient(160deg,#1a2b4a 0%,#243b63 100%);color:#fff">
+      ${p.logo?`<img src="${p.logo}" style="max-height:90px;background:#fff;padding:8px;border-radius:8px;margin-bottom:24px">`:''}
+      <h1 style="font-size:30px;margin-bottom:10px">${esc(p.name)||'Company Name'}</h1>
+      <div style="font-size:18px;color:#9fd8da;margin-bottom:6px">Facility Clearance (FCL) Readiness Package</div>
+      <div style="font-size:13px;color:#b9c5da">Prepared ${new Date().toLocaleDateString()} • CAGE ${esc(p.cage)||'—'} • Prepared by FSO: ${esc(p.fso)||'—'}</div>
+      <div style="font-size:11px;color:#8a98b3;margin-top:30px;max-width:700px;margin-left:auto;margin-right:auto">Internal FCL package preparation support only — not legal advice. Confirm all requirements with DCSA, your assigned ISR, the NISPOM, and current DCSA guidance.</div>
+    </div>
+    <div class="preview-page"><h2>Company Profile</h2><dl class="pv-kv">
+      <dt>Legal Name</dt><dd>${esc(p.name)}</dd><dt>DBA</dt><dd>${esc(p.dba)}</dd>
+      <dt>EIN</dt><dd>${esc(p.ein)}</dd><dt>CAGE Code</dt><dd>${esc(p.cage)}</dd>
+      <dt>UEI</dt><dd>${esc(p.uei)}</dd><dt>State of Incorporation</dt><dd>${esc(p.state)}</dd>
+      <dt>Business Address</dt><dd>${esc(p.addr)}</dd><dt>Mailing Address</dt><dd>${esc(p.mail)}</dd>
+      <dt>Phone</dt><dd>${esc(p.phone)}</dd><dt>Website</dt><dd>${esc(p.web)}</dd>
+      <dt>Business Structure</dt><dd>${esc(D.structure)||'—'}</dd>
+      <dt>FSO</dt><dd>${esc(p.fso)} ${esc(p.fsoEmail)} ${esc(p.fsoPhone)}</dd>
+      <dt>ITPSO</dt><dd>${esc(p.itpso)}</dd><dt>AFSO</dt><dd>${esc(p.afso)}</dd><dt>SMO</dt><dd>${esc(p.smo)}</dd>
+      <dt>FOCI Screening</dt><dd>${esc(D.foci).toUpperCase()} ${esc(D.fociNotes)}</dd></dl></div>
+    <div class="preview-page"><h2>FCL Roadmap — 45-Day Timeline</h2>
+      <table><thead><tr><th style="width:110px">Phase</th><th style="width:170px">Milestone</th><th>Activities</th></tr></thead><tbody>
+      ${ROADMAP.map(([d,t,x])=>`<tr><td><b>${d}</b></td><td>${t}</td><td>${x}</td></tr>`).join('')}</tbody></table></div>
+    <div class="preview-page"><h2>Key Management Personnel</h2>
+      <table><thead><tr><th>Name</th><th>Title</th><th>Role</th><th>Citizenship</th><th>US Citizen</th></tr></thead><tbody>${kmpRows}</tbody></table></div>
+    <div class="preview-page"><h2>Legal Ownership &amp; Related Entities</h2>
+      <table><thead><tr><th>Entity</th><th>Type</th><th>Loc</th><th>CAGE</th><th>FCL</th><th>Own %</th><th>Flags</th></tr></thead><tbody>${entRows}</tbody></table></div>
+    <div class="preview-page"><h2>Legal Organization Chart</h2><img src="${chartImg}" style="width:100%;border:1px solid var(--border)"></div>
+    <div class="preview-page"><h2>Excluded Tier Entity</h2>${D.excl.has?
+      `<dl class="pv-kv"><dt>Entity</dt><dd>${esc(D.excl.name)}</dd><dt>Relationship</dt><dd>${esc(D.excl.rel)}</dd><dt>Reason</dt><dd>${esc(D.excl.reason)}</dd><dt>Instrument</dt><dd>${esc(D.excl.mit)}</dd><dt>Date Executed</dt><dd>${esc(D.excl.date)}</dd><dt>DCSA POC</dt><dd>${esc(D.excl.poc)}</dd></dl>`:
+      '<p>No excluded tier entity. All entities in the ownership chain will be processed or cleared as required.</p>'}</div>
+    <div class="preview-page"><h2>Required Documents — ${esc(D.structure)||'Structure not selected'}</h2>
+      <table><thead><tr><th>Document</th><th style="width:110px">Status</th></tr></thead><tbody>${docRows}</tbody></table></div>
+    <div class="preview-page"><h2>Government Accounts &amp; Systems</h2>
+      <table><thead><tr><th>System</th><th style="width:110px">Status</th></tr></thead><tbody>${sysRows}</tbody></table></div>
+    <div class="preview-page"><h2>Training Checklist (STEPP)</h2>
+      <table><thead><tr><th style="width:70px">Who</th><th>Course</th><th style="width:110px">Status</th></tr></thead><tbody>${trnRows}</tbody></table></div>`;
+  },300);
+}
+
+/* ============ EXPORT JSON / IMPORT / RESET / SAMPLE ============ */
+function exportJSON(){
+  const a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(D,null,2));
+  a.download=(D.profile.name||'fcl-profile').replace(/\W+/g,'_')+'_fcl_profile.json';a.click();toast('Profile exported');
+}
+function importJSON(ev){
+  const f=ev.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{try{D=Object.assign(blank(),JSON.parse(r.result));save();renderAll();toast('Profile imported');}catch(e){alert('Invalid JSON file');}};
+  r.readAsText(f);ev.target.value='';
+}
+function resetAll(){
+  if(!confirm('Reset ALL data? This cannot be undone. Export JSON first if you want a backup.'))return;
+  D=blank();save();renderAll();toast('All data reset');
+}
+function loadSample(){
+  if(D.profile.name && !confirm('Replace current data with the sample profile?'))return;
+  D=blank();
+  D.profile=Object.assign(D.profile,{name:'Acme Defense Solutions, Inc.',dba:'',ein:'12-3456789',cage:'1ABC2',uei:'ABC123DEF456',state:'Delaware',addr:'100 Liberty Way, Arlington, VA 22203',phone:'(703) 555-0142',web:'https://acmedefense.example',fso:'Bob Johnson',fsoEmail:'bjohnson@acmedefense.example',fsoPhone:'(703) 555-0143',itpso:'Bob Johnson',smo:'John Smith'});
+  D.structure='Corporation';
+  D.kmp=[
+   {name:'John Smith',title:'Chief Executive Officer & President',role:'CEO/President',cit:'United States',us:true,clr:true},
+   {name:'Jane Doe',title:'Chief Financial Officer & Director',role:'CFO',cit:'United States',us:true,clr:true},
+   {name:'Bob Johnson',title:'Facility Security Officer / ITPSO',role:'FSO',cit:'United States',us:true,clr:true}
+  ];
+  D.entities=[
+   {name:'Acme Group Holdings, L.P.',type:'Ultimate Holding Company',loc:'Delaware',ein:'87-0000001',cage:'',fcl:'None',pct:'100',foreign:false,foci:false},
+   {name:'Acme Intermediate Holdings, Inc.',type:'Intermediate Holding',loc:'Delaware',ein:'87-0000002',cage:'',fcl:'None',pct:'100',foreign:false,foci:false},
+   {name:'Acme Cyber Services, LLC',type:'Subsidiary',loc:'Virginia',ein:'87-0000003',cage:'',fcl:'None',pct:'100',foreign:false,foci:false}
+  ];
+  ['SF 328 — Certificate Pertaining to Foreign Interests','FSO Appointment Letter','CAGE Code registration (SAM.gov)','UEI registration (SAM.gov)'].forEach(k=>D.docs[k]=true);
+  ['CAGE Code','UEI / SAM.gov','NISS'].forEach(k=>D.systems[k]=true);
+  save();renderAll();toast('Sample profile loaded');
+}
+
+/* ============ PDF EXPORT ============ */
+async function exportPDF(){
+  showTab('preview');renderPreview();
+  toast('Generating PDF…');
+  await new Promise(r=>setTimeout(r,700));
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF({orientation:'p',unit:'pt',format:'letter'});
+  const pages=document.querySelectorAll('#preview-content .preview-page');
+  const pw=612,ph=792,m=28;
+  for(let i=0;i<pages.length;i++){
+    const cnv=await html2canvas(pages[i],{scale:2,useCORS:true,backgroundColor:'#ffffff'});
+    const iw=pw-m*2, ih=iw*cnv.height/cnv.width;
+    if(i>0)pdf.addPage();
+    pdf.setFillColor(26,43,74);pdf.rect(0,0,pw,18,'F');
+    pdf.setTextColor(255,255,255);pdf.setFontSize(8);
+    pdf.text((D.profile.name||'FCL Package')+' — FCL Readiness Package — Page '+(i+1),m,12);
+    let remaining=ih, sy=0;
+    if(ih<=ph-m-24){pdf.addImage(cnv.toDataURL('image/png'),'PNG',m,24,iw,ih);}
+    else{ // slice tall pages
+      const sliceH=(ph-m-24)*cnv.width/iw;
+      let off=0,first=true;
+      while(off<cnv.height){
+        if(!first){pdf.addPage();pdf.setFillColor(26,43,74);pdf.rect(0,0,pw,18,'F');pdf.setTextColor(255,255,255);pdf.setFontSize(8);pdf.text((D.profile.name||'FCL Package')+' — continued',m,12);}
+        const h=Math.min(sliceH,cnv.height-off);
+        const tmp=document.createElement('canvas');tmp.width=cnv.width;tmp.height=h;
+        tmp.getContext('2d').drawImage(cnv,0,off,cnv.width,h,0,0,cnv.width,h);
+        pdf.addImage(tmp.toDataURL('image/png'),'PNG',m,24,iw,iw*h/cnv.width);
+        off+=h;first=false;
+      }
+    }
+  }
+  pdf.save((D.profile.name||'fcl-package').replace(/\W+/g,'_')+'_FCL_Package.pdf');
+  toast('PDF exported');
+}
+
+/* ============ PPT EXPORT ============ */
+async function exportPPT(){
+  toast('Generating PowerPoint…');
+  drawOrgChart();
+  await new Promise(r=>setTimeout(r,400));
+  const px=new PptxGenJS();
+  px.defineLayout({name:'W',width:13.33,height:7.5});px.layout='W';
+  const NAVY='1A2B4A',TEAL='0D7377',GRAY='4A5568',LT='F5F7FA',WHITE='FFFFFF';
+  const p=D.profile;
+  const foot={x:0.4,y:7.08,w:12.5,h:0.35,fontSize:8,color:'8A98B3',text:'Internal FCL package preparation support only — not legal advice. Confirm requirements with DCSA, your ISR, NISPOM, and current DCSA guidance.'};
+  function titleBar(s,t){
+    s.addShape('rect',{x:0,y:0,w:13.33,h:0.85,fill:{color:NAVY}});
+    s.addShape('rect',{x:0,y:0.85,w:13.33,h:0.12,fill:{color:TEAL}});
+    s.addText(t,{x:0.5,y:0.08,w:12,h:0.7,fontSize:22,bold:true,color:WHITE,fontFace:'Segoe UI'});
+    if(p.logo)s.addImage({data:p.logo,x:12.1,y:0.12,h:0.6,w:1.0,sizing:{type:'contain',w:1.0,h:0.6}});
+    s.addText(foot.text,foot);
+  }
+  function tbl(s,rows,opts){
+    s.addTable(rows,Object.assign({x:0.5,y:1.25,w:12.3,fontSize:11,fontFace:'Segoe UI',color:'222222',border:{type:'solid',color:'DDE3EC',pt:0.5},autoPage:true,rowH:0.32},opts||{}));
+  }
+  const hdr=t=>({text:t,options:{bold:true,color:WHITE,fill:{color:NAVY},fontSize:11}});
+  const ok=b=>({text:b?'✔ Complete':'Open',options:{color:b?'1E8E5A':'C0392B',bold:true}});
+
+  // 1 Cover
+  let s=px.addSlide();
+  s.addShape('rect',{x:0,y:0,w:13.33,h:7.5,fill:{color:NAVY}});
+  s.addShape('rect',{x:0,y:5.0,w:13.33,h:0.12,fill:{color:TEAL}});
+  if(p.logo)s.addImage({data:p.logo,x:5.42,y:0.8,w:2.5,h:1.4,sizing:{type:'contain',w:2.5,h:1.4}});
+  s.addText(p.name||'Company Name',{x:0.5,y:2.5,w:12.33,h:0.9,align:'center',fontSize:38,bold:true,color:WHITE});
+  s.addText('Facility Clearance (FCL) Readiness Package',{x:0.5,y:3.5,w:12.33,h:0.6,align:'center',fontSize:22,color:'9FD8DA'});
+  s.addText('Prepared '+new Date().toLocaleDateString()+'   •   CAGE '+(p.cage||'—')+'   •   FSO: '+(p.fso||'—'),{x:0.5,y:4.2,w:12.33,h:0.4,align:'center',fontSize:14,color:'B9C5DA'});
+  s.addText(foot.text,{x:0.6,y:6.6,w:12.1,h:0.6,align:'center',fontSize:9,color:'8A98B3'});
+
+  // 2 Profile
+  s=px.addSlide();titleBar(s,'Company Profile');
+  tbl(s,[
+   [hdr('Field'),hdr('Value'),hdr('Field'),hdr('Value')],
+   ['Legal Name',p.name,'DBA',p.dba],['EIN',p.ein,'CAGE Code',p.cage],
+   ['UEI',p.uei,'State of Incorporation',p.state],
+   ['Business Address',p.addr,'Mailing Address',p.mail],
+   ['Phone',p.phone,'Website',p.web],
+   ['Business Structure',D.structure||'—','FOCI Screening',(D.foci||'').toUpperCase()],
+   ['FSO',p.fso+' '+(p.fsoEmail||''),'ITPSO',p.itpso],
+   ['AFSO',p.afso,'SMO',p.smo]
+  ],{colW:[2.4,3.75,2.4,3.75]});
+
+  // 3 Roadmap
+  s=px.addSlide();titleBar(s,'FCL Roadmap — 45-Day Timeline');
+  ROADMAP.forEach(([d,t,x],i)=>{
+    const y=1.2+i*0.97;
+    s.addShape('roundRect',{x:0.5,y:y,w:1.5,h:0.8,fill:{color:i%2?TEAL:NAVY},rectRadius:0.08});
+    s.addText(d,{x:0.5,y:y,w:1.5,h:0.8,align:'center',valign:'middle',fontSize:12,bold:true,color:WHITE});
+    s.addText([{text:t+'\n',options:{bold:true,fontSize:13,color:NAVY}},{text:x,options:{fontSize:10.5,color:GRAY}}],{x:2.2,y:y-0.02,w:10.6,h:0.95,valign:'top'});
+  });
+
+  // 4 Docs checklist
+  s=px.addSlide();titleBar(s,'Required Documents — '+(D.structure||'Structure not selected'));
+  tbl(s,[[hdr('Document'),hdr('Status')],...currentDocs().map(([t])=>[{text:t,options:{fontSize:10.5}},ok(D.docs[t])])],{colW:[10.3,2.0],fontSize:10.5,rowH:0.27});
+
+  // 5 KMP
+  s=px.addSlide();titleBar(s,'Key Management Personnel (KMP)');
+  tbl(s,[[hdr('Name'),hdr('Title'),hdr('Role'),hdr('Citizenship'),hdr('US Citizen'),hdr('Clearance Needed')],
+   ...(D.kmp.length?D.kmp.map(k=>[k.name,k.title,k.role,k.cit,k.us?'Yes':'NO',k.clr?'Yes':'Excluded']):[['No KMP entered','','','','','']])],
+   {colW:[2.6,3.0,2.0,2.2,1.2,1.3]});
+  s.addText('All KMP must be U.S. citizens or be formally excluded by resolution. Foreign national KMP raise FOCI concerns requiring mitigation.',{x:0.5,y:6.4,w:12.3,h:0.5,fontSize:11,italic:true,color:GRAY});
+
+  // 6 Org chart (canvas image)
+  s=px.addSlide();titleBar(s,'Organizational Chart with Key Management Personnel for FCL Submission');
+  try{
+    const img=document.getElementById('orgCanvas').toDataURL('image/png');
+    s.addImage({data:img,x:0.4,y:1.1,w:12.5,h:12.5*760/1280});
+  }catch(e){s.addText('Org chart unavailable — open the Org Chart tab first.',{x:1,y:3,w:11,h:1,fontSize:16,color:GRAY});}
+
+  // 7 Excluded tier
+  s=px.addSlide();titleBar(s,'Excluded Tier Entity');
+  if(D.excl.has){
+    tbl(s,[[hdr('Item'),hdr('Detail')],
+     ['Excluded Entity',D.excl.name],['Relationship',D.excl.rel],['Reason for Exclusion',D.excl.reason],
+     ['Instrument',D.excl.mit],['Date Executed',D.excl.date],['DCSA POC',D.excl.poc]],{colW:[3.5,8.8]});
+    s.addText('Exclusion resolutions must state the excluded entity will not be afforded access to classified information and will not influence classified performance.',{x:0.5,y:5.6,w:12.3,h:0.6,fontSize:11,italic:true,color:GRAY});
+  } else {
+    s.addText('No excluded tier entity declared.\n\nAll entities in the ownership chain will be processed or cleared as required by DCSA. If a parent does not require access to classified information, it may be formally excluded via board resolutions.',{x:0.7,y:1.6,w:11.9,h:2.5,fontSize:15,color:GRAY});
+  }
+
+  // 8 Systems
+  s=px.addSlide();titleBar(s,'Government Accounts & Systems');
+  tbl(s,[[hdr('System'),hdr('Purpose'),hdr('Status')],...SYSTEMS.map(([t,d])=>[{text:t,options:{bold:true}},{text:d,options:{fontSize:10}},ok(D.systems[t])])],{colW:[2.0,8.3,2.0]});
+
+  // 9 Training
+  s=px.addSlide();titleBar(s,'Training Checklist (STEPP / CDSE)');
+  tbl(s,[[hdr('Who'),hdr('Course'),hdr('Status')],
+    ...TRN_FSO.map(([t])=>['FSO',{text:t,options:{fontSize:10.5}},ok(D.training[t])]),
+    ...TRN_ITPSO.map(([t])=>['ITPSO',{text:t,options:{fontSize:10.5}},ok(D.training[t])])],{colW:[1.2,9.1,2.0],rowH:0.3});
+
+  // 10 Submission checklist
+  s=px.addSlide();titleBar(s,'FCL Package Submission Checklist');
+  const docsC=currentDocs(),docsDone=docsC.filter(([t])=>D.docs[t]).length;
+  const sysDone=SYSTEMS.filter(([t])=>D.systems[t]).length;
+  const trnAll=[...TRN_FSO,...TRN_ITPSO],trnDone=trnAll.filter(([t])=>D.training[t]).length;
+  tbl(s,[[hdr('Area'),hdr('Status'),hdr('Detail')],
+   ['Sponsorship obtained',ok(D.docs['Sponsorship letter (GCA or cleared prime)']),'GCA or cleared prime — cannot self-sponsor'],
+   ['Business structure documents',{text:docsDone+' / '+docsC.length+' complete',options:{bold:true,color:docsDone===docsC.length?'1E8E5A':'B8860B'}},D.structure||'Select a structure'],
+   ['KMP identified',{text:D.kmp.length+' KMP entered',options:{bold:true}},D.kmp.every(k=>k.us)?'All U.S. citizens':'⚠ Non-U.S. citizen KMP — FOCI review needed'],
+   ['SF 328',ok(D.docs['SF 328 — Certificate Pertaining to Foreign Interests']),'Certificate Pertaining to Foreign Interests'],
+   ['DD 441',ok(D.docs['DD Form 441 — DoD Security Agreement']),'DoD Security Agreement'],
+   ['FSO / ITPSO appointed',{text:(p.fso&&p.itpso)?'✔ Complete':'Open',options:{bold:true,color:(p.fso&&p.itpso)?'1E8E5A':'C0392B'}},(p.fso||'—')+' / '+(p.itpso||'—')],
+   ['Legal org chart',{text:'Included (Slide 6)',options:{color:'1E8E5A',bold:true}},'Ownership %, CAGE, FCL status, KMP'],
+   ['Accounts & systems',{text:sysDone+' / '+SYSTEMS.length,options:{bold:true}},'CAGE, UEI, NISS, DISS, e-QIP, SWFT, STEPP'],
+   ['Training',{text:trnDone+' / '+trnAll.length,options:{bold:true}},'FSO within 6 months of appointment'],
+   ['FOCI screening',{text:(D.foci==='no'?'No FOCI declared':'⚠ '+D.foci.toUpperCase()),options:{bold:true,color:D.foci==='no'?'1E8E5A':'B8860B'}},D.fociNotes||'']
+  ],{colW:[3.2,2.4,6.7],rowH:0.42});
+
+  await px.writeFile({fileName:(p.name||'fcl-package').replace(/\W+/g,'_')+'_FCL_Package.pptx'});
+  toast('PowerPoint exported');
+}
+
+/* ============ INIT ============ */
+function renderAll(){
+  bindProfile();renderStructure();renderKMP();renderEnts();renderDocs();renderSystems();renderTraining();renderRoadmap();renderDash();drawOrgChart();
+}
+load();renderAll();
+</script>
+</body>
+</html>
