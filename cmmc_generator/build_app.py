@@ -23,7 +23,7 @@ from cmmc_gen.procedures_data import (DOMAIN_GOVERNANCE, DOMAIN_GUIDANCE,
 from cmmc_gen.references import COMPLIANCE_REFERENCES, COMPLIANCE_STATEMENT
 from cmmc_gen import spp_content
 
-APP_VERSION = "2.0.0"
+APP_VERSION = "2.0.1"
 
 
 def _packages_json():

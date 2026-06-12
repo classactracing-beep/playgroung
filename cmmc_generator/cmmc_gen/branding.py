@@ -160,11 +160,12 @@ def add_toc(doc):
     fld_begin.set(qn("w:fldCharType"), "begin")
     instr = OxmlElement("w:instrText")
     instr.set(qn("xml:space"), "preserve")
-    instr.text = 'TOC \\o "1-3" \\h \\z \\u'
+    instr.text = 'TOC \\o "1-3" \\h \\u'
     fld_sep = OxmlElement("w:fldChar")
     fld_sep.set(qn("w:fldCharType"), "separate")
     placeholder = OxmlElement("w:t")
-    placeholder.text = "Right-click and choose Update Field to build the Table of Contents."
+    placeholder.text = ("Right-click and choose Update Field to build the "
+                        "Table of Contents with page numbers.")
     fld_end = OxmlElement("w:fldChar")
     fld_end.set(qn("w:fldCharType"), "end")
     run._r.append(fld_begin)

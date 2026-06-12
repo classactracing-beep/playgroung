@@ -694,7 +694,7 @@ function coverHTML(title,subtitle){
   var logo=profile.logo_data?'<img src="'+profile.logo_data+'" alt="logo">':"<div style='height:60pt'></div>";
   return '<div class="cover">'+logo+
     '<div class="doctitle">'+esc(title)+'</div>'+
-    '<div class="subtitle">'+esc(subtitle)+'</div>'+
+    (subtitle?'<div class="subtitle">'+esc(subtitle)+'</div>':"")+
     '<div class="co">'+fill("{company_legal_name}")+'</div>'+
     '<div class="line">'+fill("{address_line1}")+'</div>'+
     '<div class="line">'+fill("{address_line2}")+'</div>'+
@@ -744,13 +744,28 @@ function blocksHTML(blocks){
 }
 
 /* ---------- document builders ---------- */
+function tocFieldHTML(entries){
+  /* A real Word TOC field. Browsers see only the placeholder list; Word
+     turns it into a live Table of Contents with page numbers. */
+  var placeholder=entries.map(function(e){
+    return '<p style="margin:3pt 0">'+e+'</p>';
+  }).join("");
+  return '<!--[if supportFields]><span style="mso-element:field-begin"></span>'+
+    '<span style="mso-spacerun:yes"> </span>TOC \\o &quot;1-1&quot; \\h '+
+    '<span style="mso-element:field-separator"></span><![endif]-->'+
+    placeholder+
+    '<!--[if supportFields]><span style="mso-element:field-end"></span><![endif]-->'+
+    '<p style="font-size:9pt;color:#5a6678;font-style:italic">In Microsoft Word: '+
+    'right-click the list above and choose &quot;Update Field&quot; to show '+
+    'section page numbers.</p>';
+}
 function buildSPP(){
-  var h=coverHTML("STANDARD PRACTICES AND PROCEDURES (SPP)",
-    "CMMC Level 2 Security Program | "+(profile.document_year||new Date().getFullYear()));
+  var h=coverHTML("STANDARD PRACTICES AND PROCEDURES (SPP)","");
   h+="<h1>Forward</h1>"+blocksHTML(CMMC.spp.forward);
-  h+='<div class="pagebreak"></div><h1>Table of Contents</h1><ul>'+
-     CMMC.spp.sections.map(function(s,i){return "<li>"+(i+1)+". "+fill(s[0])+"</li>";}).join("")+
-     "<li>Appendix A: CMMC Level 2 Control Mapping Matrix</li><li>Appendix B: CMMC Level 2 Procedures, Forms, Logs, and Checklists</li></ul>";
+  h+='<div class="pagebreak"></div><h1>Table of Contents</h1>'+tocFieldHTML(
+     CMMC.spp.sections.map(function(s,i){return (i+1)+". "+fill(s[0]);})
+       .concat(["Appendix A: CMMC Level 2 Control Mapping Matrix",
+                "Appendix B: CMMC Level 2 Procedures, Forms, Logs, and Checklists"]));
   CMMC.spp.sections.forEach(function(s,i){
     h+='<h1>'+(i+1)+". "+fill(s[0])+"</h1>"+blocksHTML(s[1]);
   });
@@ -895,7 +910,8 @@ function buildFor(target,domain){
 /* ============================ EXPORT ============================ */
 function fileSafe(s){ return sanitize(s).replace(/&/g,"and").replace(/[^A-Za-z0-9._-]+/g,"_").replace(/^_+|_+$/g,"")||"Document"; }
 function fullHTML(doc){
-  return "<!DOCTYPE html><html><head><meta charset='utf-8'><title>"+esc(doc.title)+
+  return "<!DOCTYPE html><html xmlns:o='urn:schemas-microsoft-com:office:office' "+
+    "xmlns:w='urn:schemas-microsoft-com:office:word'><head><meta charset='utf-8'><title>"+esc(doc.title)+
     "</title><style>"+DOC_CSS+"</style></head><body>"+doc.html+"</body></html>";
 }
 function wordMHT(doc){

@@ -47,9 +47,7 @@ def build_spp(profile, out_dir, include_appendices=True):
     """Branded SPP modeled on the AVASO Federal Solutions SPP 2026."""
     doc = br.new_document()
     title = "STANDARD PRACTICES AND PROCEDURES (SPP)"
-    br.add_cover_page(doc, profile, title,
-                      subtitle=f"CMMC Level 2 Security Program | "
-                               f"{profile['document_year']}")
+    br.add_cover_page(doc, profile, title)
     br.add_disclosure_statement(doc, profile)
     br.add_page_break(doc)
 
