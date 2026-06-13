@@ -353,25 +353,42 @@ const NODE_W=300,NODE_H=96,PERSON_W=250,PERSON_H=132,HGAP=46,VGAP=120;
 function nodeW(e){return isPerson(e)?PERSON_W:NODE_W}
 function nodeH(e){return isPerson(e)?PERSON_H:NODE_H}
 
-function nodeLines(e){
-  let lines=[{t:e.name||'Entity',b:true,s:15}];
-  let meta=[];
+function rawLines(e){
+  // logical lines before wrapping: name (bold) then meta lines
+  let lines=[{t:e.name||'Entity',b:true,s:13}];
   if(!isPerson(e)){
-    if(e.type)meta.push(e.type);
-    if(e.cage)meta.push('CAGE: '+e.cage);
-    if(e.uei)meta.push('UEI: '+e.uei);
-    if(e.fclStatus)meta.push('FCL: '+e.fclStatus);
-    if(e.country&&e.country.toLowerCase()!=='united states')meta.push(e.country);
+    if(e.type)lines.push({t:e.type,b:false,s:11});
+    if(e.cage)lines.push({t:'CAGE Code: '+e.cage,b:false,s:11});
+    if(e.uei)lines.push({t:'UEI: '+e.uei,b:false,s:11});
+    if(e.fclStatus)lines.push({t:'FCL: '+e.fclStatus,b:false,s:11});
+    if(e.country&&e.country.toLowerCase()!=='united states')lines.push({t:e.country,b:false,s:11});
   }else{
     let k=kmpFor(e.name);
-    if(k&&k.title)meta.push(k.title);
+    if(k&&k.title)lines.push({t:k.title,b:false,s:11});
     let cit=(k&&k.citizenship)||e.country||'';
-    if(cit){meta.push(/citizen/i.test(cit)?cit:(cit+' Citizen').replace('United States Citizen','United States Citizen'))}
-    else if(!isForeign(e))meta.push('United States Citizen');
-    if(e.notes&&/citizen/i.test(e.notes)&&!meta.some(m=>/citizen/i.test(m)))meta.push(e.notes);
+    if(cit){lines.push({t:/citizen/i.test(cit)?cit:cit+' Citizen',b:false,s:11})}
+    else if(!isForeign(e))lines.push({t:'United States Citizen',b:false,s:11});
   }
-  meta.forEach(m=>lines.push({t:m,b:false,s:11}));
   return lines;
+}
+function approxW(t,s,b){return String(t).length*s*(b?0.60:0.545)}
+function wrapToWidth(text,tw,s,b){
+  let words=String(text).split(/\s+/),out=[],cur='';
+  words.forEach(w=>{let test=cur?cur+' '+w:w;if(cur&&approxW(test,s,b)>tw){out.push(cur);cur=w}else cur=test});
+  if(cur)out.push(cur);
+  return out.length?out:[''];
+}
+function measureNode(e){
+  let person=isPerson(e), tw=person?188:248;
+  let lines=[];
+  rawLines(e).forEach(l=>wrapToWidth(l.t,tw,l.s,l.b).forEach(t=>lines.push({t:t,b:l.b,s:l.s,c:'#0b1f3a'})));
+  let lh=l=>l.s+6, textH=lines.reduce((a,l)=>a+lh(l),0);
+  let maxw=0;lines.forEach(l=>maxw=Math.max(maxw,approxW(l.t,l.s,l.b)));
+  let w,h;
+  if(person){w=Math.max(210,Math.round(maxw*1.5)+20);h=Math.max(118,Math.round(textH*1.55)+14)}
+  else{w=Math.max(232,Math.round(maxw)+44);h=Math.max(84,textH+30)}
+  w=Math.min(w,380);
+  return {w:w,h:h,lines:lines};
 }
 function kmpFor(name){
   let n=(name||'').trim().toLowerCase();
@@ -382,6 +399,8 @@ function buildScene(chartType){
   chartType=chartType||'Legal Organization Chart';
   let ents=normalizeEntities();
   if(chartType==='FOCI Chart'){let f=ents.filter(e=>isForeign(e));if(f.length)ents=f;}
+  let dims=new Map();ents.forEach(e=>dims.set(e,measureNode(e)));
+  const NW=e=>dims.get(e).w, NH=e=>dims.get(e).h;
   let byName={}; ents.forEach(e=>byName[(e.name||'').trim().toLowerCase()]=e);
   let kids={}; let roots=[];
   ents.forEach(e=>{
@@ -391,7 +410,7 @@ function buildScene(chartType){
   });
   if(!roots.length)roots=[ents[0]];
   function childrenOf(e){return kids[(e.name||'').trim().toLowerCase()]||[]}
-  function subW(e){let c=childrenOf(e);if(!c.length)return nodeW(e);let t=c.reduce((a,k)=>a+subW(k),0)+HGAP*(c.length-1);return Math.max(nodeW(e),t)}
+  function subW(e){let c=childrenOf(e);if(!c.length)return NW(e);let t=c.reduce((a,k)=>a+subW(k),0)+HGAP*(c.length-1);return Math.max(NW(e),t)}
 
   const marginX=60, headerH=92, bannerH=58, treeTop=200;
   let placed=[]; // {e,x,y,w,h}
@@ -399,7 +418,7 @@ function buildScene(chartType){
   let maxBottom=treeTop;
 
   function place(e,left,top){
-    let w=nodeW(e),h=nodeH(e),sw=subW(e);
+    let w=NW(e),h=NH(e),sw=subW(e);
     let cx=left+sw/2, x=cx-w/2;
     placed.push({e,x,y:top,w,h});
     maxBottom=Math.max(maxBottom,top+h);
@@ -458,7 +477,7 @@ function buildScene(chartType){
   placed.forEach(p=>{
     let foreign=isForeign(p.e), person=isPerson(p.e);
     let stroke=foreign?'#c7352d':'#111';
-    items.push({type:person?'ellipse':'rect',x:p.x,y:p.y,w:p.w,h:p.h,fill:'#fff',stroke:stroke,lines:nodeLines(p.e).map(l=>({t:l.t,b:l.b,s:l.s,c:'#0b1f3a'})),pad:8});
+    items.push({type:person?'ellipse':'rect',x:p.x,y:p.y,w:p.w,h:p.h,fill:'#fff',stroke:stroke,lines:dims.get(p.e).lines,pad:8});
   });
 
   // legend bottom-left
