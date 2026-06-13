@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>DCSA Legal Organization Chart Builder Pro</title>
+<style>
+:root{--navy:#0b1f3a;--navy2:#12355b;--teal:#0f8b8d;--gray:#eef2f5;--line:#d8e0e7;--text:#152238;--muted:#5f6f82;--card:#fff;--green:#1f8f4d;--yellow:#d99a00;--blue:#2475d6;--red:#c93434}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--gray);color:var(--text)}
+header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:16px 22px;display:flex;gap:16px;align-items:center;position:sticky;top:0;z-index:20;box-shadow:0 4px 18px #0004}
+.logoBox{width:64px;height:50px;border:1px solid #ffffff55;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--navy);font-weight:700;font-size:11px}
+.logoBox img{max-width:100%;max-height:100%;object-fit:contain}
+h1{margin:0;font-size:20px}
+header p{margin:3px 0 0;color:#d9f4f4;font-size:13px}
+.topBtns{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+button,.btn{border:0;background:var(--teal);color:#fff;border-radius:8px;padding:9px 13px;font-weight:650;cursor:pointer;font-size:14px}
+button:hover{filter:brightness(.95)}
+button.secondary{background:#fff;color:var(--navy)}
+button.gray{background:#667085}
+button.red{background:var(--red)}
+.layout{display:grid;grid-template-columns:235px 1fr;min-height:calc(100vh - 84px)}
+nav{background:var(--card);border-right:1px solid var(--line);padding:12px;position:sticky;top:84px;height:calc(100vh - 84px);overflow:auto}
+nav button{display:block;width:100%;text-align:left;margin:5px 0;background:transparent;color:var(--text);border:1px solid var(--line)}
+nav button.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.content{padding:20px;overflow:auto}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:16px;box-shadow:0 6px 20px #0000000d}
+.span3{grid-column:span 3}.span4{grid-column:span 4}.span6{grid-column:span 6}.span12{grid-column:span 12}
+.card h2,.card h3{margin:0 0 12px;color:var(--navy2)}
+label{display:block;font-weight:650;margin:9px 0 4px;font-size:13px}
+input,select,textarea{width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);font-size:14px}
+textarea{min-height:70px;resize:vertical}
+.row2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.small{font-size:12px;color:var(--muted)}
+.progress{height:15px;background:#dfe8ef;border-radius:99px;overflow:hidden}
+.bar{height:100%;background:linear-gradient(90deg,var(--teal),var(--green));width:0%;transition:width .3s}
+.warn{border-left:5px solid var(--yellow);background:#fff8e6;padding:9px 11px;border-radius:8px;margin:6px 0;color:#3b2b00;font-size:13px}
+.bad{border-left-color:var(--red);background:#fff0f0;color:#5b1212}
+.good{border-left-color:var(--green);background:#edf9f0;color:#103b1f}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{border-bottom:1px solid var(--line);padding:7px;text-align:left;vertical-align:top}
+th{background:#f4f7fa;color:var(--navy)}
+.entityCard{border:1px solid var(--line);border-radius:10px;padding:11px;margin:9px 0;background:#fbfdff}
+.hidden{display:none!important}
+.tabPanel{animation:fade .2s}
+@keyframes fade{from{opacity:.4}to{opacity:1}}
+#chartHost{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:auto;padding:8px}
+#chartHost svg{display:block;margin:0 auto;max-width:100%;height:auto}
+.exportBtns button{margin:5px 6px 5px 0}
+.manual h3{margin-top:22px}
+.manual ol,.manual ul{line-height:1.6}
+.manual code{background:#eef2f5;padding:1px 5px;border-radius:4px;font-size:13px}
+.step{display:flex;gap:12px;align-items:flex-start;margin:10px 0}
+.stepNum{flex:0 0 28px;height:28px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.pill{display:inline-block;background:#e7f7f7;color:#075c5d;border-radius:99px;padding:3px 9px;font-size:12px;margin:2px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}nav{position:relative;top:0;height:auto}.span3,.span4,.span6{grid-column:span 12}.row2,.row3{grid-template-columns:1fr}.topBtns{margin-left:0}header{flex-wrap:wrap}}
+@media print{header,nav,.noPrint{display:none!important}.layout{display:block}.content{padding:0}.card{box-shadow:none;border:0}}
+</style>
+</head>
+<body>
+<header>
+<div class="logoBox" id="mainLogoBox">LOGO</div>
+<div><h1>DCSA Legal Organization Chart Builder Pro</h1><p id="subtitle">Ownership, control, FOCI, KMP and DCSA chart packet builder</p></div>
+<div class="topBtns noPrint">
+<button class="secondary" type="button" onclick="saveJson()">Save</button>
+<button class="secondary" type="button" onclick="$('jsonFile').click()">Load</button>
+<input id="jsonFile" type="file" accept=".json" class="hidden" onchange="loadJson(event)">
+<button type="button" onclick="sample('aadiera')">Simple Sample</button>
+<button type="button" onclick="sample('complex')">Complex Sample</button>
+<button class="red" type="button" onclick="if(confirm('Clear all data and reload?')){localStorage.removeItem('dcsaOrg');location.reload()}">Reset</button>
+</div>
+</header>
+<div class="layout">
+<nav class="noPrint" id="nav"></nav>
+<main class="content">
+
+<section id="dashboard" class="tabPanel">
+<div class="grid">
+<div class="card span12"><h2>Dashboard</h2>
+<div class="progress"><div id="scoreBar" class="bar"></div></div>
+<p style="margin:8px 0"><b>DCSA Readiness Score:</b> <span id="scoreText">0%</span></p>
+<div id="dashWarn"></div></div>
+<div class="card span3"><h3>Company</h3><p id="dCompany" class="small">Not started</p></div>
+<div class="card span3"><h3>Entities</h3><p id="dEnt" class="small">0</p></div>
+<div class="card span3"><h3>KMPs</h3><p id="dKmp" class="small">0</p></div>
+<div class="card span3"><h3>FOCI Risk</h3><p id="dFoci" class="small">Not assessed</p></div>
+<div class="card span12"><h3>Quick Start</h3>
+<p class="small">New here? Open the <b>User Manual</b> tab for a 5 minute walkthrough, or click a sample button at the top right to see a finished package.</p>
+<button type="button" onclick="go('manual')">Open User Manual</button>
+<button type="button" onclick="go('wizard')">Start Guided Wizard</button>
+<button type="button" onclick="go('charts')">Generate Chart</button>
+<button type="button" onclick="go('exports')">Go to Exports</button></div>
+</div>
+</section>
+
+<section id="manual" class="tabPanel hidden"><div class="card manual">
+<h2>User Manual</h2>
+<p>This tool builds a DCSA ready Legal Organization Chart and supporting package for a Facility Clearance (FCL) submission. Everything runs in your browser. Nothing is uploaded. Your work is saved automatically in this browser.</p>
+
+<h3>The fastest path (5 minutes)</h3>
+<div class="step"><div class="stepNum">1</div><div><b>Load a sample.</b> Click <span class="pill">Simple Sample</span> (single owner) or <span class="pill">Complex Sample</span> (tiered ownership with foreign minority) at the top right. This fills every field so you can see a complete, valid package and then edit it.</div></div>
+<div class="step"><div class="stepNum">2</div><div><b>Add your logo and website.</b> Go to <b>Branding</b>, upload a logo and type your real website. These appear on the chart header and every export.</div></div>
+<div class="step"><div class="stepNum">3</div><div><b>Fill the Company Profile.</b> Legal name, business type, CAGE Code, UEI, FCL status, and your SMO / FSO / ITPSO. Fields marked * are required by DCSA.</div></div>
+<div class="step"><div class="stepNum">4</div><div><b>Build the ownership chain.</b> In <b>Entity Builder</b> add every company in the chain (parent companies, intermediate parents, the ultimate parent, subsidiaries, affiliates) and each owning person. Set the <b>Parent Entity</b> field to link them, and fill ownership % and voting %.</div></div>
+<div class="step"><div class="stepNum">5</div><div><b>List Key Management Personnel.</b> In <b>KMP Builder</b> add officers and directors with titles and citizenship.</div></div>
+<div class="step"><div class="stepNum">6</div><div><b>Review the Dashboard.</b> Fix any red or yellow warnings. Aim for a readiness score of 100%.</div></div>
+<div class="step"><div class="stepNum">7</div><div><b>Generate and export.</b> Open <b>Chart Generator</b> to view the chart, then <b>Exports</b> to download the editable PowerPoint, PDF, PNG, Word comments, and Excel data.</div></div>
+
+<h3>How the chart is built (important)</h3>
+<ul>
+<li>Every row in <b>Entity Builder</b> is a node on the chart. A node is drawn as a <b>rectangle</b> if it is a company and an <b>oval</b> if it is a person.</li>
+<li>The <b>Parent Entity</b> field controls who sits above whom. Type the exact name of the parent into the child's Parent Entity field. The ultimate parent (no parent) is drawn at the top; the cleared facility sits at the bottom of its chain.</li>
+<li>A <b>person is detected automatically</b> when the name has no company words (Inc, LLC, Corp, etc.) or the Business Type is set to U.S. Person / Individual. You can force it by choosing the <b>U.S. Person</b> business type.</li>
+<li>Connector lines carry the ownership % (solid line) and voting / control % (dashed line) per the DCSA legend, which is printed on every chart.</li>
+<li>Foreign entities and foreign persons are outlined in <b>red</b>; U.S. ones in <b>black</b>.</li>
+</ul>
+
+<h3>The editable PowerPoint</h3>
+<p>The PowerPoint export creates <b>native, editable shapes</b> - real rectangles, ovals, lines, and text boxes - not a picture. After downloading you can open it in PowerPoint, click any box, move it, retype the name, or change a percentage. The same coordinates are used for the PDF and PNG so all three match.</p>
+
+<h3>DCSA requirements this tool covers</h3>
+<ul>
+<li>All U.S. and foreign parent companies, subsidiaries, and affiliates.</li>
+<li>The association between the cleared facility and the ultimate parent.</li>
+<li>Percentages of ownership and voting, FCL status, and CAGE codes for each entity.</li>
+<li>Key Management Personnel with titles and citizenship.</li>
+<li>A FOCI summary and an auto generated DCSA package comments narrative.</li>
+<li>A legend, cover information, and supporting tables in the Output Packet.</li>
+</ul>
+
+<h3>Tips</h3>
+<ul>
+<li>Click <b>Save</b> (top right) to download a JSON backup. <b>Load</b> restores it later or on another computer.</li>
+<li>Ownership percentages at the same level should total 100%. The Dashboard warns you if they do not.</li>
+<li>If a node shows the wrong shape, set its Business Type explicitly (Corporation/LLC for a box, U.S. Person for an oval).</li>
+</ul>
+</div></section>
+
+<section id="branding" class="tabPanel hidden"><div class="card"><h2>Branding</h2>
+<div class="row3">
+<div><label>Company Logo</label><input type="file" accept="image/*" onchange="readLogo(event)"></div>
+<div><label>Company Website</label><input id="website" placeholder="www.yourcompany.com" oninput="upd()"></div>
+<div><label>Company Display Name</label><input id="displayName" oninput="upd()"></div>
+</div>
+<div class="row3">
+<div><label>Prepared By</label><input id="preparedBy" oninput="upd()"></div>
+<div><label>Prepared Date</label><input id="preparedDate" type="date" oninput="upd()"></div>
+<div><label>Footer Text</label><input id="footerText" placeholder="Prepared for DCSA FCL submission" oninput="upd()"></div>
+</div>
+<p class="small">The logo and website appear on the chart header and on the PDF, PNG, and PowerPoint exports.</p>
+</div></section>
+
+<section id="wizard" class="tabPanel hidden"><div class="card"><h2>Guided Wizard</h2>
+<div id="wizBody"></div>
+<div class="noPrint" style="margin-top:14px"><button type="button" onclick="wiz(-1)">Back</button> <button type="button" onclick="wiz(1)">Next</button></div>
+</div></section>
+
+<section id="profile" class="tabPanel hidden"><div class="card"><h2>Company Profile</h2>
+<div class="row3">
+<div><label>Legal Name *</label><input id="legalName" oninput="upd()"></div>
+<div><label>DBA</label><input id="dba" oninput="upd()"></div>
+<div><label>Business Type *</label><select id="businessType" onchange="upd()"><option></option><option>Corporation</option><option>LLC</option><option>Partnership</option><option>Joint Venture</option><option>Branch</option><option>Sole Proprietorship</option></select></div>
+</div>
+<div class="row3">
+<div><label>Address</label><input id="address" oninput="upd()"></div>
+<div><label>City</label><input id="city" oninput="upd()"></div>
+<div><label>State</label><input id="state" oninput="upd()"></div>
+</div>
+<div class="row3">
+<div><label>Zip</label><input id="zip" oninput="upd()"></div>
+<div><label>CAGE Code *</label><input id="cage" oninput="upd()"></div>
+<div><label>UEI *</label><input id="uei" oninput="upd()"></div>
+</div>
+<div class="row3">
+<div><label>FCL Status *</label><select id="fclStatus" onchange="upd()"><option></option><option>None</option><option>Sponsored</option><option>In Process</option><option>Interim Secret</option><option>Secret</option><option>Top Secret</option></select></div>
+<div><label>FCL Level</label><select id="fclLevel" onchange="upd()"><option></option><option>None</option><option>Confidential</option><option>Secret</option><option>Top Secret</option></select></div>
+<div><label>FSO Name *</label><input id="fsoName" oninput="upd()"></div>
+</div>
+<div class="row2">
+<div><label>SMO Name *</label><input id="smoName" oninput="upd()"></div>
+<div><label>ITPSO Name *</label><input id="itpsoName" oninput="upd()"></div>
+</div>
+</div></section>
+
+<section id="entities" class="tabPanel hidden"><div class="card"><h2>Entity Builder</h2>
+<p class="small">Add every company and person in the ownership chain. Use <b>Parent Entity</b> to connect them. Leave Parent Entity blank for the top (ultimate parent).</p>
+<button type="button" onclick="addEntity()">+ Add Entity</button>
+<div id="entityList"></div>
+</div></section>
+
+<section id="kmp" class="tabPanel hidden"><div class="card"><h2>KMP Builder</h2>
+<button type="button" onclick="addKmp()">+ Add KMP</button>
+<div id="kmpList"></div>
+</div></section>
+
+<section id="charts" class="tabPanel hidden"><div class="card"><h2>Chart Generator</h2>
+<div class="row3 noPrint">
+<div><label>Chart Type</label><select id="chartType" onchange="renderChart()">
+<option>Legal Organization Chart</option><option>Ownership Chart</option><option>Control Chart</option>
+<option>Parent and Subsidiary Chart</option><option>FOCI Chart</option><option>Internal Management Chart</option></select></div>
+<div><label>&nbsp;</label><button type="button" onclick="renderChart()">Refresh</button></div>
+<div><label>&nbsp;</label><button type="button" onclick="go('exports')">Go to Exports</button></div>
+</div>
+<div id="chartHost"></div>
+</div></section>
+
+<section id="foci" class="tabPanel hidden"><div class="card"><h2>FOCI Analysis</h2>
+<div class="row3">
+<div><label>Foreign Investors</label><textarea id="foreignInvestors" oninput="upd()"></textarea></div>
+<div><label>Foreign Board Members</label><textarea id="foreignBoard" oninput="upd()"></textarea></div>
+<div><label>Foreign Voting Rights</label><textarea id="foreignVoting" oninput="upd()"></textarea></div>
+</div>
+<div class="row3">
+<div><label>Foreign Debt</label><textarea id="foreignDebt" oninput="upd()"></textarea></div>
+<div><label>Foreign Contracts</label><textarea id="foreignContracts" oninput="upd()"></textarea></div>
+<div><label>Foreign Management</label><textarea id="foreignManagement" oninput="upd()"></textarea></div>
+</div>
+<div id="fociResult"></div>
+</div></section>
+
+<section id="comments" class="tabPanel hidden"><div class="card"><h2>DCSA Package Comments</h2>
+<button type="button" onclick="copyComments()">Copy to Clipboard</button>
+<textarea id="commentsText" style="min-height:380px;margin-top:10px"></textarea>
+</div></section>
+
+<section id="packet" class="tabPanel hidden"><div class="card"><h2>Output Packet</h2><div id="packetView"></div></div></section>
+
+<section id="exports" class="tabPanel hidden"><div class="card"><h2>Exports</h2>
+<p class="small">All files are generated locally in your browser. The PowerPoint contains editable native shapes (boxes, ovals, lines, text) that match the PDF and PNG.</p>
+<div class="exportBtns">
+<button type="button" onclick="exportPptx()">Export Editable PowerPoint (PPTX)</button>
+<button type="button" onclick="exportPdf()">Export PDF</button>
+<button type="button" onclick="exportImage('png')">Export PNG</button>
+<button type="button" onclick="exportSvg()">Export SVG</button>
+<button type="button" onclick="exportDocx()">Export Word Comments (DOCX)</button>
+<button type="button" onclick="exportXlsx()">Export Excel Data (XLSX)</button>
+</div>
+<p class="small" style="margin-top:14px">Preview of the chart that will be exported:</p>
+<div id="exportPreview" style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px;overflow:auto"></div>
+</div></section>
+
+</main>
+</div>
+
+<script>
+"use strict";
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+function xml(s){return String(s==null?'':s).replace(/[<>&'"]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','"':'&quot;'}[m]))}
+
+/* ---------- State ---------- */
+const FIELDS=['website','displayName','preparedBy','preparedDate','footerText','legalName','dba','businessType','address','city','state','zip','cage','uei','fclStatus','fclLevel','fsoName','smoName','itpsoName','foreignInvestors','foreignBoard','foreignVoting','foreignDebt','foreignContracts','foreignManagement'];
+let app={logo:'',entities:[],kmps:[],wizardStep:0};
+
+const TABS=[['dashboard','Dashboard'],['manual','User Manual'],['branding','Branding'],['wizard','Guided Wizard'],['profile','Company Profile'],['entities','Entity Builder'],['kmp','KMP Builder'],['charts','Chart Generator'],['foci','FOCI Analysis'],['comments','DCSA Comments'],['packet','Output Packet'],['exports','Exports']];
+function buildNav(){$('nav').innerHTML=TABS.map(([id,label],i)=>`<button type="button" class="${i===0?'active':''}" onclick="go('${id}')">${label}</button>`).join('')}
+function go(id){
+  document.querySelectorAll('.tabPanel').forEach(x=>x.classList.add('hidden'));
+  $(id).classList.remove('hidden');
+  document.querySelectorAll('#nav button').forEach((b,i)=>b.classList.toggle('active',TABS[i][0]===id));
+  if(id==='charts')renderChart();
+  if(id==='packet')renderPacket();
+  if(id==='exports')renderExportPreview();
+  if(id==='wizard')renderWizard();
+  window.scrollTo(0,0);
+}
+
+function val(id){return $(id)?$(id).value:''}
+function setVal(id,v){if($(id))$(id).value=v==null?'':v}
+function upd(){FIELDS.forEach(f=>app[f]=val(f));renderAll();localStorage.setItem('dcsaOrg',JSON.stringify(app))}
+function loadState(){let s=localStorage.getItem('dcsaOrg');if(s){try{app=Object.assign(app,JSON.parse(s))}catch(e){}}FIELDS.forEach(f=>setVal(f,app[f]));renderAll()}
+function renderAll(){renderLogo();renderEntities();renderKmps();renderDash();renderFoci();genComments();}
+
+function readLogo(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{app.logo=r.result;upd();renderChart()};r.readAsDataURL(f)}
+function renderLogo(){$('mainLogoBox').innerHTML=app.logo?`<img src="${app.logo}">`:'LOGO';$('subtitle').textContent=(app.displayName||app.legalName||'Ownership, control, FOCI, KMP and DCSA chart packet builder')+(app.website?' | '+app.website:'')}
+
+/* ---------- Entities / KMP ---------- */
+function addEntity(d){d=d||{};app.entities.push(Object.assign({name:'',type:'',country:'United States',cage:'',uei:'',own:'',vote:'',parent:'',fclStatus:'',fclLevel:'',foreign:false,excluded:false,highest:false,notes:''},d));upd();go('entities')}
+function addKmp(d){d=d||{};app.kmps.push(Object.assign({name:'',title:'',role:'',citizenship:'United States',clearance:'',excluded:false,required:true,notes:''},d));upd();go('kmp')}
+function opts(arr,sel){return arr.map(x=>`<option ${x===sel?'selected':''}>${esc(x)}</option>`).join('')}
+
+function renderEntities(){
+  let out=app.entities.map((e,i)=>`<div class="entityCard">
+  <div class="row3">
+   <div><label>Entity / Person Name</label><input value="${esc(e.name)}" oninput="app.entities[${i}].name=this.value;upd()"></div>
+   <div><label>Business Type</label><select onchange="app.entities[${i}].type=this.value;upd()">${opts(['','Corporation','LLC','Partnership','Joint Venture','Branch','Sole Proprietorship','U.S. Person','Foreign Person'],e.type)}</select></div>
+   <div><label>Country</label><input value="${esc(e.country)}" oninput="app.entities[${i}].country=this.value;upd()"></div>
+  </div>
+  <div class="row3">
+   <div><label>CAGE Code</label><input value="${esc(e.cage)}" oninput="app.entities[${i}].cage=this.value;upd()"></div>
+   <div><label>UEI</label><input value="${esc(e.uei)}" oninput="app.entities[${i}].uei=this.value;upd()"></div>
+   <div><label>FCL Status</label><select onchange="app.entities[${i}].fclStatus=this.value;upd()">${opts(['','None','Sponsored','In Process','Interim Secret','Secret','Top Secret'],e.fclStatus)}</select></div>
+  </div>
+  <div class="row3">
+   <div><label>Ownership %</label><input type="number" value="${esc(e.own)}" oninput="app.entities[${i}].own=this.value;upd()"></div>
+   <div><label>Voting / Control %</label><input type="number" value="${esc(e.vote)}" oninput="app.entities[${i}].vote=this.value;upd()"></div>
+   <div><label>Parent Entity (type exact name)</label><input value="${esc(e.parent)}" oninput="app.entities[${i}].parent=this.value;upd()" list="entNames"></div>
+  </div>
+  <div class="row3" style="align-items:center">
+   <label style="margin:0"><input type="checkbox" ${e.foreign?'checked':''} onchange="app.entities[${i}].foreign=this.checked;upd()"> Foreign owned / controlled</label>
+   <label style="margin:0"><input type="checkbox" ${e.excluded?'checked':''} onchange="app.entities[${i}].excluded=this.checked;upd()"> Excluded entity</label>
+   <label style="margin:0"><input type="checkbox" ${e.highest?'checked':''} onchange="app.entities[${i}].highest=this.checked;upd()"> Highest cleared tier</label>
+  </div>
+  <label>Notes (citizenship, relationship, FOCI explanation)</label><textarea oninput="app.entities[${i}].notes=this.value;upd()">${esc(e.notes)}</textarea>
+  <button class="red" type="button" onclick="app.entities.splice(${i},1);upd()">Remove</button>
+  </div>`).join('');
+  $('entityList').innerHTML=(out||'<p class="small">No entities yet. Click Add Entity.</p>')+`<datalist id="entNames">${app.entities.map(e=>`<option value="${esc(e.name)}">`).join('')}</datalist>`;
+}
+function renderKmps(){
+  $('kmpList').innerHTML=app.kmps.map((k,i)=>`<div class="entityCard">
+  <div class="row3">
+   <div><label>Name</label><input value="${esc(k.name)}" oninput="app.kmps[${i}].name=this.value;upd()"></div>
+   <div><label>Title</label><input value="${esc(k.title)}" oninput="app.kmps[${i}].title=this.value;upd()"></div>
+   <div><label>Role</label><select onchange="app.kmps[${i}].role=this.value;upd()">${opts(['','SMO','FSO','ITPSO','CEO','President','Vice President','Chairman','Director','Manager','Member','Treasurer','Secretary','Officer'],k.role)}</select></div>
+  </div>
+  <div class="row3">
+   <div><label>Citizenship</label><input value="${esc(k.citizenship)}" oninput="app.kmps[${i}].citizenship=this.value;upd()"></div>
+   <div><label>Clearance</label><select onchange="app.kmps[${i}].clearance=this.value;upd()">${opts(['','None','Interim Secret','Secret','Top Secret'],k.clearance)}</select></div>
+   <div style="display:flex;gap:14px;align-items:flex-end;padding-bottom:9px"><label style="margin:0"><input type="checkbox" ${k.excluded?'checked':''} onchange="app.kmps[${i}].excluded=this.checked;upd()"> Excluded</label><label style="margin:0"><input type="checkbox" ${k.required?'checked':''} onchange="app.kmps[${i}].required=this.checked;upd()"> Required for FCL</label></div>
+  </div>
+  <button class="red" type="button" onclick="app.kmps.splice(${i},1);upd()">Remove</button>
+  </div>`).join('')||'<p class="small">No KMPs yet. Click Add KMP.</p>';
+}
+
+/* ---------- Helpers ---------- */
+function isPerson(e){
+  let t=(e.type||'').toLowerCase();
+  if(t.includes('person')||t.includes('individual'))return true;
+  if(t)return false; // an explicit company type
+  let name=(e.name||'');
+  let company=/\b(inc\.?|llc|l\.l\.c\.?|l\.p\.?|lp|corp\.?|corporation|company|co\.?|partners|capital|holdings|group|ltd\.?|gmbh|plc)\b/i.test(name);
+  if(company)return false;
+  let notes=((e.notes||'')+' '+(e.name||'')).toLowerCase();
+  if(notes.includes('citizen'))return true;
+  return name.trim().split(/\s+/).length>=2; // two-word names default to person
+}
+function isForeign(e){return !!e.foreign || ((e.country||'').trim()&&(e.country||'').trim().toLowerCase()!=='united states')}
+function normalizeEntities(){
+  let ents=(app.entities||[]).filter(e=>e&&(e.name||'').trim()).map(e=>Object.assign({},e));
+  if(!ents.length){
+    // build a minimal default from profile + SMO
+    let person={name:app.smoName||'U.S. Person',type:'U.S. Person',country:'United States',own:'100',vote:'100',parent:'',notes:'United States Citizen'};
+    let comp={name:app.legalName||'Company Name',type:app.businessType||'Corporation',country:'United States',cage:app.cage,uei:app.uei,fclStatus:app.fclStatus,fclLevel:app.fclLevel,own:'100',vote:'100',parent:person.name};
+    ents=app.smoName?[person,comp]:[comp];
+  }
+  return ents;
+}
+
+/* ---------- Layout engine: produces a flat scene of primitives ---------- */
+const NODE_W=300,NODE_H=96,PERSON_W=250,PERSON_H=132,HGAP=46,VGAP=120;
+function nodeW(e){return isPerson(e)?PERSON_W:NODE_W}
+function nodeH(e){return isPerson(e)?PERSON_H:NODE_H}
+
+function nodeLines(e){
+  let lines=[{t:e.name||'Entity',b:true,s:15}];
+  let meta=[];
+  if(!isPerson(e)){
+    if(e.type)meta.push(e.type);
+    if(e.cage)meta.push('CAGE: '+e.cage);
+    if(e.uei)meta.push('UEI: '+e.uei);
+    if(e.fclStatus)meta.push('FCL: '+e.fclStatus);
+    if(e.country&&e.country.toLowerCase()!=='united states')meta.push(e.country);
+  }else{
+    let k=kmpFor(e.name);
+    if(k&&k.title)meta.push(k.title);
+    let cit=(k&&k.citizenship)||e.country||'';
+    if(cit){meta.push(/citizen/i.test(cit)?cit:(cit+' Citizen').replace('United States Citizen','United States Citizen'))}
+    else if(!isForeign(e))meta.push('United States Citizen');
+    if(e.notes&&/citizen/i.test(e.notes)&&!meta.some(m=>/citizen/i.test(m)))meta.push(e.notes);
+  }
+  meta.forEach(m=>lines.push({t:m,b:false,s:11}));
+  return lines;
+}
+function kmpFor(name){
+  let n=(name||'').trim().toLowerCase();
+  return (app.kmps||[]).find(k=>(k.name||'').trim().toLowerCase()===n);
+}
+
+function buildScene(chartType){
+  chartType=chartType||'Legal Organization Chart';
+  let ents=normalizeEntities();
+  if(chartType==='FOCI Chart'){let f=ents.filter(e=>isForeign(e));if(f.length)ents=f;}
+  let byName={}; ents.forEach(e=>byName[(e.name||'').trim().toLowerCase()]=e);
+  let kids={}; let roots=[];
+  ents.forEach(e=>{
+    let p=(e.parent||'').trim().toLowerCase();
+    if(p&&byName[p]&&byName[p]!==e){(kids[(e.parent||'').trim().toLowerCase()]=kids[(e.parent||'').trim().toLowerCase()]||[]).push(e)}
+    else roots.push(e);
+  });
+  if(!roots.length)roots=[ents[0]];
+  function childrenOf(e){return kids[(e.name||'').trim().toLowerCase()]||[]}
+  function subW(e){let c=childrenOf(e);if(!c.length)return nodeW(e);let t=c.reduce((a,k)=>a+subW(k),0)+HGAP*(c.length-1);return Math.max(nodeW(e),t)}
+
+  const marginX=60, headerH=92, bannerH=58, treeTop=200;
+  let placed=[]; // {e,x,y,w,h}
+  let edges=[];  // {x1,y1,x2,y2,dashed,label,color}
+  let maxBottom=treeTop;
+
+  function place(e,left,top){
+    let w=nodeW(e),h=nodeH(e),sw=subW(e);
+    let cx=left+sw/2, x=cx-w/2;
+    placed.push({e,x,y:top,w,h});
+    maxBottom=Math.max(maxBottom,top+h);
+    let c=childrenOf(e);
+    if(c.length){
+      let total=c.reduce((a,k)=>a+subW(k),0)+HGAP*(c.length-1);
+      let cl=cx-total/2, childTop=top+h+VGAP;
+      c.forEach(k=>{
+        let ksw=subW(k);
+        let kcx=cl+ksw/2;
+        // connector parent bottom -> child top (orthogonal)
+        let pby=top+h, kty=childTop, midY=pby+VGAP/2;
+        let own=(k.own!==''&&k.own!=null)?k.own+'% Ownership':'';
+        let vote=(k.vote!==''&&k.vote!=null)?k.vote+'% Voting':'';
+        let control=vote&&String(k.vote)!==String(k.own);
+        edges.push({seg:[[cx,pby],[cx,midY],[kcx,midY],[kcx,kty]],dashed:false,color:'#111',label:own,labelColor:'#111',lx:kcx,ly:midY});
+        if(control){
+          edges.push({seg:[[kcx+16,midY],[kcx+16,kty]],dashed:true,color:'#1d6fd6',label:vote,labelColor:'#1d6fd6',lx:kcx+16,ly:(midY+kty)/2});
+        }
+        place(k,cl,childTop);
+        cl+=ksw+HGAP;
+      });
+    }
+  }
+  let totalTreeW=roots.reduce((a,r)=>a+subW(r),0)+HGAP*(roots.length-1);
+  let sceneW=Math.max(totalTreeW+marginX*2, 1120);
+  let startLeft=(sceneW-totalTreeW)/2, cl=startLeft;
+  roots.forEach(r=>{let sw=subW(r);place(r,cl,treeTop);cl+=sw+HGAP});
+
+  // Build primitives
+  let items=[];
+  // Header: logo (placeholder text if none), website, address, title banner
+  let title=chartType==='Legal Organization Chart'?'Organizational Chart with Key Management Personnel for FCL Submission':chartType;
+  let website=(app.website||'').replace(/^https?:\/\//,'')||'www.yourcompany.com';
+  let address=[app.address,app.city,app.state,app.zip].filter(Boolean).join(', ');
+
+  // logo box (image handled by renderers); reserve area left
+  items.push({type:'logo',x:marginX,y:24,w:300,h:80});
+  // website + address centered over right area
+  items.push({type:'text',x:sceneW/2,y:46,text:website,size:30,bold:true,color:'#0b1f3a',align:'center'});
+  if(address)items.push({type:'text',x:sceneW/2,y:78,text:address,size:14,bold:false,color:'#3a4a5c',align:'center'});
+  // banner
+  items.push({type:'rect',x:marginX,y:headerH+22,w:sceneW-marginX*2,h:bannerH,fill:'#0b1f3a',stroke:'#0b1f3a',lines:[{t:title,b:true,s:18,c:'#fff'}],pad:8});
+
+  // edges
+  edges.forEach(ed=>{
+    for(let i=0;i<ed.seg.length-1;i++){
+      items.push({type:'line',x1:ed.seg[i][0],y1:ed.seg[i][1],x2:ed.seg[i+1][0],y2:ed.seg[i+1][1],color:ed.color,dashed:ed.dashed,width:2.2});
+    }
+    if(ed.label)items.push({type:'text',x:ed.lx+6,y:ed.ly-4,text:ed.label,size:12,bold:true,color:ed.labelColor,align:'left',bg:true});
+  });
+  // nodes
+  placed.forEach(p=>{
+    let foreign=isForeign(p.e), person=isPerson(p.e);
+    let stroke=foreign?'#c7352d':'#111';
+    items.push({type:person?'ellipse':'rect',x:p.x,y:p.y,w:p.w,h:p.h,fill:'#fff',stroke:stroke,lines:nodeLines(p.e).map(l=>({t:l.t,b:l.b,s:l.s,c:'#0b1f3a'})),pad:8});
+  });
+
+  // legend bottom-left
+  let legX=marginX, legY=maxBottom+46, legW=250, legH=200;
+  items.push({type:'rect',x:legX,y:legY,w:legW,h:legH,fill:'#f7f3e8',stroke:'#7a1d1d',pad:0});
+  items.push({type:'text',x:legX+16,y:legY+26,text:'LEGEND',size:14,bold:true,color:'#a94442',align:'left'});
+  function legLine(yy,color,dash,label){
+    items.push({type:'line',x1:legX+20,y1:yy,x2:legX+78,y2:yy,color:color,dashed:dash,width:3});
+    items.push({type:'text',x:legX+92,y:yy+4,text:label,size:12,bold:false,color:'#222',align:'left'});
+  }
+  legLine(legY+52,'#111',false,'Ownership');
+  legLine(legY+78,'#1d6fd6',true,'Control / Voting');
+  items.push({type:'rect',x:legX+20,y:legY+96,w:48,h:24,fill:'#fff',stroke:'#111'});items.push({type:'text',x:legX+92,y:legY+112,text:'U.S. Entity',size:12,color:'#222',align:'left'});
+  items.push({type:'ellipse',x:legX+20,y:legY+128,w:48,h:24,fill:'#fff',stroke:'#111'});items.push({type:'text',x:legX+92,y:legY+144,text:'U.S. Person',size:12,color:'#222',align:'left'});
+  items.push({type:'rect',x:legX+20,y:legY+160,w:48,h:24,fill:'#fff',stroke:'#c7352d'});items.push({type:'text',x:legX+92,y:legY+176,text:'Foreign Entity / Person',size:12,color:'#222',align:'left'});
+
+  // footer
+  let foot=app.footerText||'Prepared for DCSA FCL submission';
+  let sceneH=legY+legH+50;
+  items.push({type:'text',x:sceneW-marginX,y:sceneH-18,text:foot+(app.preparedDate?('  |  '+app.preparedDate):''),size:12,color:'#555',align:'right'});
+
+  return {w:sceneW,h:sceneH,items:items};
+}
+
+/* ---------- Renderer: SVG ---------- */
+function sceneToSVG(scene,forExport){
+  let s=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${scene.w} ${scene.h}" width="${scene.w}" height="${scene.h}" font-family="Arial, sans-serif">`;
+  s+=`<rect x="0" y="0" width="${scene.w}" height="${scene.h}" fill="#ffffff"/>`;
+  scene.items.forEach(it=>{
+    if(it.type==='logo'){
+      if(app.logo){s+=`<image href="${app.logo}" x="${it.x}" y="${it.y}" height="${it.h}" width="${it.w}" preserveAspectRatio="xMinYMid meet"/>`}
+      else{s+=`<text x="${it.x}" y="${it.y+44}" font-size="34" font-weight="700" fill="#24358c">${esc((app.displayName||app.legalName||'COMPANY'))}</text>`}
+    }else if(it.type==='line'){
+      s+=`<line x1="${it.x1}" y1="${it.y1}" x2="${it.x2}" y2="${it.y2}" stroke="${it.color}" stroke-width="${it.width||2}" ${it.dashed?'stroke-dasharray="8 6"':''}/>`;
+    }else if(it.type==='rect'||it.type==='ellipse'){
+      if(it.type==='rect')s+=`<rect x="${it.x}" y="${it.y}" width="${it.w}" height="${it.h}" fill="${it.fill||'#fff'}" stroke="${it.stroke||'#111'}" stroke-width="2.5"/>`;
+      else s+=`<ellipse cx="${it.x+it.w/2}" cy="${it.y+it.h/2}" rx="${it.w/2}" ry="${it.h/2}" fill="${it.fill||'#fff'}" stroke="${it.stroke||'#111'}" stroke-width="2.5"/>`;
+      if(it.lines)s+=svgLines(it);
+    }else if(it.type==='text'){
+      let anchor=it.align==='center'?'middle':(it.align==='right'?'end':'start');
+      if(it.bg)s+=`<rect x="${it.x-2}" y="${it.y-12}" width="${(it.text.length*it.size*0.56)+4}" height="16" fill="#ffffff" opacity="0.85"/>`;
+      s+=`<text x="${it.x}" y="${it.y}" font-size="${it.size}" ${it.bold?'font-weight="700"':''} fill="${it.color}" text-anchor="${anchor}">${esc(it.text)}</text>`;
+    }
+  });
+  s+=`</svg>`;
+  return s;
+}
+function svgLines(it){
+  let cx=it.x+it.w/2, lines=it.lines, lh=lines.map(l=>l.s+6), total=lh.reduce((a,b)=>a+b,0);
+  let y=it.y+it.h/2-total/2;
+  let out='';
+  lines.forEach((l,i)=>{
+    y+=lh[i];
+    out+=`<text x="${cx}" y="${y-4}" font-size="${l.s}" ${l.b?'font-weight="700"':''} fill="${l.c||'#0b1f3a'}" text-anchor="middle">${esc(l.t)}</text>`;
+  });
+  return out;
+}
+
+/* ---------- Renderer: Canvas (for PDF/PNG) ---------- */
+function loadImage(src){return new Promise(res=>{if(!src){res(null);return}let i=new Image();i.onload=()=>res(i);i.onerror=()=>res(null);i.src=src})}
+async function sceneToCanvas(scene,scale){
+  scale=scale||2;
+  let c=document.createElement('canvas');c.width=scene.w*scale;c.height=scene.h*scale;
+  let ctx=c.getContext('2d');ctx.scale(scale,scale);
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,scene.w,scene.h);
+  ctx.textBaseline='alphabetic';
+  let logo=await loadImage(app.logo);
+  for(let it of scene.items){
+    if(it.type==='logo'){
+      if(logo){let r=Math.min(it.w/logo.width,it.h/logo.height);ctx.drawImage(logo,it.x,it.y,logo.width*r,logo.height*r)}
+      else{ctx.fillStyle='#24358c';ctx.font='700 34px Arial';ctx.textAlign='left';ctx.fillText((app.displayName||app.legalName||'COMPANY'),it.x,it.y+44)}
+    }else if(it.type==='line'){
+      ctx.strokeStyle=it.color;ctx.lineWidth=it.width||2;ctx.setLineDash(it.dashed?[8,6]:[]);
+      ctx.beginPath();ctx.moveTo(it.x1,it.y1);ctx.lineTo(it.x2,it.y2);ctx.stroke();ctx.setLineDash([]);
+    }else if(it.type==='rect'||it.type==='ellipse'){
+      ctx.fillStyle=it.fill||'#fff';ctx.strokeStyle=it.stroke||'#111';ctx.lineWidth=2.5;
+      if(it.type==='rect'){ctx.fillRect(it.x,it.y,it.w,it.h);ctx.strokeRect(it.x,it.y,it.w,it.h)}
+      else{ctx.beginPath();ctx.ellipse(it.x+it.w/2,it.y+it.h/2,it.w/2,it.h/2,0,0,Math.PI*2);ctx.fill();ctx.stroke()}
+      if(it.lines)canvasLines(ctx,it);
+    }else if(it.type==='text'){
+      ctx.textAlign=it.align==='center'?'center':(it.align==='right'?'right':'left');
+      if(it.bg){let w=ctx.measureText(it.text).width;ctx.fillStyle='rgba(255,255,255,.85)';ctx.fillRect(it.x-2,it.y-12,w+4,16)}
+      ctx.fillStyle=it.color;ctx.font=(it.bold?'700 ':'')+it.size+'px Arial';ctx.fillText(it.text,it.x,it.y);
+    }
+  }
+  return c;
+}
+function canvasLines(ctx,it){
+  let cx=it.x+it.w/2,lines=it.lines,lh=lines.map(l=>l.s+6),total=lh.reduce((a,b)=>a+b,0);
+  let y=it.y+it.h/2-total/2;ctx.textAlign='center';
+  lines.forEach((l,i)=>{y+=lh[i];ctx.fillStyle=l.c||'#0b1f3a';ctx.font=(l.b?'700 ':'')+l.s+'px Arial';ctx.fillText(l.t,cx,y-4)});
+}
+
+/* ---------- Screen render ---------- */
+function currentChartType(){return ($('chartType')&&$('chartType').value)||'Legal Organization Chart'}
+function renderChart(){let scene=buildScene(currentChartType());$('chartHost').innerHTML=sceneToSVG(scene)}
+function renderExportPreview(){let scene=buildScene(currentChartType());$('exportPreview').innerHTML=sceneToSVG(scene)}
+
+/* ---------- PDF (landscape letter, scene scaled to fit) ---------- */
+async function exportPdf(){
+  let scene=buildScene(currentChartType());
+  let canvas=await sceneToCanvas(scene,2);
+  let jpg=canvas.toDataURL('image/jpeg',0.95).split(',')[1];
+  let bytes=b64ToBytes(jpg);
+  let W=792,H=612,margin=24;
+  // fit scene into page
+  let sc=Math.min((W-margin*2)/scene.w,(H-margin*2)/scene.h);
+  let dw=scene.w*sc, dh=scene.h*sc, ox=(W-dw)/2, oy=(H-dh)/2;
+  let enc=new TextEncoder();const B=s=>enc.encode(s);
+  let objs=[];const add=d=>{objs.push(d instanceof Uint8Array?d:B(d));return objs.length};
+  add('<< /Type /Catalog /Pages 2 0 R >>');
+  add('<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+  add(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /XObject << /Im1 4 0 R >> >> /Contents 5 0 R >>`);
+  add(concat([B(`<< /Type /XObject /Subtype /Image /Width ${canvas.width} /Height ${canvas.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${bytes.length} >>\nstream\n`),bytes,B('\nendstream')]));
+  let content=`q\n${dw.toFixed(2)} 0 0 ${dh.toFixed(2)} ${ox.toFixed(2)} ${oy.toFixed(2)} cm\n/Im1 Do\nQ`;
+  add(`<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
+  let parts=[B('%PDF-1.4\n')],off=[0],pos=parts[0].length;
+  objs.forEach((o,i)=>{off.push(pos);let h=B(`${i+1} 0 obj\n`),t=B('\nendobj\n');parts.push(h,o,t);pos+=h.length+o.length+t.length});
+  let xp=pos,xref=`xref\n0 ${objs.length+1}\n0000000000 65535 f \n`;
+  for(let i=1;i<off.length;i++)xref+=String(off[i]).padStart(10,'0')+' 00000 n \n';
+  xref+=`trailer\n<< /Size ${objs.length+1} /Root 1 0 R >>\nstartxref\n${xp}\n%%EOF`;
+  parts.push(B(xref));
+  dl('dcsa-legal-org-chart.pdf',new Blob(parts,{type:'application/pdf'}));
+}
+
+/* ---------- PNG ---------- */
+async function exportImage(type){
+  let scene=buildScene(currentChartType());
+  let canvas=await sceneToCanvas(scene,2);
+  canvas.toBlob(b=>dlBlob(`dcsa-legal-org-chart.${type==='jpeg'?'jpg':'png'}`,b),type==='jpeg'?'image/jpeg':'image/png',0.95);
+}
+function exportSvg(){let scene=buildScene(currentChartType());dl('dcsa-legal-org-chart.svg',new Blob([sceneToSVG(scene,true)],{type:'image/svg+xml'}))}
+
+/* ---------- Editable PPTX (native shapes from same scene) ---------- */
+async function exportPptx(){
+  let scene=buildScene(currentChartType());
+  const SW=12192000,SH=6858000; // 13.333 x 7.5 in EMU
+  let sc=Math.min((SW*0.96)/scene.w,(SH*0.96)/scene.h);
+  let ox=(SW-scene.w*sc)/2, oy=(SH-scene.h*sc)/2;
+  const X=v=>Math.round(v*sc+ox), Y=v=>Math.round(v*sc+oy), L=v=>Math.round(v*sc);
+  let id=10;const nid=()=>id++;
+  function paras(lines){
+    return lines.map(l=>{
+      return `<a:p><a:pPr algn="ctr"/><a:r><a:rPr lang="en-US" sz="${Math.round((l.s||12)*100)}" ${l.b?'b="1"':''}><a:solidFill><a:srgbClr val="${(l.c||'000000').replace('#','')}"/></a:solidFill></a:rPr><a:t>${xml(l.t)}</a:t></a:r></a:p>`;
+    }).join('');
+  }
+  function shape(prst,it){
+    let txt=it.lines?`<p:txBody><a:bodyPr wrap="square" anchor="ctr" lIns="36000" rIns="36000" tIns="18000" bIns="18000"/><a:lstStyle/>${paras(it.lines)}</p:txBody>`:'<p:txBody><a:bodyPr/><a:p/></p:txBody>';
+    return `<p:sp><p:nvSpPr><p:cNvPr id="${nid()}" name="${prst}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="${X(it.x)}" y="${Y(it.y)}"/><a:ext cx="${L(it.w)}" cy="${L(it.h)}"/></a:xfrm><a:prstGeom prst="${prst}"><a:avLst/></a:prstGeom><a:solidFill><a:srgbClr val="${(it.fill||'FFFFFF').replace('#','')}"/></a:solidFill><a:ln w="25400"><a:solidFill><a:srgbClr val="${(it.stroke||'111111').replace('#','')}"/></a:solidFill></a:ln></p:spPr>${txt}</p:sp>`;
+  }
+  function textbox(it){
+    let anchor=it.align==='center'?'ctr':(it.align==='right'?'r':'l');
+    let w=it.align==='center'?2400:1800;
+    let bx=it.align==='center'?it.x-w/2:(it.align==='right'?it.x-w:it.x);
+    return `<p:sp><p:nvSpPr><p:cNvPr id="${nid()}" name="txt"/><p:cNvSpPr txBox="1"/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="${X(bx)}" y="${Y(it.y-it.size)}"/><a:ext cx="${L(w)}" cy="${L(it.size*1.8)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/></p:spPr><p:txBody><a:bodyPr wrap="none"/><a:lstStyle/><a:p><a:pPr algn="${anchor}"/><a:r><a:rPr lang="en-US" sz="${Math.round(it.size*100)}" ${it.bold?'b="1"':''}><a:solidFill><a:srgbClr val="${(it.color||'000000').replace('#','')}"/></a:solidFill></a:rPr><a:t>${xml(it.text)}</a:t></a:r></a:p></p:txBody></p:sp>`;
+  }
+  function line(it){
+    let x1=it.x1,y1=it.y1,x2=it.x2,y2=it.y2;
+    let ox2=Math.min(x1,x2),oy2=Math.min(y1,y2);
+    let flipH=x2<x1?' flipH="1"':'',flipV=y2<y1?' flipV="1"':'';
+    return `<p:cxnSp><p:nvCxnSpPr><p:cNvPr id="${nid()}" name="conn"/><p:cNvCxnSpPr/><p:nvPr/></p:nvCxnSpPr><p:spPr><a:xfrm${flipH}${flipV}><a:off x="${X(ox2)}" y="${Y(oy2)}"/><a:ext cx="${L(Math.max(Math.abs(x2-x1),1))}" cy="${L(Math.max(Math.abs(y2-y1),1))}"/></a:xfrm><a:prstGeom prst="line"><a:avLst/></a:prstGeom><a:ln w="28575"><a:solidFill><a:srgbClr val="${(it.color||'111111').replace('#','')}"/></a:solidFill>${it.dashed?'<a:prstDash val="dash"/>':''}</a:ln></p:spPr></p:cxnSp>`;
+  }
+  let body='';
+  // logo image
+  let logoRel='';
+  let mediaFiles=[];
+  for(let it of scene.items){
+    if(it.type==='logo'){
+      if(app.logo&&app.logo.indexOf(',')>0){
+        let b64=app.logo.split(',')[1];let ext=/png/i.test(app.logo)?'png':'jpeg';
+        mediaFiles.push({name:'ppt/media/logo.'+ext,bytes:b64ToBytes(b64)});
+        let r=1; // fit
+        body+=`<p:pic><p:nvPicPr><p:cNvPr id="${nid()}" name="logo"/><p:cNvPicPr/><p:nvPr/></p:nvPicPr><p:blipFill><a:blip r:embed="rIdLogo"/><a:stretch><a:fillRect/></a:stretch></p:blipFill><p:spPr><a:xfrm><a:off x="${X(it.x)}" y="${Y(it.y)}"/><a:ext cx="${L(it.w)}" cy="${L(it.h)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr></p:pic>`;
+        logoRel=`<Relationship Id="rIdLogo" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/logo.${ext}"/>`;
+      }else{
+        body+=textbox({x:it.x,y:it.y+40,text:(app.displayName||app.legalName||'COMPANY'),size:26,bold:true,color:'24358C',align:'left'});
+      }
+    }else if(it.type==='rect'){body+=shape('rect',it)}
+    else if(it.type==='ellipse'){body+=shape('ellipse',it)}
+    else if(it.type==='line'){body+=line(it)}
+    else if(it.type==='text'){body+=textbox(it)}
+  }
+  let slide=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:cSld><p:bg><p:bgPr><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill><a:effectLst/></p:bgPr></p:bg><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>${body}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>`;
+
+  let files=[
+   {name:'[Content_Types].xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="jpg" ContentType="image/jpeg"/><Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/><Override PartName="/ppt/slides/slide1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/><Override PartName="/ppt/slideLayouts/slideLayout1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml"/><Override PartName="/ppt/slideMasters/slideMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml"/><Override PartName="/ppt/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/></Types>'},
+   {name:'_rels/.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="ppt/presentation.xml"/></Relationships>'},
+   {name:'ppt/presentation.xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><p:presentation xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst><p:sldIdLst><p:sldId id="256" r:id="rId2"/></p:sldIdLst><p:sldSz cx="12192000" cy="6858000" type="screen16x9"/><p:notesSz cx="6858000" cy="9144000"/></p:presentation>'},
+   {name:'ppt/_rels/presentation.xml.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="slideMasters/slideMaster1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide1.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/></Relationships>'},
+   {name:'ppt/slides/slide1.xml',data:slide},
+   {name:'ppt/slides/_rels/slide1.xml.rels',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>${logoRel}</Relationships>`},
+   {name:'ppt/slideLayouts/slideLayout1.xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><p:sldLayout xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" type="blank" preserve="1"><p:cSld name="Blank"><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr/></p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sldLayout>'},
+   {name:'ppt/slideLayouts/_rels/slideLayout1.xml.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="../slideMasters/slideMaster1.xml"/></Relationships>'},
+   {name:'ppt/slideMasters/slideMaster1.xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><p:sldMaster xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:cSld><p:bg><p:bgPr><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill></p:bgPr></p:bg><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr/></p:spTree></p:cSld><p:clrMap bg1="lt1" tx1="dk1" bg2="lt2" tx2="dk2" accent1="accent1" accent2="accent2" accent3="accent3" accent4="accent4" accent5="accent5" accent6="accent6" hlink="hlink" folHlink="folHlink"/><p:sldLayoutIdLst><p:sldLayoutId id="2147483649" r:id="rId1"/></p:sldLayoutIdLst><p:txStyles><p:titleStyle/><p:bodyStyle/><p:otherStyle/></p:txStyles></p:sldMaster>'},
+   {name:'ppt/slideMasters/_rels/slideMaster1.xml.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="../theme/theme1.xml"/></Relationships>'},
+   {name:'ppt/theme/theme1.xml',data:themeXml()}
+  ];
+  mediaFiles.forEach(m=>files.push({name:m.name,data:m.bytes}));
+  dlBlob('dcsa-editable-org-chart.pptx',new Blob([zip(files)],{type:'application/vnd.openxmlformats-officedocument.presentationml.presentation'}));
+}
+function themeXml(){return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Office"><a:themeElements><a:clrScheme name="Office"><a:dk1><a:srgbClr val="000000"/></a:dk1><a:lt1><a:srgbClr val="FFFFFF"/></a:lt1><a:dk2><a:srgbClr val="1F497D"/></a:dk2><a:lt2><a:srgbClr val="EEECE1"/></a:lt2><a:accent1><a:srgbClr val="4F81BD"/></a:accent1><a:accent2><a:srgbClr val="C0504D"/></a:accent2><a:accent3><a:srgbClr val="9BBB59"/></a:accent3><a:accent4><a:srgbClr val="8064A2"/></a:accent4><a:accent5><a:srgbClr val="4BACC6"/></a:accent5><a:accent6><a:srgbClr val="F79646"/></a:accent6><a:hlink><a:srgbClr val="0000FF"/></a:hlink><a:folHlink><a:srgbClr val="800080"/></a:folHlink></a:clrScheme><a:fontScheme name="Office"><a:majorFont><a:latin typeface="Arial"/><a:ea typeface=""/><a:cs typeface=""/></a:majorFont><a:minorFont><a:latin typeface="Arial"/><a:ea typeface=""/><a:cs typeface=""/></a:minorFont></a:fontScheme><a:fmtScheme name="Office"><a:fillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:fillStyleLst><a:lnStyleLst><a:ln w="9525" cap="flat" cmpd="sng" algn="ctr"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/></a:ln><a:ln w="9525" cap="flat" cmpd="sng" algn="ctr"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/></a:ln><a:ln w="9525" cap="flat" cmpd="sng" algn="ctr"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/></a:ln></a:lnStyleLst><a:effectStyleLst><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle></a:effectStyleLst><a:bgFillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:bgFillStyleLst></a:fmtScheme></a:themeElements></a:theme>'}
+
+/* ---------- DOCX / XLSX ---------- */
+function exportDocx(){
+  let text=genComments();
+  let body=text.split('\n').map(p=>`<w:p><w:r><w:t xml:space="preserve">${xml(p)}</w:t></w:r></w:p>`).join('');
+  let files=[
+   {name:'[Content_Types].xml',data:'<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>'},
+   {name:'_rels/.rels',data:'<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'},
+   {name:'word/document.xml',data:`<?xml version="1.0"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${body}</w:body></w:document>`}
+  ];
+  dlBlob('dcsa-package-comments.docx',new Blob([zip(files)],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}));
+}
+function exportXlsx(){
+  let rows=[['Entity Name','Business Type','Country','CAGE','UEI','FCL Status','Ownership %','Voting %','Parent','Foreign','Excluded','Notes'],
+    ...app.entities.map(e=>[e.name,e.type,e.country,e.cage,e.uei,e.fclStatus,e.own,e.vote,e.parent,e.foreign?'Yes':'No',e.excluded?'Yes':'No',e.notes])];
+  let sheet=`<?xml version="1.0"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>${rows.map((r,i)=>`<row r="${i+1}">${r.map((c,j)=>`<c r="${String.fromCharCode(65+j)}${i+1}" t="inlineStr"><is><t xml:space="preserve">${xml(c)}</t></is></c>`).join('')}</row>`).join('')}</sheetData></worksheet>`;
+  let files=[
+   {name:'[Content_Types].xml',data:'<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>'},
+   {name:'_rels/.rels',data:'<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'},
+   {name:'xl/workbook.xml',data:'<?xml version="1.0"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Entities" sheetId="1" r:id="rId1"/></sheets></workbook>'},
+   {name:'xl/_rels/workbook.xml.rels',data:'<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>'},
+   {name:'xl/worksheets/sheet1.xml',data:sheet}
+  ];
+  dlBlob('dcsa-org-chart-data.xlsx',new Blob([zip(files)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+}
+
+/* ---------- ZIP (store) ---------- */
+function strBytes(s){return new TextEncoder().encode(String(s))}
+function concat(parts){let n=parts.reduce((a,p)=>a+p.length,0),o=new Uint8Array(n),p=0;for(let x of parts){o.set(x,p);p+=x.length}return o}
+function u16(n){return new Uint8Array([n&255,(n>>>8)&255])}
+function u32(n){return new Uint8Array([n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255])}
+function crc32(b){let c=0xffffffff;for(let i=0;i<b.length;i++){c^=b[i];for(let j=0;j<8;j++)c=(c>>>1)^(0xedb88320&-(c&1))}return(c^0xffffffff)>>>0}
+function zip(files){let local=[],central=[],off=0;
+  for(let f of files){let nm=strBytes(f.name),da=(f.data instanceof Uint8Array)?f.data:strBytes(f.data);let crc=crc32(da),sz=da.length;
+    let lh=concat([strBytes('PK\x03\x04'),u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(sz),u32(sz),u16(nm.length),u16(0),nm,da]);local.push(lh);
+    let ch=concat([strBytes('PK\x01\x02'),u16(20),u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(sz),u32(sz),u16(nm.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(off),nm]);central.push(ch);off+=lh.length}
+  let cd=concat(central);
+  let end=concat([strBytes('PK\x05\x06'),u16(0),u16(0),u16(files.length),u16(files.length),u32(cd.length),u32(off),u16(0)]);
+  return concat([...local,cd,end]);
+}
+function b64ToBytes(b){let bin=atob(b),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a}
+function dl(name,blob){dlBlob(name,blob)}
+function dlBlob(name,blob){let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
+function saveJson(){upd();dl('dcsa-org-chart.json',new Blob([JSON.stringify(app,null,2)],{type:'application/json'}))}
+function loadJson(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{app=Object.assign({logo:'',entities:[],kmps:[],wizardStep:0},JSON.parse(r.result));FIELDS.forEach(x=>setVal(x,app[x]));renderAll();renderChart();alert('Loaded.')}catch(err){alert('Invalid file.')}};r.readAsText(f)}
+
+/* ---------- Warnings / score / dashboard ---------- */
+function warnings(){
+  let w=[];const bad=(m)=>w.push(['bad',m]),warn=(m)=>w.push(['warn',m]);
+  if(!app.legalName)bad('Legal name is missing.');
+  if(!app.cage)bad('CAGE Code is missing.');
+  if(!app.uei)warn('UEI is missing.');
+  if(!app.fclStatus)bad('FCL status is missing.');
+  if(!app.smoName&&!app.kmps.some(k=>k.role==='SMO'))bad('SMO is missing.');
+  if(!app.fsoName&&!app.kmps.some(k=>k.role==='FSO'))bad('FSO is missing.');
+  if(!app.itpsoName&&!app.kmps.some(k=>k.role==='ITPSO'))bad('ITPSO is missing.');
+  if(!app.website)warn('Company website is missing.');
+  if(!app.entities.length)warn('No entities added; chart uses profile defaults.');
+  // ownership totals per parent
+  let groups={};app.entities.forEach(e=>{let p=(e.parent||'').trim().toLowerCase();if(p){(groups[p]=groups[p]||[]).push(e)}});
+  Object.keys(groups).forEach(p=>{let t=groups[p].reduce((a,e)=>a+(parseFloat(e.own)||0),0);if(groups[p].length>1&&Math.round(t)!==100&&t>0)warn('Ownership under '+groups[p][0].parent+' totals '+t+'%, not 100%.')});
+  app.entities.forEach(e=>{
+    if(e.parent&&!e.own)warn(e.name+' has a parent but no ownership %.');
+    if(e.foreign&&!e.notes)bad(e.name+' is flagged foreign but has no explanation in Notes.');
+  });
+  if(!app.entities.some(e=>!(e.parent||'').trim())&&app.entities.length)warn('No ultimate parent identified (every entity has a parent).');
+  return w;
+}
+function score(){
+  let c=[app.legalName,app.businessType,app.cage,app.uei,app.fclStatus,
+    app.smoName||app.kmps.some(k=>k.role==='SMO'),app.fsoName||app.kmps.some(k=>k.role==='FSO'),app.itpsoName||app.kmps.some(k=>k.role==='ITPSO'),
+    app.website,app.entities.length,app.kmps.length,app.entities.some(e=>e.own),app.entities.every(e=>!e.foreign||e.notes)];
+  return Math.round(c.filter(Boolean).length/c.length*100);
+}
+function fociRisk(){
+  let n=app.entities.filter(e=>e.foreign).length+['foreignInvestors','foreignBoard','foreignVoting','foreignDebt','foreignContracts','foreignManagement'].filter(k=>app[k]).length;
+  if(n>=4)return{level:'High Risk',text:'Multiple FOCI indicators are present. Provide detailed explanations and consider a mitigation review.'};
+  if(n>=1)return{level:'Moderate Risk',text:'Some FOCI indicators are present. Provide clear supplemental explanation for each.'};
+  return{level:'Low Risk',text:'No foreign ownership, control, or influence indicators were entered.'};
+}
+function renderFoci(){let r=fociRisk();$('fociResult').innerHTML=`<div class="${r.level==='Low Risk'?'good warn':(r.level==='High Risk'?'bad warn':'warn')}"><b>${r.level}.</b> ${esc(r.text)}</div>`}
+function renderDash(){
+  let s=score();$('scoreBar').style.width=s+'%';$('scoreText').textContent=s+'%';
+  $('dCompany').textContent=app.legalName||'Not started';
+  $('dEnt').textContent=app.entities.length+' entit'+(app.entities.length===1?'y':'ies');
+  $('dKmp').textContent=app.kmps.length+' KMP'+(app.kmps.length===1?'':'s');
+  $('dFoci').textContent=fociRisk().level;
+  let w=warnings();$('dashWarn').innerHTML=w.length?w.map(x=>`<div class="warn ${x[0]}">${esc(x[1])}</div>`).join(''):'<div class="warn good">No major warnings. This package looks DCSA ready.</div>';
+}
+
+/* ---------- Comments / packet ---------- */
+function genComments(){
+  let r=fociRisk();
+  let t=`DCSA Legal Organization Chart - Package Comments
+
+${app.legalName||'[Company]'} is organized as a ${app.businessType||'[business type]'} located at ${[app.address,app.city,app.state,app.zip].filter(Boolean).join(', ')||'[address]'}.
+
+CAGE Code: ${app.cage||'[CAGE]'}
+UEI: ${app.uei||'[UEI]'}
+FCL Status: ${app.fclStatus||'[status]'}    FCL Level: ${app.fclLevel||'[level]'}
+Website: ${app.website||'[website]'}
+
+Ownership and Control:
+${app.entities.length?app.entities.map(e=>`- ${e.name||'[Entity]'} (${e.type||'type n/a'}): ${e.own||'?'}% ownership, ${e.vote||'?'}% voting; parent: ${e.parent||'None (ultimate parent)'}; CAGE: ${e.cage||'n/a'}; FCL: ${e.fclStatus||'n/a'}${e.foreign?'; FOREIGN':''}${e.notes?'; '+e.notes:''}`).join('\n'):'- No entities entered.'}
+
+Key Management Personnel:
+${app.kmps.length?app.kmps.map(k=>`- ${k.name||'[Name]'}, ${k.title||k.role||'[Title]'}, ${k.citizenship||'citizenship n/a'}${k.clearance?', '+k.clearance:''}${k.excluded?', excluded':''}`).join('\n'):'- SMO: '+(app.smoName||'[SMO]')+'\n- FSO: '+(app.fsoName||'[FSO]')+'\n- ITPSO: '+(app.itpsoName||'[ITPSO]')}
+
+FOCI Assessment: ${r.level}. ${r.text}
+${[['Foreign Investors',app.foreignInvestors],['Foreign Board',app.foreignBoard],['Foreign Voting',app.foreignVoting],['Foreign Debt',app.foreignDebt],['Foreign Contracts',app.foreignContracts],['Foreign Management',app.foreignManagement]].filter(x=>x[1]).map(x=>`- ${x[0]}: ${x[1]}`).join('\n')}
+
+Outstanding items:
+${warnings().map(x=>'- '+x[1]).join('\n')||'- None identified.'}`;
+  if($('commentsText'))$('commentsText').value=t;
+  return t;
+}
+function copyComments(){navigator.clipboard.writeText(genComments()).then(()=>alert('Copied.'))}
+function renderPacket(){
+  let tbl=rows=>`<table><thead><tr>${rows[0].map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.slice(1).map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  let er=[['Entity','Type','Country','CAGE','UEI','FCL','Own %','Vote %','Parent','Foreign','Notes'],...app.entities.map(e=>[e.name,e.type,e.country,e.cage,e.uei,e.fclStatus,e.own,e.vote,e.parent,e.foreign?'Yes':'No',e.notes])];
+  let kr=[['Name','Title','Role','Citizenship','Clearance','Excluded'],...app.kmps.map(k=>[k.name,k.title,k.role,k.citizenship,k.clearance,k.excluded?'Yes':'No'])];
+  let r=fociRisk();
+  $('packetView').innerHTML=`<div style="text-align:center;margin-bottom:14px">${app.logo?`<img src="${app.logo}" style="max-height:60px"><br>`:''}<h1 style="margin:6px 0">${esc(app.displayName||app.legalName||'DCSA Legal Organization Chart Packet')}</h1><p class="small">${esc(app.website||'')} ${app.preparedBy?(' | Prepared by '+esc(app.preparedBy)):''} ${app.preparedDate?(' | '+esc(app.preparedDate)):''}</p></div>
+  <h2>Company Information</h2><p><b>${esc(app.legalName||'')}</b><br>${esc(app.businessType||'')}<br>CAGE ${esc(app.cage||'')} | UEI ${esc(app.uei||'')} | FCL ${esc(app.fclStatus||'')}</p>
+  <h2>Legal Organization Chart</h2><div style="overflow:auto">${sceneToSVG(buildScene('Legal Organization Chart'))}</div>
+  <h2>Entity Relationship Table</h2>${tbl(er)}
+  <h2>Key Management Personnel</h2>${tbl(kr)}
+  <h2>FOCI Assessment</h2><p>${r.level}: ${esc(r.text)}</p>
+  <h2>Package Comments</h2><pre style="white-space:pre-wrap;font-family:inherit">${esc(genComments())}</pre>`;
+}
+
+/* ---------- Wizard ---------- */
+const WIZ=[
+  {t:'Welcome',h:'This wizard walks you through a DCSA submission package step by step. Click Next to begin, or load a sample from the top bar to see a finished example.',go:null},
+  {t:'1. Branding',h:'Add your company logo and website so every chart and export is branded.',go:'branding'},
+  {t:'2. Company Profile',h:'Enter legal name, CAGE, UEI, FCL status, and your SMO / FSO / ITPSO. Required fields are marked with *.',go:'profile'},
+  {t:'3. Entities',h:'Add every company and person in the ownership chain. Link them with the Parent Entity field.',go:'entities'},
+  {t:'4. KMP',h:'List officers and directors with titles and citizenship.',go:'kmp'},
+  {t:'5. FOCI',h:'Describe any foreign ownership, control, or influence. Leave blank if none.',go:'foci'},
+  {t:'6. Review & Export',h:'Check the Dashboard for warnings, view the Chart Generator, then download the editable PowerPoint and PDF from Exports.',go:'exports'}
+];
+function renderWizard(){
+  let i=app.wizardStep||0;let s=WIZ[i];
+  $('wizBody').innerHTML=`<div class="progress" style="margin-bottom:12px"><div class="bar" style="width:${Math.round((i+1)/WIZ.length*100)}%"></div></div>
+  <h3>${esc(s.t)}</h3><p>${esc(s.h)}</p>${s.go?`<button type="button" onclick="go('${s.go}')">Open ${esc(s.t.replace(/^\d+\.\s*/,''))}</button>`:''}<p class="small" style="margin-top:10px">Step ${i+1} of ${WIZ.length}</p>`;
+}
+function wiz(d){app.wizardStep=Math.max(0,Math.min(WIZ.length-1,(app.wizardStep||0)+d));localStorage.setItem('dcsaOrg',JSON.stringify(app));renderWizard()}
+
+/* ---------- Samples ---------- */
+function sample(type){
+  if(type==='aadiera'){
+    Object.assign(app,{displayName:'Aadiera Inc.',legalName:'Aadiera Inc.',website:'www.aadiera.com',businessType:'Corporation',address:'9255 Center Drive, Suite 400A',city:'Manassas',state:'VA',zip:'20110',cage:'9VQH9',uei:'',fclStatus:'In Process',fclLevel:'Secret',smoName:'Ramakanth Peechara',fsoName:'Ramakanth Peechara',itpsoName:'Ramakanth Peechara',preparedDate:new Date().toISOString().slice(0,10),footerText:'Prepared for DCSA FCL submission'});
+    app.entities=[
+      {name:'Ramakanth Peechara',type:'U.S. Person',country:'United States',own:'100',vote:'100',parent:'',notes:'United States Citizen'},
+      {name:'Aadiera Inc.',type:'Corporation',country:'United States',cage:'9VQH9',own:'100',vote:'100',parent:'Ramakanth Peechara',fclStatus:'In Process',fclLevel:'Secret',notes:'Wholly owned by Ramakanth Peechara, U.S. Citizen'}
+    ];
+    app.kmps=[{name:'Ramakanth Peechara',title:'President, CEO, SMO, Secretary, Treasurer',role:'SMO',citizenship:'United States',clearance:'',excluded:false,required:true}];
+  }else{
+    Object.assign(app,{displayName:'ABC Company, LLC',legalName:'ABC Company, LLC',website:'www.abccompany.com',businessType:'LLC',address:'100 Industry Way',city:'Arlington',state:'VA',zip:'22201',cage:'123C5',uei:'ABC123DEF456',fclStatus:'Top Secret',fclLevel:'Top Secret',smoName:'James C. Jones',fsoName:'Tina D. Jones',itpsoName:'James C. Jones',preparedDate:new Date().toISOString().slice(0,10),footerText:'Prepared for DCSA FCL submission'});
+    app.entities=[
+      {name:'XYZ Capital, LLC',type:'LLC',country:'United States',own:'100',vote:'100',parent:'',notes:'Ultimate parent, U.S. entity'},
+      {name:'XYZ Partners IV, L.P.',type:'Partnership',country:'United States',own:'79',vote:'79',parent:'XYZ Capital, LLC',notes:'Limited partnership'},
+      {name:'EFG, Inc.',type:'Corporation',country:'United States',cage:'687W6',fclStatus:'Top Secret',own:'94',vote:'94',parent:'XYZ Partners IV, L.P.',foreign:true,notes:'6% minority foreign ownership by Mr. Lu G. Hoang, Chinese citizen; no foreign control'},
+      {name:'ABC Company, LLC',type:'LLC',country:'United States',cage:'123C5',fclStatus:'Top Secret',fclLevel:'Top Secret',own:'100',vote:'100',parent:'EFG, Inc.',highest:true,notes:'Cleared facility, member managed'}
+    ];
+    app.kmps=[
+      {name:'James C. Jones',title:'Managing Member, SMO',role:'SMO',citizenship:'United States',clearance:'Top Secret',excluded:false,required:true},
+      {name:'Tina D. Jones',title:'Managing Member, FSO',role:'FSO',citizenship:'United States',clearance:'Top Secret',excluded:false,required:true}
+    ];
+  }
+  FIELDS.forEach(f=>setVal(f,app[f]));
+  upd();renderChart();go('charts');
+}
+
+/* ---------- init ---------- */
+buildNav();loadState();renderWizard();
+if(!localStorage.getItem('dcsaOrg')&&!app.legalName)sample('aadiera');
+renderChart();
+</script>
+</body>
+</html>
