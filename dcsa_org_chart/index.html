@@ -430,15 +430,17 @@ function buildScene(chartType){
         let ksw=subW(k);
         let kcx=cl+ksw/2;
         // connector parent bottom -> child top (orthogonal); solid = ownership, dashed = control/voting
-        let pby=top+h, kty=childTop, midY=pby+VGAP/2, dx=18;
+        let pby=top+h, kty=childTop, midY=pby+VGAP/2, dx=28;
         let own=(k.own!==''&&k.own!=null)?String(k.own):'';
         let vote=(k.vote!==''&&k.vote!=null)?String(k.vote):own;
-        // solid ownership line (centered)
-        edges.push({path:[[cx,pby],[cx,midY],[kcx,midY],[kcx,kty]],dashed:false,color:'#111111'});
-        if(own!=='')edges.push({label:own+'% Ownership',lx:kcx-8,ly:(midY+kty)/2-4,color:'#111111',align:'right'});
-        // dashed control / voting line (parallel, offset right) - always shown per DCSA legend
-        edges.push({path:[[cx+dx,pby],[cx+dx,midY],[kcx+dx,midY],[kcx+dx,kty]],dashed:true,color:'#1d6fd6'});
-        if(vote!=='')edges.push({label:vote+'% Voting',lx:kcx+dx+8,ly:(midY+kty)/2-4,color:'#1d6fd6',align:'left'});
+        let solidPath,dashPath;
+        if(Math.abs(cx-kcx)<1){solidPath=[[cx,pby],[cx,kty]];dashPath=[[cx+dx,pby],[cx+dx,kty]]}
+        else{solidPath=[[cx,pby],[cx,midY],[kcx,midY],[kcx,kty]];dashPath=[[cx+dx,pby],[cx+dx,midY],[kcx+dx,midY],[kcx+dx,kty]]}
+        edges.push({path:solidPath,dashed:false,color:'#111111'});      // ownership
+        edges.push({path:dashPath,dashed:true,color:'#1d6fd6'});        // control / voting
+        let lyc=(pby+kty)/2-4;
+        if(own!=='')edges.push({label:own+'% Ownership',lx:Math.min(cx,kcx)-12,ly:lyc,color:'#111111',align:'right'});
+        if(vote!=='')edges.push({label:vote+'% Voting',lx:Math.max(cx,kcx)+dx+12,ly:lyc,color:'#1d6fd6',align:'left'});
         place(k,cl,childTop);
         cl+=ksw+HGAP;
       });
@@ -468,7 +470,9 @@ function buildScene(chartType){
   edges.forEach(ed=>{
     if(ed.path){
       for(let i=0;i<ed.path.length-1;i++){
-        items.push({type:'line',x1:ed.path[i][0],y1:ed.path[i][1],x2:ed.path[i+1][0],y2:ed.path[i+1][1],color:ed.color,dashed:ed.dashed,width:2.2});
+        let a=ed.path[i],b=ed.path[i+1];
+        if(a[0]===b[0]&&a[1]===b[1])continue; // skip degenerate segment
+        items.push({type:'line',x1:a[0],y1:a[1],x2:b[0],y2:b[1],color:ed.color,dashed:ed.dashed,width:2.4});
       }
     }
     if(ed.label)items.push({type:'text',x:ed.lx,y:ed.ly,text:ed.label,size:12,bold:true,color:ed.color,align:ed.align||'left',bg:true});
@@ -614,8 +618,10 @@ function exportSvg(){let scene=buildScene(currentChartType());dl('dcsa-legal-org
 /* ---------- Editable PPTX (native shapes from same scene) ---------- */
 async function exportPptx(){
   let scene=buildScene(currentChartType());
-  const SW=12192000,SH=6858000; // 13.333 x 7.5 in EMU
-  let sc=Math.min((SW*0.96)/scene.w,(SH*0.96)/scene.h);
+  // size the slide to the chart's own proportions so it fills the slide (no compression / wasted space)
+  const SW=12192000; // 13.333 in wide
+  const SH=Math.round(SW*scene.h/scene.w);
+  let sc=Math.min((SW*0.97)/scene.w,(SH*0.97)/scene.h);
   let ox=(SW-scene.w*sc)/2, oy=(SH-scene.h*sc)/2;
   const X=v=>Math.round(v*sc+ox), Y=v=>Math.round(v*sc+oy), L=v=>Math.round(v*sc);
   let id=10;const nid=()=>id++;
@@ -667,7 +673,7 @@ async function exportPptx(){
   let files=[
    {name:'[Content_Types].xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="jpg" ContentType="image/jpeg"/><Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/><Override PartName="/ppt/slides/slide1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/><Override PartName="/ppt/slideLayouts/slideLayout1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml"/><Override PartName="/ppt/slideMasters/slideMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml"/><Override PartName="/ppt/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/></Types>'},
    {name:'_rels/.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="ppt/presentation.xml"/></Relationships>'},
-   {name:'ppt/presentation.xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><p:presentation xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst><p:sldIdLst><p:sldId id="256" r:id="rId2"/></p:sldIdLst><p:sldSz cx="12192000" cy="6858000" type="screen16x9"/><p:notesSz cx="6858000" cy="9144000"/></p:presentation>'},
+   {name:'ppt/presentation.xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><p:presentation xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst><p:sldIdLst><p:sldId id="256" r:id="rId2"/></p:sldIdLst><p:sldSz cx="${SW}" cy="${SH}"/><p:notesSz cx="6858000" cy="9144000"/></p:presentation>`},
    {name:'ppt/_rels/presentation.xml.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="slideMasters/slideMaster1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide1.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/></Relationships>'},
    {name:'ppt/slides/slide1.xml',data:slide},
    {name:'ppt/slides/_rels/slide1.xml.rels',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>${logoRel}</Relationships>`},
